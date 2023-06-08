@@ -1,0 +1,628 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>lyra_graphtool.parameters &mdash; Lyra Graphtool 0.0.1 documentation</title>
+      <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/doctools.js"></script>
+        <script src="../../_static/sphinx_highlight.js"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            Lyra Graphtool
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <!-- Local TOC -->
+              <div class="local-toc"></div>
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">Lyra Graphtool</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">lyra_graphtool.parameters</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for lyra_graphtool.parameters</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">datetime</span>
+<span class="kn">import</span> <span class="nn">itertools</span>
+<span class="kn">import</span> <span class="nn">json</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">pickle</span>
+<span class="kn">from</span> <span class="nn">argparse</span> <span class="kn">import</span> <span class="n">ArgumentParser</span>
+<span class="kn">from</span> <span class="nn">copy</span> <span class="kn">import</span> <span class="n">deepcopy</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Generic</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">TypeVar</span>
+
+<span class="kn">import</span> <span class="nn">lyra_graphtool.utils</span> <span class="k">as</span> <span class="nn">utils</span>
+<span class="kn">from</span> <span class="nn">lyra_graphtool.graph</span> <span class="kn">import</span> <span class="n">Graph</span><span class="p">,</span> <span class="n">Graph_Type</span>
+<span class="kn">from</span> <span class="nn">lyra_graphtool.worker</span> <span class="kn">import</span> <span class="n">WORKER_COST_RATE</span><span class="p">,</span> <span class="n">Worker_Type</span>
+<span class="kn">from</span> <span class="nn">lyra_graphtool.vertex</span> <span class="kn">import</span> <span class="n">Vertex_Type</span>
+
+
+<span class="n">Parameters</span> <span class="o">=</span> <span class="n">TypeVar</span><span class="p">(</span><span class="s1">&#39;Parameters&#39;</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="Parameters"><a class="viewcode-back" href="../../lyra_graphtool.html#lyra_graphtool.parameters.Parameters">[docs]</a><span class="k">class</span> <span class="nc">Parameters</span><span class="p">(</span><span class="n">Generic</span><span class="p">[</span><span class="n">Parameters</span><span class="p">]):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">graph</span><span class="p">:</span> <span class="n">Graph</span><span class="p">,</span> <span class="n">budget</span><span class="o">=</span><span class="n">utils</span><span class="o">.</span><span class="n">BUDGET</span><span class="p">,</span> <span class="n">duration_time</span><span class="o">=</span><span class="n">utils</span><span class="o">.</span><span class="n">DURATION</span><span class="p">,</span>
+                 <span class="n">cost_rate</span><span class="o">=</span><span class="n">WORKER_COST_RATE</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">budget</span> <span class="o">=</span> <span class="n">budget</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">duration_time</span> <span class="o">=</span> <span class="n">duration_time</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">graph</span> <span class="o">=</span> <span class="n">graph</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">worker_cost_rate</span> <span class="o">=</span> <span class="n">cost_rate</span>
+
+<div class="viewcode-block" id="Parameters.display"><a class="viewcode-back" href="../../lyra_graphtool.html#lyra_graphtool.parameters.Parameters.display">[docs]</a>    <span class="k">def</span> <span class="nf">display</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="nb">print</span><span class="p">(</span><span class="nb">vars</span><span class="p">(</span><span class="bp">self</span><span class="p">))</span></div></div>
+
+
+<span class="c1"># noinspection DuplicatedCode,SpellCheckingInspection</span>
+<div class="viewcode-block" id="ProcessArgs"><a class="viewcode-back" href="../../lyra_graphtool.html#lyra_graphtool.parameters.ProcessArgs">[docs]</a><span class="k">class</span> <span class="nc">ProcessArgs</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Set up args and graph. Get graph from this class object after instantiating.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">args_list</span><span class="p">:</span> <span class="n">List</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="c1"># noinspection PyUnresolvedReferences</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">                set up args</span>
+<span class="sd">                Arguments:</span>
+<span class="sd">                    args_list - list of form</span>
+
+<span class="sd">                                    [&#39;--budget&#39;, &#39;1000&#39;, &#39;--duration&#39;, &#39;20&#39;, ...]</span>
+
+<span class="sd">                                args followed by values.</span>
+<span class="sd">                                If args_list = &#39;&#39;, default values will be used.</span>
+
+<span class="sd">                        Note: If args_list contains a value for &#39;filename_graph&#39;,</span>
+<span class="sd">                                the graph will be loaded (pickle file).</span>
+<span class="sd">                                specified args will OVERRIDE graph parameters.</span>
+<span class="sd">                              If there is no value for &#39;filename_graph&#39;, a graph will be created</span>
+<span class="sd">                              using arg parameters.</span>
+<span class="sd">                &quot;&quot;&quot;</span>
+
+        <span class="c1"># set these below</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">args</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">args_trial</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">graph</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">site_structures</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">worker_cost_rate</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">keys_gen</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="s1">&#39;trial_name&#39;</span><span class="p">,</span> <span class="s1">&#39;filename_graph&#39;</span><span class="p">,</span>
+            <span class="c1"># graph geometric properties</span>
+            <span class="s1">&#39;max_x&#39;</span><span class="p">,</span> <span class="s1">&#39;max_y&#39;</span><span class="p">,</span> <span class="s1">&#39;num_verts&#39;</span><span class="p">,</span> <span class="s1">&#39;graph_type&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;num_site1&#39;</span><span class="p">,</span> <span class="s1">&#39;num_site2&#39;</span><span class="p">,</span> <span class="s1">&#39;num_site3&#39;</span><span class="p">,</span>
+            <span class="c1"># worker properties</span>
+            <span class="s1">&#39;worker1_cost&#39;</span><span class="p">,</span> <span class="s1">&#39;worker2_cost&#39;</span><span class="p">,</span> <span class="s1">&#39;worker3_cost&#39;</span><span class="p">,</span>
+            <span class="c1"># configuration params</span>
+            <span class="s1">&#39;budget&#39;</span><span class="p">,</span> <span class="s1">&#39;duration&#39;</span>
+        <span class="p">]</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">keys_site</span> <span class="o">=</span> <span class="p">[</span>  <span class="c1"># site economics properties</span>
+            <span class="s1">&#39;site1_acquire_time&#39;</span><span class="p">,</span> <span class="s1">&#39;site2_acquire_time&#39;</span><span class="p">,</span> <span class="s1">&#39;site3_acquire_time&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;site1_reward&#39;</span><span class="p">,</span> <span class="s1">&#39;site2_reward&#39;</span><span class="p">,</span> <span class="s1">&#39;site3_reward&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;site1_mult_time&#39;</span><span class="p">,</span> <span class="s1">&#39;site2_mult_time&#39;</span><span class="p">,</span> <span class="s1">&#39;site3_mult_time&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;site1_mult_time_active&#39;</span><span class="p">,</span> <span class="s1">&#39;site2_mult_time_active&#39;</span><span class="p">,</span> <span class="s1">&#39;site3_mult_time_active&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;site1_mult_workers&#39;</span><span class="p">,</span> <span class="s1">&#39;site2_mult_workers&#39;</span><span class="p">,</span> <span class="s1">&#39;site3_mult_workers&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;site1_exp_time&#39;</span><span class="p">,</span> <span class="s1">&#39;site2_exp_time&#39;</span><span class="p">,</span> <span class="s1">&#39;site3_exp_time&#39;</span>
+        <span class="p">]</span>
+
+        <span class="n">parser</span> <span class="o">=</span> <span class="n">ArgumentParser</span><span class="p">(</span><span class="n">description</span><span class="o">=</span><span class="s1">&#39;Args for Lyra&#39;</span><span class="p">)</span>
+
+        <span class="c1"># trial name</span>
+        <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;--trial_name&#39;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">str</span><span class="p">,</span> <span class="n">required</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="s2">&quot;Lyra_trial&quot;</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s1">&#39;name of trial&#39;</span><span class="p">)</span>
+
+        <span class="c1"># graph</span>
+        <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;--filename_graph&#39;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">str</span><span class="p">,</span> <span class="n">required</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span>
+                            <span class="n">help</span><span class="o">=</span><span class="s1">&#39;filename of graph - overloads arg values&#39;</span><span class="p">)</span>
+        <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;--max_x&#39;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="n">utils</span><span class="o">.</span><span class="n">pint</span><span class="p">,</span> <span class="n">required</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="n">utils</span><span class="o">.</span><span class="n">NotSpecI</span><span class="p">,</span>
+                            <span class="n">help</span><span class="o">=</span><span class="s1">&#39;maximum x value of graph vertex coordinates (0&lt;=x&lt;=max_x)&#39;</span><span class="p">)</span>
+        <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;--max_y&#39;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="n">utils</span><span class="o">.</span><span class="n">pint</span><span class="p">,</span> <span class="n">required</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="n">utils</span><span class="o">.</span><span class="n">NotSpecI</span><span class="p">,</span>
+                            <span class="n">help</span><span class="o">=</span><span class="s1">&#39;maximum y value of graph vertex coordinates (0&lt;=y&lt;=max_y)&#39;</span><span class="p">)</span>
+        <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;--num_verts&#39;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="n">utils</span><span class="o">.</span><span class="n">pint</span><span class="p">,</span> <span class="n">required</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="n">utils</span><span class="o">.</span><span class="n">NotSpecI</span><span class="p">,</span>
+                            <span class="n">help</span><span class="o">=</span><span class="s1">&#39;number of vertices in graph&#39;</span><span class="p">)</span>
+        <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;--graph_type&#39;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="n">utils</span><span class="o">.</span><span class="n">grstr</span><span class="p">,</span> <span class="n">required</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span>
+                            <span class="n">help</span><span class="o">=</span><span class="s1">&#39;type of graph: &quot;random&quot; or &quot;grid&quot;&#39;</span><span class="p">)</span>
+        <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;--num_site1&#39;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="n">utils</span><span class="o">.</span><span class="n">nnint</span><span class="p">,</span> <span class="n">required</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="n">utils</span><span class="o">.</span><span class="n">NotSpecI</span><span class="p">,</span>
+                            <span class="n">help</span><span class="o">=</span><span class="s1">&#39;number of graph vertices of site-type 1&#39;</span><span class="p">)</span>
+        <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;--num_site2&#39;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="n">utils</span><span class="o">.</span><span class="n">nnint</span><span class="p">,</span> <span class="n">required</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="n">utils</span><span class="o">.</span><span class="n">NotSpecI</span><span class="p">,</span>
+                            <span class="n">help</span><span class="o">=</span><span class="s1">&#39;number of graph vertices of site-type 2&#39;</span><span class="p">)</span>
+        <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;--num_site3&#39;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="n">utils</span><span class="o">.</span><span class="n">nnint</span><span class="p">,</span> <span class="n">required</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="n">utils</span><span class="o">.</span><span class="n">NotSpecI</span><span class="p">,</span>
+                            <span class="n">help</span><span class="o">=</span><span class="s1">&#39;number of graph vertices of site-type 3&#39;</span><span class="p">)</span>
+
+        <span class="c1"># site properties</span>
+        <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;--site1_acquire_time&#39;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="n">utils</span><span class="o">.</span><span class="n">pint</span><span class="p">,</span> <span class="n">required</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="n">utils</span><span class="o">.</span><span class="n">NotSpecI</span><span class="p">,</span>
+                            <span class="n">help</span><span class="o">=</span><span class="s1">&#39;time steps to aquire reward from site-type 1&#39;</span><span class="p">)</span>
+        <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;--site2_acquire_time&#39;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="n">utils</span><span class="o">.</span><span class="n">pint</span><span class="p">,</span> <span class="n">required</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="n">utils</span><span class="o">.</span><span class="n">NotSpecI</span><span class="p">,</span>
+                            <span class="n">help</span><span class="o">=</span><span class="s1">&#39;time steps to aquire reward from site-type 2&#39;</span><span class="p">)</span>
+        <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;--site3_acquire_time&#39;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="n">utils</span><span class="o">.</span><span class="n">pint</span><span class="p">,</span> <span class="n">required</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="n">utils</span><span class="o">.</span><span class="n">NotSpecI</span><span class="p">,</span>
+                            <span class="n">help</span><span class="o">=</span><span class="s1">&#39;time steps to aquire reward from site-type 3&#39;</span><span class="p">)</span>
+
+        <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;--site1_reward&#39;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="n">utils</span><span class="o">.</span><span class="n">nnfloat</span><span class="p">,</span> <span class="n">required</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="n">utils</span><span class="o">.</span><span class="n">NotSpecF</span><span class="p">,</span>
+                            <span class="n">help</span><span class="o">=</span><span class="s1">&#39;reward amount from site-type 1&#39;</span><span class="p">)</span>
+        <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;--site2_reward&#39;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="n">utils</span><span class="o">.</span><span class="n">nnfloat</span><span class="p">,</span> <span class="n">required</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="n">utils</span><span class="o">.</span><span class="n">NotSpecF</span><span class="p">,</span>
+                            <span class="n">help</span><span class="o">=</span><span class="s1">&#39;reward amount from site-type 2&#39;</span><span class="p">)</span>
+        <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;--site3_reward&#39;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="n">utils</span><span class="o">.</span><span class="n">nnfloat</span><span class="p">,</span> <span class="n">required</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="n">utils</span><span class="o">.</span><span class="n">NotSpecF</span><span class="p">,</span>
+                            <span class="n">help</span><span class="o">=</span><span class="s1">&#39;reward amount from site-type 3&#39;</span><span class="p">)</span>
+
+        <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;--site1_mult_time&#39;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="n">utils</span><span class="o">.</span><span class="n">nnfloat</span><span class="p">,</span> <span class="n">required</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="n">utils</span><span class="o">.</span><span class="n">NotSpecF</span><span class="p">,</span>
+                            <span class="n">help</span><span class="o">=</span><span class="s1">&#39;time multiplier value for all site-type 1&#39;</span><span class="p">)</span>
+        <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;--site2_mult_time&#39;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="n">utils</span><span class="o">.</span><span class="n">nnfloat</span><span class="p">,</span> <span class="n">required</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="n">utils</span><span class="o">.</span><span class="n">NotSpecF</span><span class="p">,</span>
+                            <span class="n">help</span><span class="o">=</span><span class="s1">&#39;time multiplier value for all site-type 2&#39;</span><span class="p">)</span>
+        <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;--site3_mult_time&#39;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="n">utils</span><span class="o">.</span><span class="n">nnfloat</span><span class="p">,</span> <span class="n">required</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="n">utils</span><span class="o">.</span><span class="n">NotSpecF</span><span class="p">,</span>
+                            <span class="n">help</span><span class="o">=</span><span class="s1">&#39;time multiplier value for all site-type 3&#39;</span><span class="p">)</span>
+
+        <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;--site1_mult_time_active&#39;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="n">utils</span><span class="o">.</span><span class="n">comma_separated_int_2</span><span class="p">,</span> <span class="n">required</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                            <span class="n">default</span><span class="o">=</span><span class="n">utils</span><span class="o">.</span><span class="n">NotSpecI</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s1">&#39;time multiplier is active between these times for all &#39;</span>
+                                                            <span class="s1">&#39;site-type 1 (if only one arg t, active time &gt;= t)&#39;</span><span class="p">)</span>
+        <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;--site2_mult_time_active&#39;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="n">utils</span><span class="o">.</span><span class="n">comma_separated_int_2</span><span class="p">,</span> <span class="n">required</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                            <span class="n">default</span><span class="o">=</span><span class="n">utils</span><span class="o">.</span><span class="n">NotSpecI</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s1">&#39;time multiplier is active between these times for all &#39;</span>
+                                                            <span class="s1">&#39;site-type 2 (if only one arg t, active time &gt;= t)&#39;</span><span class="p">)</span>
+        <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;--site3_mult_time_active&#39;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="n">utils</span><span class="o">.</span><span class="n">comma_separated_int_2</span><span class="p">,</span> <span class="n">required</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                            <span class="n">default</span><span class="o">=</span><span class="n">utils</span><span class="o">.</span><span class="n">NotSpecI</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s1">&#39;time multiplier is active between these times for all &#39;</span>
+                                                            <span class="s1">&#39;site-type 3 (if only one arg t, active time &gt;= t)&#39;</span><span class="p">)</span>
+
+        <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;--site1_mult_workers&#39;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="n">utils</span><span class="o">.</span><span class="n">comma_separated_float_3</span><span class="p">,</span> <span class="n">required</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                            <span class="n">default</span><span class="o">=</span><span class="n">utils</span><span class="o">.</span><span class="n">NotSpecF</span><span class="p">,</span>
+                            <span class="n">help</span><span class="o">=</span><span class="s1">&#39;site-type 1 worker multipliers for w1, w2, w3 (missing args set to 1)&#39;</span><span class="p">)</span>
+        <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;--site2_mult_workers&#39;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="n">utils</span><span class="o">.</span><span class="n">comma_separated_float_3</span><span class="p">,</span> <span class="n">required</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                            <span class="n">default</span><span class="o">=</span><span class="n">utils</span><span class="o">.</span><span class="n">NotSpecF</span><span class="p">,</span>
+                            <span class="n">help</span><span class="o">=</span><span class="s1">&#39;site-type 2 worker multipliers for w1, w2, w3 (missing args set to 1)&#39;</span><span class="p">)</span>
+        <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;--site3_mult_workers&#39;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="n">utils</span><span class="o">.</span><span class="n">comma_separated_float_3</span><span class="p">,</span> <span class="n">required</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                            <span class="n">default</span><span class="o">=</span><span class="n">utils</span><span class="o">.</span><span class="n">NotSpecF</span><span class="p">,</span>
+                            <span class="n">help</span><span class="o">=</span><span class="s1">&#39;site-type 3 worker multipliers for w1, w2, w3 (missing args set to 1)&#39;</span><span class="p">)</span>
+
+        <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;--site1_exp_time&#39;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="n">utils</span><span class="o">.</span><span class="n">nnint</span><span class="p">,</span> <span class="n">required</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="n">utils</span><span class="o">.</span><span class="n">NotSpecI</span><span class="p">,</span>
+                            <span class="n">help</span><span class="o">=</span><span class="s1">&#39;time multiplier value for all site-type 1&#39;</span><span class="p">)</span>
+        <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;--site2_exp_time&#39;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="n">utils</span><span class="o">.</span><span class="n">nnint</span><span class="p">,</span> <span class="n">required</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="n">utils</span><span class="o">.</span><span class="n">NotSpecI</span><span class="p">,</span>
+                            <span class="n">help</span><span class="o">=</span><span class="s1">&#39;time multiplier value for all site-type 2&#39;</span><span class="p">)</span>
+        <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;--site3_exp_time&#39;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="n">utils</span><span class="o">.</span><span class="n">nnint</span><span class="p">,</span> <span class="n">required</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="n">utils</span><span class="o">.</span><span class="n">NotSpecI</span><span class="p">,</span>
+                            <span class="n">help</span><span class="o">=</span><span class="s1">&#39;time multiplier value for all site-type 3&#39;</span><span class="p">)</span>
+
+        <span class="c1"># worker properties</span>
+        <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;--worker1_cost&#39;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="n">utils</span><span class="o">.</span><span class="n">nnfloat</span><span class="p">,</span> <span class="n">required</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="mi">200</span><span class="p">,</span>
+                            <span class="n">help</span><span class="o">=</span><span class="s1">&#39;cost per unit time of worker-type 1&#39;</span><span class="p">)</span>
+        <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;--worker2_cost&#39;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="n">utils</span><span class="o">.</span><span class="n">nnfloat</span><span class="p">,</span> <span class="n">required</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="mi">400</span><span class="p">,</span>
+                            <span class="n">help</span><span class="o">=</span><span class="s1">&#39;cost per unit time of worker-type 2&#39;</span><span class="p">)</span>
+        <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;--worker3_cost&#39;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="n">utils</span><span class="o">.</span><span class="n">nnfloat</span><span class="p">,</span> <span class="n">required</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="mi">500</span><span class="p">,</span>
+                            <span class="n">help</span><span class="o">=</span><span class="s1">&#39;cost per unit time of worker-type 3&#39;</span><span class="p">)</span>
+
+        <span class="c1"># configuration parameters</span>
+        <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;--budget&#39;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="n">utils</span><span class="o">.</span><span class="n">nnfloat</span><span class="p">,</span> <span class="n">required</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="mi">999</span><span class="p">,</span>
+                            <span class="n">help</span><span class="o">=</span><span class="s1">&#39;budget - total costs cannot exceed this&#39;</span><span class="p">)</span>
+        <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;--duration&#39;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="n">utils</span><span class="o">.</span><span class="n">pint</span><span class="p">,</span> <span class="n">required</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span>
+                            <span class="n">help</span><span class="o">=</span><span class="s1">&#39;duration - number of time steps (eg days) in simulation&#39;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">args_list</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">args</span> <span class="o">=</span> <span class="n">parser</span><span class="o">.</span><span class="n">parse_args</span><span class="p">()</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">args</span> <span class="o">=</span> <span class="n">parser</span><span class="o">.</span><span class="n">parse_args</span><span class="p">(</span><span class="n">args_list</span><span class="p">)</span>
+
+        <span class="c1"># set defaults to create graph if not loading graph and args not specified</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="o">.</span><span class="n">filename_graph</span> <span class="o">==</span> <span class="s2">&quot;&quot;</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="o">.</span><span class="n">max_x</span> <span class="o">==</span> <span class="n">utils</span><span class="o">.</span><span class="n">NotSpecI</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="o">.</span><span class="n">max_x</span> <span class="o">=</span> <span class="mi">10</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="o">.</span><span class="n">max_y</span> <span class="o">==</span> <span class="n">utils</span><span class="o">.</span><span class="n">NotSpecI</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="o">.</span><span class="n">max_y</span> <span class="o">=</span> <span class="mi">10</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="o">.</span><span class="n">num_verts</span> <span class="o">==</span> <span class="n">utils</span><span class="o">.</span><span class="n">NotSpecI</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="o">.</span><span class="n">num_verts</span> <span class="o">=</span> <span class="mi">11</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="o">.</span><span class="n">graph_type</span> <span class="o">==</span> <span class="s2">&quot;&quot;</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="o">.</span><span class="n">graph_type</span> <span class="o">=</span> <span class="s1">&#39;random&#39;</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="o">.</span><span class="n">num_site1</span> <span class="o">==</span> <span class="n">utils</span><span class="o">.</span><span class="n">NotSpecI</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="o">.</span><span class="n">num_site1</span> <span class="o">=</span> <span class="mi">3</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="o">.</span><span class="n">num_site2</span> <span class="o">==</span> <span class="n">utils</span><span class="o">.</span><span class="n">NotSpecI</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="o">.</span><span class="n">num_site2</span> <span class="o">=</span> <span class="mi">2</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="o">.</span><span class="n">num_site3</span> <span class="o">==</span> <span class="n">utils</span><span class="o">.</span><span class="n">NotSpecI</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="o">.</span><span class="n">num_site3</span> <span class="o">=</span> <span class="mi">4</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">worker_cost_rate</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="n">Worker_Type</span><span class="o">.</span><span class="n">WORKER1</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="o">.</span><span class="n">worker1_cost</span><span class="p">,</span>
+            <span class="n">Worker_Type</span><span class="o">.</span><span class="n">WORKER2</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="o">.</span><span class="n">worker2_cost</span><span class="p">,</span>
+            <span class="n">Worker_Type</span><span class="o">.</span><span class="n">WORKER3</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="o">.</span><span class="n">worker3_cost</span>
+        <span class="p">}</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">graph</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">load_graph</span><span class="p">(</span><span class="n">verbose</span><span class="p">)</span>
+
+<div class="viewcode-block" id="ProcessArgs.load_graph"><a class="viewcode-back" href="../../lyra_graphtool.html#lyra_graphtool.parameters.ProcessArgs.load_graph">[docs]</a>    <span class="k">def</span> <span class="nf">load_graph</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Graph</span><span class="p">:</span>
+
+        <span class="n">filename_graph</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="o">.</span><span class="n">filename_graph</span>
+
+        <span class="c1"># load graph from file if filename</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">filename_graph</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+
+            <span class="c1"># set up structures for parameters - site_structures will have arg defaults here</span>
+            <span class="c1"># if args are unspecified, a loaded graph can override below</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">site_structures</span> <span class="o">=</span> <span class="n">Site_Structures</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="p">,</span> <span class="n">use_arg_defaults</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+            <span class="c1"># set args from graph vars</span>
+            <span class="c1">#</span>
+            <span class="c1"># default dict for site access times in class Parameter - graph vars set in Configuration instantiation</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">graph_type</span> <span class="o">=</span> <span class="n">Graph_Type</span><span class="o">.</span><span class="n">RANDOM</span>
+                <span class="n">graph</span> <span class="o">=</span> <span class="n">Graph</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="o">.</span><span class="n">num_verts</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="o">.</span><span class="n">max_x</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="o">.</span><span class="n">max_y</span><span class="p">,</span> <span class="n">graph_type</span><span class="p">)</span>
+                <span class="n">graph</span><span class="o">.</span><span class="n">load_from_json</span><span class="p">(</span><span class="n">filename_graph</span><span class="p">)</span>
+            <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">msg_e</span><span class="p">:</span>
+                <span class="n">msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;Could not load graph file &quot;</span><span class="si">{</span><span class="n">filename_graph</span><span class="si">}</span><span class="s1">&quot; from current directory </span><span class="si">{</span><span class="n">os</span><span class="o">.</span><span class="n">getcwd</span><span class="p">()</span><span class="si">}</span><span class="s1">: </span><span class="si">{</span><span class="n">msg_e</span><span class="si">}</span><span class="s1">.&#39;</span>
+                <span class="nb">print</span><span class="p">(</span><span class="n">msg</span><span class="p">,</span> <span class="n">flush</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+                <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+
+            <span class="c1">#</span>
+            <span class="c1"># graph parameters will be overridden below if args are specified</span>
+            <span class="c1">#</span>
+            <span class="c1"># noinspection DuplicatedCode</span>
+            <span class="k">for</span> <span class="n">vt</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">site_structures</span><span class="o">.</span><span class="n">site_acquire_times</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+                <span class="n">vt_list</span> <span class="o">=</span> <span class="n">graph</span><span class="o">.</span><span class="n">get_vertices_type</span><span class="p">(</span><span class="n">vt</span><span class="p">)</span>
+                <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">vt_list</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
+                        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;in graph, vertex type </span><span class="si">{</span><span class="n">vt</span><span class="si">}</span><span class="s1"> acq time = </span><span class="si">{</span><span class="n">vt_list</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">time_to_acquire</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">flush</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+                        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">site_structures</span><span class="o">.</span><span class="n">site_acquire_times</span><span class="p">[</span><span class="n">vt</span><span class="p">]</span> <span class="o">!=</span> <span class="n">utils</span><span class="o">.</span><span class="n">NotSpecI</span><span class="p">:</span>
+                            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;   ...overriding graph value with command-line arg value of acquire times&#39;</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
+                        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;no vertices found in graph of type </span><span class="si">{</span><span class="n">vt</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+
+            <span class="k">for</span> <span class="n">vt</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">site_structures</span><span class="o">.</span><span class="n">site_rewards</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+                <span class="n">vt_list</span> <span class="o">=</span> <span class="n">graph</span><span class="o">.</span><span class="n">get_vertices_type</span><span class="p">(</span><span class="n">vt</span><span class="p">)</span>
+                <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">vt_list</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
+                        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;in graph, vertex type </span><span class="si">{</span><span class="n">vt</span><span class="si">}</span><span class="s1"> reward = </span><span class="si">{</span><span class="n">vt_list</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">reward</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">flush</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+                        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">site_structures</span><span class="o">.</span><span class="n">site_rewards</span><span class="p">[</span><span class="n">vt</span><span class="p">]</span> <span class="o">!=</span> <span class="n">utils</span><span class="o">.</span><span class="n">NotSpecF</span><span class="p">:</span>
+                            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;   ...overriding graph value with command-line arg value of rewards&#39;</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
+                        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;no vertices found in graph of type </span><span class="si">{</span><span class="n">vt</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+
+            <span class="k">for</span> <span class="n">vt</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">site_structures</span><span class="o">.</span><span class="n">site_mult_time</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+                <span class="n">vt_list</span> <span class="o">=</span> <span class="n">graph</span><span class="o">.</span><span class="n">get_vertices_type</span><span class="p">(</span><span class="n">vt</span><span class="p">)</span>
+                <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">vt_list</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
+                        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;in graph, vertex type </span><span class="si">{</span><span class="n">vt</span><span class="si">}</span><span class="s1"> multiplier time = </span><span class="si">{</span><span class="n">vt_list</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">mult_time</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">flush</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+                        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">site_structures</span><span class="o">.</span><span class="n">site_mult_time</span><span class="p">[</span><span class="n">vt</span><span class="p">]</span> <span class="o">!=</span> <span class="n">utils</span><span class="o">.</span><span class="n">NotSpecF</span><span class="p">:</span>
+                            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;   ...overriding graph value with command-line arg value of time multiplier&#39;</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
+                        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;no vertices found in graph of type </span><span class="si">{</span><span class="n">vt</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+
+            <span class="c1"># noinspection DuplicatedCode</span>
+            <span class="k">for</span> <span class="n">vt</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">site_structures</span><span class="o">.</span><span class="n">site_mult_time_active</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+                <span class="n">vt_list</span> <span class="o">=</span> <span class="n">graph</span><span class="o">.</span><span class="n">get_vertices_type</span><span class="p">(</span><span class="n">vt</span><span class="p">)</span>
+                <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">vt_list</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
+                        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;in graph, vertex type </span><span class="si">{</span><span class="n">vt</span><span class="si">}</span><span class="s1"> multiplier time active = </span><span class="si">{</span><span class="n">vt_list</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">mult_time</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">flush</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+                        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">site_structures</span><span class="o">.</span><span class="n">site_mult_time_active</span><span class="p">[</span><span class="n">vt</span><span class="p">]</span> <span class="o">!=</span> <span class="n">utils</span><span class="o">.</span><span class="n">NotSpecI</span><span class="p">:</span>
+                            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;   ...overriding graph value with command-line arg value of time multiplier active&#39;</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
+                        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;no vertices found in graph of type </span><span class="si">{</span><span class="n">vt</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+
+            <span class="k">for</span> <span class="n">vt</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">site_structures</span><span class="o">.</span><span class="n">site_mult_worker</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+                <span class="n">vt_list</span> <span class="o">=</span> <span class="n">graph</span><span class="o">.</span><span class="n">get_vertices_type</span><span class="p">(</span><span class="n">vt</span><span class="p">)</span>
+                <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">vt_list</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
+                        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;in graph, vertex type </span><span class="si">{</span><span class="n">vt</span><span class="si">}</span><span class="s1"> multiplier worker = </span><span class="si">{</span><span class="n">vt_list</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">mult_worker</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">flush</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+                        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">site_structures</span><span class="o">.</span><span class="n">site_mult_worker</span><span class="p">[</span><span class="n">vt</span><span class="p">]</span> <span class="o">!=</span> <span class="n">utils</span><span class="o">.</span><span class="n">NotSpecF</span><span class="p">:</span>
+                            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;   ...overriding graph value with command-line arg value of worker multiplier&#39;</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
+                        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;no vertices found in graph of type </span><span class="si">{</span><span class="n">vt</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+
+            <span class="k">for</span> <span class="n">vt</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">site_structures</span><span class="o">.</span><span class="n">site_expiration_times</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+                <span class="n">vt_list</span> <span class="o">=</span> <span class="n">graph</span><span class="o">.</span><span class="n">get_vertices_type</span><span class="p">(</span><span class="n">vt</span><span class="p">)</span>
+                <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">vt_list</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
+                        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;in graph, vertex type </span><span class="si">{</span><span class="n">vt</span><span class="si">}</span><span class="s1"> exp time = </span><span class="si">{</span><span class="n">vt_list</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">expiration_time</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">flush</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+                        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">site_structures</span><span class="o">.</span><span class="n">site_expiration_times</span><span class="p">[</span><span class="n">vt</span><span class="p">]</span> <span class="o">!=</span> <span class="n">utils</span><span class="o">.</span><span class="n">NotSpecI</span><span class="p">:</span>
+                            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;   ...overriding graph value with command-line arg value of expiration times&#39;</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
+                        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;no vertices found in graph of type </span><span class="si">{</span><span class="n">vt</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+
+        <span class="k">else</span><span class="p">:</span>  <span class="c1"># graph filename not specified - create graph</span>
+
+            <span class="c1"># set up structures for parameters -</span>
+            <span class="c1"># if args are unspecified, use Site_Structures defaults</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">site_structures</span> <span class="o">=</span> <span class="n">Site_Structures</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="p">,</span> <span class="n">use_arg_defaults</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="o">.</span><span class="n">num_verts</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="o">.</span><span class="n">num_site1</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="o">.</span><span class="n">num_site2</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="o">.</span><span class="n">num_site3</span> <span class="o">+</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="n">msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;Not enough vertices on graph: &#39;</span> <span class="o">+</span> \
+                      <span class="sa">f</span><span class="s1">&#39;require number vertices &gt; num site 1 (</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="o">.</span><span class="n">num_site1</span><span class="si">}</span><span class="s1">) &#39;</span> <span class="o">+</span> \
+                      <span class="sa">f</span><span class="s1">&#39;+ num site 2 (</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="o">.</span><span class="n">num_site1</span><span class="si">}</span><span class="s1">) &#39;</span> <span class="o">+</span> \
+                      <span class="sa">f</span><span class="s1">&#39;+ num site 3 (</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="o">.</span><span class="n">num_site3</span><span class="si">}</span><span class="s1">)+ 1&#39;</span>
+                <span class="nb">print</span><span class="p">(</span><span class="n">msg</span><span class="p">,</span> <span class="n">flush</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+                <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="o">.</span><span class="n">graph_type</span> <span class="o">==</span> <span class="s1">&#39;random&#39;</span><span class="p">:</span>
+                    <span class="n">graph_type</span> <span class="o">=</span> <span class="n">Graph_Type</span><span class="o">.</span><span class="n">RANDOM</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">graph_type</span> <span class="o">=</span> <span class="n">Graph_Type</span><span class="o">.</span><span class="n">GRID</span>
+
+                <span class="n">graph</span> <span class="o">=</span> <span class="n">Graph</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="o">.</span><span class="n">num_verts</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="o">.</span><span class="n">max_x</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="o">.</span><span class="n">max_y</span><span class="p">,</span> <span class="n">graph_type</span><span class="p">)</span>
+
+                <span class="n">graph</span><span class="o">.</span><span class="n">make_graph_connected</span><span class="p">()</span>
+
+                <span class="n">graph</span><span class="o">.</span><span class="n">set_random_sites_origin</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="o">.</span><span class="n">num_site1</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="o">.</span><span class="n">num_site2</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="o">.</span><span class="n">num_site3</span><span class="p">)</span>
+
+        <span class="c1"># above,</span>
+        <span class="c1">#   graph loaded -&gt; SiteStructure variables were set to values in graph IF arg was unspecified</span>
+        <span class="c1">#                       S_S vars are only meaningful in this case if sites of same type have identical values</span>
+        <span class="c1">#                     - if arg was specified, arg value will be written to graph below</span>
+        <span class="c1">#</span>
+        <span class="c1">#   graph not loaded -&gt; nothing done to Site_Structure variables</span>
+        <span class="c1">#                        - will have Site_Structure defaults if arg was unspecified</span>
+        <span class="c1">#</span>
+        <span class="c1"># check for argument overrides in parser.add_argument above</span>
+        <span class="c1"># if the argument has a default value, it was not specified - so don&#39;t override</span>
+        <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">graph</span><span class="o">.</span><span class="n">vertices</span><span class="p">:</span>
+            <span class="n">vt</span> <span class="o">=</span> <span class="n">v</span><span class="o">.</span><span class="n">vertex_type</span>
+            <span class="k">if</span> <span class="n">vt</span> <span class="ow">in</span> <span class="n">v</span><span class="o">.</span><span class="n">accessible_types</span><span class="p">():</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">site_structures</span><span class="o">.</span><span class="n">site_acquire_times</span><span class="p">[</span><span class="n">vt</span><span class="p">]</span> <span class="o">!=</span> <span class="n">utils</span><span class="o">.</span><span class="n">NotSpecI</span><span class="p">:</span>
+                    <span class="n">v</span><span class="o">.</span><span class="n">time_to_acquire</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">site_structures</span><span class="o">.</span><span class="n">site_acquire_times</span><span class="p">[</span><span class="n">vt</span><span class="p">]</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">site_structures</span><span class="o">.</span><span class="n">site_rewards</span><span class="p">[</span><span class="n">vt</span><span class="p">]</span> <span class="o">!=</span> <span class="n">utils</span><span class="o">.</span><span class="n">NotSpecF</span><span class="p">:</span>
+                    <span class="n">v</span><span class="o">.</span><span class="n">reward</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">site_structures</span><span class="o">.</span><span class="n">site_rewards</span><span class="p">[</span><span class="n">vt</span><span class="p">]</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">site_structures</span><span class="o">.</span><span class="n">site_mult_time</span><span class="p">[</span><span class="n">vt</span><span class="p">]</span> <span class="o">!=</span> <span class="n">utils</span><span class="o">.</span><span class="n">NotSpecF</span><span class="p">:</span>
+                    <span class="n">v</span><span class="o">.</span><span class="n">mult_time</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">site_structures</span><span class="o">.</span><span class="n">site_mult_time</span><span class="p">[</span><span class="n">vt</span><span class="p">]</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">site_structures</span><span class="o">.</span><span class="n">site_mult_time_active</span><span class="p">[</span><span class="n">vt</span><span class="p">]</span> <span class="o">!=</span> <span class="n">utils</span><span class="o">.</span><span class="n">NotSpecI</span><span class="p">:</span>
+                    <span class="n">v</span><span class="o">.</span><span class="n">mult_time_active</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">site_structures</span><span class="o">.</span><span class="n">site_mult_time_active</span><span class="p">[</span><span class="n">vt</span><span class="p">]</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">site_structures</span><span class="o">.</span><span class="n">site_mult_worker</span><span class="p">[</span><span class="n">vt</span><span class="p">]</span> <span class="o">!=</span> <span class="n">utils</span><span class="o">.</span><span class="n">NotSpecF</span><span class="p">:</span>
+                    <span class="n">v</span><span class="o">.</span><span class="n">mult_worker</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">site_structures</span><span class="o">.</span><span class="n">site_mult_worker</span><span class="p">[</span><span class="n">vt</span><span class="p">]</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">site_structures</span><span class="o">.</span><span class="n">site_expiration_times</span><span class="p">[</span><span class="n">vt</span><span class="p">]</span> <span class="o">!=</span> <span class="n">utils</span><span class="o">.</span><span class="n">NotSpecI</span><span class="p">:</span>
+                    <span class="n">v</span><span class="o">.</span><span class="n">expiration_time</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">site_structures</span><span class="o">.</span><span class="n">site_expiration_times</span><span class="p">[</span><span class="n">vt</span><span class="p">]</span>
+
+        <span class="c1"># copy possible overridden values to args</span>
+        <span class="n">args_temp</span> <span class="o">=</span> <span class="n">deepcopy</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">site_structures</span><span class="o">.</span><span class="n">values_to_args</span><span class="p">(</span><span class="n">args_temp</span><span class="p">)</span>
+        <span class="c1"># remove unspecified args</span>
+        <span class="n">d</span> <span class="o">=</span> <span class="n">args_temp</span><span class="o">.</span><span class="vm">__dict__</span>
+        <span class="n">d2</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">d</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+            <span class="k">if</span> <span class="nb">str</span><span class="p">(</span><span class="n">d</span><span class="p">[</span><span class="n">k</span><span class="p">])</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="nb">str</span><span class="p">(</span><span class="n">utils</span><span class="o">.</span><span class="n">NotSpecI</span><span class="p">),</span> <span class="nb">str</span><span class="p">(</span><span class="n">utils</span><span class="o">.</span><span class="n">NotSpecF</span><span class="p">),</span> <span class="s2">&quot;&quot;</span><span class="p">]:</span>
+                <span class="n">d2</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">d</span><span class="p">[</span><span class="n">k</span><span class="p">]</span>
+        <span class="n">args_temp</span><span class="o">.</span><span class="vm">__dict__</span> <span class="o">=</span> <span class="n">d2</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">args_trial</span> <span class="o">=</span> <span class="n">args_temp</span>
+
+        <span class="k">return</span> <span class="n">graph</span></div>
+
+<div class="viewcode-block" id="ProcessArgs.values_to_args"><a class="viewcode-back" href="../../lyra_graphtool.html#lyra_graphtool.parameters.ProcessArgs.values_to_args">[docs]</a>    <span class="k">def</span> <span class="nf">values_to_args</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Arguments:</span>
+<span class="sd">                args - from argparse.ArgumentParser copy class variables to these args</span>
+<span class="sd">        Return:</span>
+<span class="sd">                arg_list - command-line-style argument list that can be</span>
+<span class="sd">                        used as input to Process_Args()</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">arg_list</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">d</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">args_trial</span><span class="o">.</span><span class="vm">__dict__</span>
+        <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">d</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+            <span class="n">arg_list</span> <span class="o">+=</span> <span class="p">[</span><span class="sa">f</span><span class="s1">&#39;--</span><span class="si">{</span><span class="n">k</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">d</span><span class="p">[</span><span class="n">k</span><span class="p">])]</span>
+        <span class="k">return</span> <span class="n">arg_list</span></div>
+
+<div class="viewcode-block" id="ProcessArgs.save"><a class="viewcode-back" href="../../lyra_graphtool.html#lyra_graphtool.parameters.ProcessArgs.save">[docs]</a>    <span class="k">def</span> <span class="nf">save</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">filename</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        save trial arguments to text file</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">filename</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">timestr</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s2">&quot;%Y-%m-</span><span class="si">%d</span><span class="s2">_%H-%M-%S.txt&quot;</span><span class="p">)</span>
+            <span class="n">filename</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="o">.</span><span class="n">trial_name</span> <span class="o">+</span> <span class="n">timestr</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+            <span class="n">json</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">args_trial</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">,</span> <span class="n">f</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="ProcessArgs.load"><a class="viewcode-back" href="../../lyra_graphtool.html#lyra_graphtool.parameters.ProcessArgs.load">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">load</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">filename</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">graph_file</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Method to load arguments</span>
+<span class="sd">        :param</span>
+<span class="sd">            filename: path to file with arguments</span>
+<span class="sd">            graph_file: path to file with graph</span>
+<span class="sd">        :return:</span>
+<span class="sd">            list of arguments</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">def</span> <span class="nf">json_to_list</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
+            <span class="n">lst_tup</span> <span class="o">=</span> <span class="p">[(</span><span class="s1">&#39;--&#39;</span> <span class="o">+</span> <span class="n">k</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">v</span><span class="p">))</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">args_dict</span><span class="o">.</span><span class="n">items</span><span class="p">()]</span>
+            <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="n">itertools</span><span class="o">.</span><span class="n">chain</span><span class="p">(</span><span class="o">*</span><span class="n">lst_tup</span><span class="p">))</span>
+
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+            <span class="n">args_dict</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">graph_file</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">graph_file</span><span class="p">):</span>
+            <span class="n">args_dict</span><span class="p">[</span><span class="s1">&#39;filename_graph&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">graph_file</span>
+
+        <span class="n">args_list</span> <span class="o">=</span> <span class="n">json_to_list</span><span class="p">(</span><span class="n">args_dict</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="n">args_list</span><span class="p">)</span></div></div>
+
+
+<span class="c1"># set up structures used for problem classes</span>
+<div class="viewcode-block" id="Site_Structures"><a class="viewcode-back" href="../../lyra_graphtool.html#lyra_graphtool.parameters.Site_Structures">[docs]</a><span class="k">class</span> <span class="nc">Site_Structures</span><span class="p">:</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">args</span><span class="p">,</span> <span class="n">use_arg_defaults</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Arguments:</span>
+<span class="sd">                args - from argparse.ArgumentParser from which to get values</span>
+
+<span class="sd">                use_arg_defaults -</span>
+<span class="sd">                    True: use defaults in parser.add_argument() below</span>
+<span class="sd">                    False: use defaults specified here - these defaults override NotSpecI and NotSpecF values</span>
+
+<span class="sd">        all site variables below must be set directly in graph</span>
+<span class="sd">        NOTE: properties below can be set/varied at SITEs individually</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">ad</span> <span class="o">=</span> <span class="n">use_arg_defaults</span>
+
+        <span class="c1"># default dict for site access times in class Parameter</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">site_acquire_times</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="n">Vertex_Type</span><span class="o">.</span><span class="n">SITE1</span><span class="p">:</span> <span class="n">utils</span><span class="o">.</span><span class="n">checki</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">site1_acquire_time</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">use_arg_default</span><span class="o">=</span><span class="n">ad</span><span class="p">),</span>
+            <span class="n">Vertex_Type</span><span class="o">.</span><span class="n">SITE2</span><span class="p">:</span> <span class="n">utils</span><span class="o">.</span><span class="n">checki</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">site2_acquire_time</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">use_arg_default</span><span class="o">=</span><span class="n">ad</span><span class="p">),</span>
+            <span class="n">Vertex_Type</span><span class="o">.</span><span class="n">SITE3</span><span class="p">:</span> <span class="n">utils</span><span class="o">.</span><span class="n">checki</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">site3_acquire_time</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">use_arg_default</span><span class="o">=</span><span class="n">ad</span><span class="p">)</span>
+        <span class="p">}</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">site_rewards</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="n">Vertex_Type</span><span class="o">.</span><span class="n">SITE1</span><span class="p">:</span> <span class="n">utils</span><span class="o">.</span><span class="n">checkf</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">site1_reward</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="mi">1000</span><span class="p">,</span> <span class="n">use_arg_default</span><span class="o">=</span><span class="n">ad</span><span class="p">),</span>
+            <span class="n">Vertex_Type</span><span class="o">.</span><span class="n">SITE2</span><span class="p">:</span> <span class="n">utils</span><span class="o">.</span><span class="n">checkf</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">site2_reward</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="mi">2000</span><span class="p">,</span> <span class="n">use_arg_default</span><span class="o">=</span><span class="n">ad</span><span class="p">),</span>
+            <span class="n">Vertex_Type</span><span class="o">.</span><span class="n">SITE3</span><span class="p">:</span> <span class="n">utils</span><span class="o">.</span><span class="n">checkf</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">site3_reward</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="mi">3000</span><span class="p">,</span> <span class="n">use_arg_default</span><span class="o">=</span><span class="n">ad</span><span class="p">)</span>
+        <span class="p">}</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">site_mult_time</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="n">Vertex_Type</span><span class="o">.</span><span class="n">SITE1</span><span class="p">:</span> <span class="n">utils</span><span class="o">.</span><span class="n">checkf</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">site1_mult_time</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">use_arg_default</span><span class="o">=</span><span class="n">ad</span><span class="p">),</span>
+            <span class="n">Vertex_Type</span><span class="o">.</span><span class="n">SITE2</span><span class="p">:</span> <span class="n">utils</span><span class="o">.</span><span class="n">checkf</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">site2_mult_time</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">use_arg_default</span><span class="o">=</span><span class="n">ad</span><span class="p">),</span>
+            <span class="n">Vertex_Type</span><span class="o">.</span><span class="n">SITE3</span><span class="p">:</span> <span class="n">utils</span><span class="o">.</span><span class="n">checkf</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">site3_mult_time</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">use_arg_default</span><span class="o">=</span><span class="n">ad</span><span class="p">)</span>
+        <span class="p">}</span>
+
+        <span class="c1"># default is entire duration</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">site_mult_time_active</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="n">Vertex_Type</span><span class="o">.</span><span class="n">SITE1</span><span class="p">:</span> <span class="n">utils</span><span class="o">.</span><span class="n">checkp2</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">site1_mult_time_active</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">args</span><span class="o">.</span><span class="n">duration</span><span class="p">),</span>
+                                            <span class="n">use_arg_default</span><span class="o">=</span><span class="n">ad</span><span class="p">),</span>
+            <span class="n">Vertex_Type</span><span class="o">.</span><span class="n">SITE2</span><span class="p">:</span> <span class="n">utils</span><span class="o">.</span><span class="n">checkp2</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">site2_mult_time_active</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">args</span><span class="o">.</span><span class="n">duration</span><span class="p">),</span>
+                                            <span class="n">use_arg_default</span><span class="o">=</span><span class="n">ad</span><span class="p">),</span>
+            <span class="n">Vertex_Type</span><span class="o">.</span><span class="n">SITE3</span><span class="p">:</span> <span class="n">utils</span><span class="o">.</span><span class="n">checkp2</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">site3_mult_time_active</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">args</span><span class="o">.</span><span class="n">duration</span><span class="p">),</span> <span class="n">use_arg_default</span><span class="o">=</span><span class="n">ad</span><span class="p">)</span>
+        <span class="p">}</span>
+
+        <span class="c1"># values are dict with key,val = worker_type for which multiplier applies, multiplier</span>
+        <span class="n">wt1</span><span class="p">,</span> <span class="n">wt2</span><span class="p">,</span> <span class="n">wt3</span> <span class="o">=</span> <span class="n">Worker_Type</span><span class="o">.</span><span class="n">WORKER1</span><span class="p">,</span> <span class="n">Worker_Type</span><span class="o">.</span><span class="n">WORKER2</span><span class="p">,</span> <span class="n">Worker_Type</span><span class="o">.</span><span class="n">WORKER3</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">site_mult_worker</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="n">Vertex_Type</span><span class="o">.</span><span class="n">SITE1</span><span class="p">:</span> <span class="n">utils</span><span class="o">.</span><span class="n">checkd3</span><span class="p">([</span><span class="n">wt1</span><span class="p">,</span> <span class="n">wt2</span><span class="p">,</span> <span class="n">wt3</span><span class="p">],</span> <span class="n">args</span><span class="o">.</span><span class="n">site1_mult_workers</span><span class="p">,</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="n">use_arg_default</span><span class="o">=</span><span class="n">ad</span><span class="p">),</span>
+            <span class="n">Vertex_Type</span><span class="o">.</span><span class="n">SITE2</span><span class="p">:</span> <span class="n">utils</span><span class="o">.</span><span class="n">checkd3</span><span class="p">([</span><span class="n">wt1</span><span class="p">,</span> <span class="n">wt2</span><span class="p">,</span> <span class="n">wt3</span><span class="p">],</span> <span class="n">args</span><span class="o">.</span><span class="n">site2_mult_workers</span><span class="p">,</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="n">use_arg_default</span><span class="o">=</span><span class="n">ad</span><span class="p">),</span>
+            <span class="n">Vertex_Type</span><span class="o">.</span><span class="n">SITE3</span><span class="p">:</span> <span class="n">utils</span><span class="o">.</span><span class="n">checkd3</span><span class="p">([</span><span class="n">wt1</span><span class="p">,</span> <span class="n">wt2</span><span class="p">,</span> <span class="n">wt3</span><span class="p">],</span> <span class="n">args</span><span class="o">.</span><span class="n">site3_mult_workers</span><span class="p">,</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="n">use_arg_default</span><span class="o">=</span><span class="n">ad</span><span class="p">)</span>
+        <span class="p">}</span>
+
+        <span class="c1"># check for value = -1 below - set to last time in this case</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">site_expiration_times</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="n">Vertex_Type</span><span class="o">.</span><span class="n">SITE1</span><span class="p">:</span> <span class="n">utils</span><span class="o">.</span><span class="n">checki</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">site1_exp_time</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">duration</span><span class="p">,</span> <span class="n">use_arg_default</span><span class="o">=</span><span class="n">ad</span><span class="p">),</span>
+            <span class="n">Vertex_Type</span><span class="o">.</span><span class="n">SITE2</span><span class="p">:</span> <span class="n">utils</span><span class="o">.</span><span class="n">checki</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">site2_exp_time</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">duration</span><span class="p">,</span> <span class="n">use_arg_default</span><span class="o">=</span><span class="n">ad</span><span class="p">),</span>
+            <span class="n">Vertex_Type</span><span class="o">.</span><span class="n">SITE3</span><span class="p">:</span> <span class="n">utils</span><span class="o">.</span><span class="n">checki</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">site3_exp_time</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">duration</span><span class="p">,</span> <span class="n">use_arg_default</span><span class="o">=</span><span class="n">ad</span><span class="p">)</span>
+        <span class="p">}</span>
+
+    <span class="c1"># noinspection DuplicatedCode</span>
+<div class="viewcode-block" id="Site_Structures.values_to_args"><a class="viewcode-back" href="../../lyra_graphtool.html#lyra_graphtool.parameters.Site_Structures.values_to_args">[docs]</a>    <span class="k">def</span> <span class="nf">values_to_args</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">args</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Arguments:</span>
+<span class="sd">                args - from argparse.ArgumentParser copy class variables to these args</span>
+<span class="sd">        Return:</span>
+<span class="sd">                arg_list - command-line-style argument list that can be</span>
+<span class="sd">                        used as input to Process_Args()</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="c1"># noinspection DuplicatedCode</span>
+            <span class="n">args</span><span class="o">.</span><span class="n">site1_acquire_time</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">site_acquire_times</span><span class="p">[</span><span class="n">Vertex_Type</span><span class="o">.</span><span class="n">SITE1</span><span class="p">]</span>
+            <span class="n">args</span><span class="o">.</span><span class="n">site2_acquire_time</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">site_acquire_times</span><span class="p">[</span><span class="n">Vertex_Type</span><span class="o">.</span><span class="n">SITE2</span><span class="p">]</span>
+            <span class="n">args</span><span class="o">.</span><span class="n">site3_acquire_time</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">site_acquire_times</span><span class="p">[</span><span class="n">Vertex_Type</span><span class="o">.</span><span class="n">SITE3</span><span class="p">]</span>
+
+            <span class="n">args</span><span class="o">.</span><span class="n">site1_reward</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">site_rewards</span><span class="p">[</span><span class="n">Vertex_Type</span><span class="o">.</span><span class="n">SITE1</span><span class="p">]</span>
+            <span class="n">args</span><span class="o">.</span><span class="n">site2_reward</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">site_rewards</span><span class="p">[</span><span class="n">Vertex_Type</span><span class="o">.</span><span class="n">SITE2</span><span class="p">]</span>
+            <span class="n">args</span><span class="o">.</span><span class="n">site3_reward</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">site_rewards</span><span class="p">[</span><span class="n">Vertex_Type</span><span class="o">.</span><span class="n">SITE3</span><span class="p">]</span>
+
+            <span class="n">args</span><span class="o">.</span><span class="n">site1_mult_time</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">site_mult_time</span><span class="p">[</span><span class="n">Vertex_Type</span><span class="o">.</span><span class="n">SITE1</span><span class="p">]</span>
+            <span class="n">args</span><span class="o">.</span><span class="n">site2_mult_time</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">site_mult_time</span><span class="p">[</span><span class="n">Vertex_Type</span><span class="o">.</span><span class="n">SITE2</span><span class="p">]</span>
+            <span class="n">args</span><span class="o">.</span><span class="n">site3_mult_time</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">site_mult_time</span><span class="p">[</span><span class="n">Vertex_Type</span><span class="o">.</span><span class="n">SITE3</span><span class="p">]</span>
+
+            <span class="n">args</span><span class="o">.</span><span class="n">site1_mult_time_active</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">site_mult_time_active</span><span class="p">[</span><span class="n">Vertex_Type</span><span class="o">.</span><span class="n">SITE1</span><span class="p">]</span>
+            <span class="n">args</span><span class="o">.</span><span class="n">site2_mult_time_active</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">site_mult_time_active</span><span class="p">[</span><span class="n">Vertex_Type</span><span class="o">.</span><span class="n">SITE2</span><span class="p">]</span>
+            <span class="n">args</span><span class="o">.</span><span class="n">site3_mult_time_active</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">site_mult_time_active</span><span class="p">[</span><span class="n">Vertex_Type</span><span class="o">.</span><span class="n">SITE3</span><span class="p">]</span>
+
+            <span class="n">args</span><span class="o">.</span><span class="n">site1_mult_workers</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">site_mult_worker</span><span class="p">[</span><span class="n">Vertex_Type</span><span class="o">.</span><span class="n">SITE1</span><span class="p">]</span>
+            <span class="n">args</span><span class="o">.</span><span class="n">site2_mult_workers</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">site_mult_worker</span><span class="p">[</span><span class="n">Vertex_Type</span><span class="o">.</span><span class="n">SITE2</span><span class="p">]</span>
+            <span class="n">args</span><span class="o">.</span><span class="n">site3_mult_workers</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">site_mult_worker</span><span class="p">[</span><span class="n">Vertex_Type</span><span class="o">.</span><span class="n">SITE3</span><span class="p">]</span>
+
+            <span class="n">args</span><span class="o">.</span><span class="n">site1_exp_time</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">site_expiration_times</span><span class="p">[</span><span class="n">Vertex_Type</span><span class="o">.</span><span class="n">SITE1</span><span class="p">]</span>
+            <span class="n">args</span><span class="o">.</span><span class="n">site2_exp_time</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">site_expiration_times</span><span class="p">[</span><span class="n">Vertex_Type</span><span class="o">.</span><span class="n">SITE2</span><span class="p">]</span>
+            <span class="n">args</span><span class="o">.</span><span class="n">site3_exp_time</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">site_expiration_times</span><span class="p">[</span><span class="n">Vertex_Type</span><span class="o">.</span><span class="n">SITE3</span><span class="p">]</span>
+        <span class="k">except</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s1">&#39;Input args missing fields in Site_Structures.values_to_args() call.&#39;</span><span class="p">)</span>
+
+        <span class="n">keys_site</span> <span class="o">=</span> <span class="p">[</span>  <span class="c1"># site economics properties</span>
+            <span class="s1">&#39;site1_acquire_time&#39;</span><span class="p">,</span> <span class="s1">&#39;site2_acquire_time&#39;</span><span class="p">,</span> <span class="s1">&#39;site3_acquire_time&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;site1_reward&#39;</span><span class="p">,</span> <span class="s1">&#39;site2_reward&#39;</span><span class="p">,</span> <span class="s1">&#39;site3_reward&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;site1_mult_time&#39;</span><span class="p">,</span> <span class="s1">&#39;site2_mult_time&#39;</span><span class="p">,</span> <span class="s1">&#39;site3_mult_time&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;site1_mult_time_active&#39;</span><span class="p">,</span> <span class="s1">&#39;site2_mult_time_active&#39;</span><span class="p">,</span> <span class="s1">&#39;site3_mult_time_active&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;site1_mult_workers&#39;</span><span class="p">,</span> <span class="s1">&#39;site2_mult_workers&#39;</span><span class="p">,</span> <span class="s1">&#39;site3_mult_workers&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;site1_exp_time&#39;</span><span class="p">,</span> <span class="s1">&#39;site2_exp_time&#39;</span><span class="p">,</span> <span class="s1">&#39;site3_exp_time&#39;</span>
+        <span class="p">]</span>
+        <span class="n">arg_list</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">keys_site</span><span class="p">:</span>
+            <span class="n">att</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">args</span><span class="p">,</span> <span class="n">k</span><span class="p">)</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">att</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+                <span class="n">v</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">att</span><span class="o">.</span><span class="n">values</span><span class="p">())</span>
+                <span class="n">sv</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">v</span><span class="p">)[</span><span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>  <span class="c1"># get rid of brackets on list</span>
+            <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">att</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">)</span> <span class="ow">or</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">att</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
+                <span class="n">v</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">att</span><span class="p">)</span>
+                <span class="n">sv</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">v</span><span class="p">)[</span><span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>  <span class="c1"># get rid of brackets on tuple or list</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">sv</span> <span class="o">=</span> <span class="n">att</span>
+
+            <span class="nb">setattr</span><span class="p">(</span><span class="n">args</span><span class="p">,</span> <span class="n">k</span><span class="p">,</span> <span class="n">sv</span><span class="p">)</span>  <span class="c1"># convert site structure form to arg form</span>
+            <span class="n">arg_list</span> <span class="o">+=</span> <span class="p">[</span><span class="s1">&#39;--&#39;</span> <span class="o">+</span> <span class="n">k</span><span class="p">,</span> <span class="n">sv</span><span class="p">]</span>
+
+        <span class="k">return</span> <span class="n">arg_list</span></div></div>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, Xeek.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
