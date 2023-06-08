@@ -1,0 +1,1000 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>lyra_graphtool.configuration &mdash; Lyra Graphtool 0.0.1 documentation</title>
+      <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/doctools.js"></script>
+        <script src="../../_static/sphinx_highlight.js"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            Lyra Graphtool
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../modules.html">lyra_graphtool</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">Lyra Graphtool</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">lyra_graphtool.configuration</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for lyra_graphtool.configuration</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">json</span>
+<span class="kn">import</span> <span class="nn">pickle</span>
+<span class="kn">from</span> <span class="nn">copy</span> <span class="kn">import</span> <span class="n">deepcopy</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Generic</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">TypeVar</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+
+<span class="kn">from</span> <span class="nn">lyra_graphtool.edge</span> <span class="kn">import</span> <span class="n">Edge</span>
+<span class="kn">from</span> <span class="nn">lyra_graphtool.parameters</span> <span class="kn">import</span> <span class="n">Parameters</span>
+<span class="kn">from</span> <span class="nn">lyra_graphtool.worker</span> <span class="kn">import</span> <span class="n">Worker</span><span class="p">,</span> <span class="n">Worker_Type</span>
+<span class="kn">from</span> <span class="nn">lyra_graphtool.vertex</span> <span class="kn">import</span> <span class="n">Vertex</span><span class="p">,</span> <span class="n">Vertex_Type</span>
+
+
+<span class="n">Config_Single_Time</span> <span class="o">=</span> <span class="n">TypeVar</span><span class="p">(</span><span class="s1">&#39;Config_Single_Time&#39;</span><span class="p">)</span>
+<span class="n">Configuration</span> <span class="o">=</span> <span class="n">TypeVar</span><span class="p">(</span><span class="s1">&#39;Configuration&#39;</span><span class="p">)</span>
+
+
+<span class="c1"># single-time-step configuration</span>
+<span class="c1"># Note: objects will have a deepcopy of the vertex. To modify a vertex</span>
+<span class="c1">#       in the graph, use graph methods to get the graph&#39;s vertex.</span>
+<div class="viewcode-block" id="Config_Single_Time"><a class="viewcode-back" href="../../lyra_graphtool.html#lyra_graphtool.configuration.Config_Single_Time">[docs]</a><span class="k">class</span> <span class="nc">Config_Single_Time</span><span class="p">(</span><span class="n">Generic</span><span class="p">[</span><span class="n">Config_Single_Time</span><span class="p">]):</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">v</span><span class="p">:</span> <span class="n">Vertex</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">access</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        # Class controls single-time-step configuration</span>
+<span class="sd">        </span>
+<span class="sd">            Note: objects will have a deepcopy of the vertex. To modify a vertex</span>
+<span class="sd">                in the graph, use graph methods to get the graph&#39;s vertex.</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">v</span> <span class="o">=</span> <span class="n">deepcopy</span><span class="p">(</span><span class="n">v</span><span class="p">)</span>  <span class="c1"># occupy this vertex at corresponding time</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">access</span> <span class="o">=</span> <span class="n">access</span>  <span class="c1"># True: access this vertex&#39;s resources; False: don&#39;t access</span>
+
+    <span class="c1"># display info about object</span>
+<div class="viewcode-block" id="Config_Single_Time.info"><a class="viewcode-back" href="../../lyra_graphtool.html#lyra_graphtool.configuration.Config_Single_Time.info">[docs]</a>    <span class="k">def</span> <span class="nf">info</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        # Displays list of information about the object</span>
+<span class="sd">        </span>
+<span class="sd">            Arguments:</span>
+<span class="sd">                verbose : bool, default = False</span>
+
+<span class="sd">            Return: </span>
+<span class="sd">                list</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">v</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">x</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">v</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">v</span><span class="o">.</span><span class="n">y</span>
+            <span class="n">vtype</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">v</span><span class="o">.</span><span class="n">vertex_type</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">x</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span>
+            <span class="n">vtype</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="n">access</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">access</span>
+        <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;[ (</span><span class="si">{</span><span class="n">x</span><span class="si">}</span><span class="s1">,</span><span class="si">{</span><span class="n">y</span><span class="si">}</span><span class="s1">), </span><span class="si">{</span><span class="n">vtype</span><span class="si">}</span><span class="s1">, acc=</span><span class="si">{</span><span class="n">access</span><span class="si">}</span><span class="s1"> ]&#39;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="p">[(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">),</span> <span class="n">vtype</span><span class="p">,</span> <span class="n">access</span><span class="p">]</span></div></div>
+
+
+<span class="c1"># noinspection SpellCheckingInspection</span>
+<div class="viewcode-block" id="Configuration"><a class="viewcode-back" href="../../lyra_graphtool.html#lyra_graphtool.configuration.Configuration">[docs]</a><span class="k">class</span> <span class="nc">Configuration</span><span class="p">(</span><span class="n">Generic</span><span class="p">[</span><span class="n">Configuration</span><span class="p">]):</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">params</span><span class="p">:</span> <span class="n">Parameters</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        # Generic class for configuring budget, worker type, duration, graphing, and worker costs</span>
+
+<span class="sd">            Arguments:</span>
+<span class="sd">                params:</span>
+<span class="sd">                    budget - </span>
+<span class="sd">                    </span>
+<span class="sd">                    duration_time - </span>
+
+<span class="sd">                    graph - </span>
+
+<span class="sd">                    worker_cost_rate - </span>
+
+<span class="sd">            Return:</span>
+<span class="sd">                None</span>
+
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">parameters</span> <span class="o">=</span> <span class="n">params</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">budget</span> <span class="o">=</span> <span class="n">params</span><span class="o">.</span><span class="n">budget</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">duration_time</span> <span class="o">=</span> <span class="n">params</span><span class="o">.</span><span class="n">duration_time</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">graph</span> <span class="o">=</span> <span class="n">params</span><span class="o">.</span><span class="n">graph</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">worker_cost_rate</span> <span class="o">=</span> <span class="n">params</span><span class="o">.</span><span class="n">worker_cost_rate</span>
+
+        <span class="c1"># compute max number of workers of each type depending on budget</span>
+        <span class="n">budget</span> <span class="o">=</span> <span class="n">params</span><span class="o">.</span><span class="n">budget</span>
+
+        <span class="n">worker_types</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">Worker_Type</span><span class="o">.</span><span class="n">__members__</span><span class="o">.</span><span class="n">values</span><span class="p">())</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">worker_types</span> <span class="o">=</span> <span class="n">worker_types</span>
+
+        <span class="n">max_workers</span> <span class="o">=</span> <span class="p">{}</span>  <span class="c1"># indexed by Worker_Type</span>
+        <span class="k">for</span> <span class="n">wt</span> <span class="ow">in</span> <span class="n">worker_types</span><span class="p">:</span>
+            <span class="n">max_workers</span><span class="p">[</span><span class="n">wt</span><span class="p">]</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">floor</span><span class="p">(</span><span class="n">budget</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">worker_cost_rate</span><span class="p">[</span><span class="n">wt</span><span class="p">]))</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">max_workers</span> <span class="o">=</span> <span class="n">max_workers</span>
+
+        <span class="c1"># Set up schedules over time for each worker</span>
+        <span class="c1">#</span>
+        <span class="c1"># A schedule is a time-series of pairs</span>
+        <span class="c1">#       (Vertex, access_status) = Config_Single_Time object</span>
+        <span class="c1"># for each worker</span>
+        <span class="c1">#        access_status = True: then take resources at site = Vertex</span>
+        <span class="c1">#                      = False: do not take resources, only travel through</span>
+        <span class="c1">#</span>
+        <span class="c1"># The time series runs from day 0 to day params.duration_days</span>
+
+        <span class="c1"># access config by</span>
+        <span class="c1">#    config[worker_type][worker number] = {0:config_single, 1:config_single,... }</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">config</span> <span class="o">=</span> <span class="p">{}</span>
+
+        <span class="k">for</span> <span class="n">worker_type</span> <span class="ow">in</span> <span class="n">worker_types</span><span class="p">:</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="n">worker_type</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+            <span class="k">for</span> <span class="n">worker_number</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">max_workers</span><span class="p">[</span><span class="n">worker_type</span><span class="p">]):</span>
+
+                <span class="c1"># set up path/schedule for single worker</span>
+                <span class="n">schedule</span> <span class="o">=</span> <span class="p">{}</span>
+                <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">duration_time</span><span class="p">):</span>
+                    <span class="n">config_t</span> <span class="o">=</span> <span class="n">Config_Single_Time</span><span class="p">()</span>
+                    <span class="n">schedule</span><span class="p">[</span><span class="n">t</span><span class="p">]</span> <span class="o">=</span> <span class="n">config_t</span>
+
+                <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="n">worker_type</span><span class="p">][</span><span class="n">worker_number</span><span class="p">]</span> <span class="o">=</span> <span class="n">schedule</span>
+
+    <span class="c1"># get vertices from which a worker&#39;s path must start</span>
+    <span class="c1">#</span>
+    <span class="c1"># Note: this allows for generalizations - should avoid hard-coding</span>
+    <span class="c1">#       constraints outside this class (ie by solvers)</span>
+<div class="viewcode-block" id="Configuration.get_vertices_start"><a class="viewcode-back" href="../../lyra_graphtool.html#lyra_graphtool.configuration.Configuration.get_vertices_start">[docs]</a>    <span class="k">def</span> <span class="nf">get_vertices_start</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        # Get list the vertices from which a worker&#39;s path must start</span>
+<span class="sd">            </span>
+<span class="sd">                Note: this allows for generalizations - should avoid hard-coding</span>
+<span class="sd">                    constraints outside this class (ie by solvers)</span>
+<span class="sd">            </span>
+<span class="sd">            Arguments:</span>
+<span class="sd">                None</span>
+<span class="sd">            </span>
+<span class="sd">            Return:</span>
+<span class="sd">                list</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+
+        <span class="n">verts_graph</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">graph</span><span class="o">.</span><span class="n">get_vertices_type</span><span class="p">(</span><span class="n">Vertex_Type</span><span class="o">.</span><span class="n">ORIGIN</span><span class="p">)</span>
+
+        <span class="n">verts_start</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">verts_graph</span><span class="p">:</span>
+            <span class="n">verts_start</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">v</span><span class="p">))</span>
+
+        <span class="k">return</span> <span class="n">verts_start</span></div>
+
+    <span class="c1"># add schedule (deepcopy) to configuration</span>
+    <span class="c1"># at wt, wn</span>
+<div class="viewcode-block" id="Configuration.add_sched"><a class="viewcode-back" href="../../lyra_graphtool.html#lyra_graphtool.configuration.Configuration.add_sched">[docs]</a>    <span class="k">def</span> <span class="nf">add_sched</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">wt</span><span class="p">:</span> <span class="n">Worker_Type</span><span class="p">,</span> <span class="n">wn</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">sched</span><span class="p">:</span> <span class="n">Dict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;    </span>
+<span class="sd">        # Add a schedule (deepcopy) to configuration at wt, wn</span>
+<span class="sd">        </span>
+<span class="sd">            Arguments:</span>
+
+<span class="sd">                wt: Worker_Type (class), int</span>
+
+<span class="sd">                wn: int, number of workers</span>
+<span class="sd">                </span>
+<span class="sd">                sched: dict, schedule</span>
+<span class="sd">            </span>
+<span class="sd">            Return:</span>
+
+<span class="sd">                None</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">sched</span><span class="p">)</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">duration_time</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="n">wt</span><span class="p">][</span><span class="n">wn</span><span class="p">]</span> <span class="o">=</span> <span class="n">deepcopy</span><span class="p">(</span><span class="n">sched</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Schedule must have length </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">duration_time</span><span class="si">}</span><span class="s1">.&#39;</span><span class="p">)</span></div>
+
+    <span class="c1"># display info on given schedule</span>
+<div class="viewcode-block" id="Configuration.sched_info"><a class="viewcode-back" href="../../lyra_graphtool.html#lyra_graphtool.configuration.Configuration.sched_info">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">sched_info</span><span class="p">(</span><span class="n">sched</span><span class="p">:</span> <span class="n">Dict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        # Display the info of the given schedule</span>
+
+<span class="sd">            Arguments:</span>
+
+<span class="sd">                sched: dict, schedule</span>
+
+<span class="sd">            Return:</span>
+<span class="sd">            </span>
+<span class="sd">                list</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="n">info</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">sched</span><span class="p">)):</span>
+            <span class="n">i</span> <span class="o">=</span> <span class="n">sched</span><span class="p">[</span><span class="n">t</span><span class="p">]</span><span class="o">.</span><span class="n">info</span><span class="p">()</span>  <span class="c1"># [ (x,y), vtype, access ]</span>
+            <span class="n">info</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;[t=</span><span class="si">{</span><span class="n">t</span><span class="si">}</span><span class="s1">, (</span><span class="si">{</span><span class="n">i</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s1">,</span><span class="si">{</span><span class="n">i</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span><span class="si">}</span><span class="s1">), vtype=</span><span class="si">{</span><span class="n">i</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="si">}</span><span class="s1">, acc=</span><span class="si">{</span><span class="n">i</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="si">}</span><span class="s1"> ]&#39;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">info</span></div>
+
+    <span class="c1"># Method to return Worker object, that has rates compliant with configuration</span>
+<div class="viewcode-block" id="Configuration.get_worker"><a class="viewcode-back" href="../../lyra_graphtool.html#lyra_graphtool.configuration.Configuration.get_worker">[docs]</a>    <span class="k">def</span> <span class="nf">get_worker</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">wt</span><span class="p">:</span> <span class="n">Worker_Type</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Worker</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        # Method to return Worker object, that has rates compliant with configuration</span>
+
+<span class="sd">            Arguments:</span>
+<span class="sd">                wt: int, Worker_Type(class)\n</span>
+
+<span class="sd">            Return:</span>
+<span class="sd">                Worker(class)</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">return</span> <span class="n">Worker</span><span class="p">(</span><span class="n">wt</span><span class="p">,</span> <span class="n">rates</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">worker_cost_rate</span><span class="p">)</span></div>
+
+    <span class="c1"># Method returning dict of workers used in configuration</span>
+<div class="viewcode-block" id="Configuration.get_current_workers"><a class="viewcode-back" href="../../lyra_graphtool.html#lyra_graphtool.configuration.Configuration.get_current_workers">[docs]</a>    <span class="k">def</span> <span class="nf">get_current_workers</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config</span><span class="p">:</span> <span class="n">Dict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        # Method returning dict of workers used in configuration</span>
+
+<span class="sd">            Arguments:</span>
+<span class="sd">                config: dict</span>
+
+<span class="sd">            Returns: </span>
+<span class="sd">                dict</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="n">used_workers</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">wt</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">worker_types</span><span class="p">:</span>
+            <span class="n">used_workers</span><span class="p">[</span><span class="n">wt</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="k">for</span> <span class="n">wn</span><span class="p">,</span> <span class="n">sched</span> <span class="ow">in</span> <span class="n">config</span><span class="p">[</span><span class="n">wt</span><span class="p">]</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                <span class="n">not_na</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span> <span class="k">if</span> <span class="n">cs</span><span class="o">.</span><span class="n">v</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="mi">0</span> <span class="k">for</span> <span class="n">_</span><span class="p">,</span> <span class="n">cs</span> <span class="ow">in</span> <span class="n">sched</span><span class="o">.</span><span class="n">items</span><span class="p">()]</span>
+                <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">not_na</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="n">used_workers</span><span class="p">[</span><span class="n">wt</span><span class="p">]</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="k">return</span> <span class="n">used_workers</span></div>
+
+    <span class="c1"># Method to return sites accessed in schedule</span>
+    <span class="c1"># Return: dict with key (x,y) , value access_count: int</span>
+    <span class="c1"># Note: access_count = 1 means the site v appeared v.time_to_acquire adjacent times in a schedule</span>
+<div class="viewcode-block" id="Configuration.get_accessed_sites"><a class="viewcode-back" href="../../lyra_graphtool.html#lyra_graphtool.configuration.Configuration.get_accessed_sites">[docs]</a>    <span class="k">def</span> <span class="nf">get_accessed_sites</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">schedule</span><span class="p">:</span> <span class="n">Dict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Dict</span><span class="p">,</span> <span class="nb">str</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        # Method to return sites accessed in a schedule</span>
+<span class="sd">        </span>
+<span class="sd">                Note: access_count = 1 means the site v appeared v.time_to_acquire adjacent times in a schedule</span>
+
+<span class="sd">            Parameters:</span>
+<span class="sd">                schedule: dict</span>
+<span class="sd">            </span>
+<span class="sd">            Return: </span>
+<span class="sd">                dict with key (x,y) </span>
+
+<span class="sd">                value access_count: int</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="n">accesses</span> <span class="o">=</span> <span class="p">{(</span><span class="n">vertex</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="n">vertex</span><span class="o">.</span><span class="n">y</span><span class="p">):</span> <span class="mi">0</span> <span class="k">for</span> <span class="n">vertex</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">graph</span><span class="o">.</span><span class="n">vertices</span>
+                    <span class="k">if</span> <span class="n">vertex</span><span class="o">.</span><span class="n">vertex_type</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">graph</span><span class="o">.</span><span class="n">vertices</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">accessible_types</span><span class="p">()</span>
+                    <span class="p">}</span>
+        <span class="n">worker_message</span> <span class="o">=</span> <span class="s2">&quot;Log of accesses:</span><span class="se">\n</span><span class="s2">&quot;</span>
+
+        <span class="k">for</span> <span class="n">wt</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">worker_types</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">wn</span><span class="p">,</span> <span class="n">sched</span> <span class="ow">in</span> <span class="n">schedule</span><span class="p">[</span><span class="n">wt</span><span class="p">]</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                <span class="n">t</span> <span class="o">=</span> <span class="mi">0</span>
+                <span class="k">while</span> <span class="n">t</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">sched</span><span class="p">):</span>
+                    <span class="n">curr_sched</span> <span class="o">=</span> <span class="n">sched</span><span class="p">[</span><span class="n">t</span><span class="p">]</span>
+                    <span class="k">if</span> <span class="n">curr_sched</span><span class="o">.</span><span class="n">access</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">:</span>
+                        <span class="n">t</span> <span class="o">=</span> <span class="n">t</span> <span class="o">+</span> <span class="nb">max</span><span class="p">(</span><span class="n">curr_sched</span><span class="o">.</span><span class="n">v</span><span class="o">.</span><span class="n">time_to_acquire</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+                        <span class="n">accesses</span><span class="p">[(</span><span class="n">curr_sched</span><span class="o">.</span><span class="n">v</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="n">curr_sched</span><span class="o">.</span><span class="n">v</span><span class="o">.</span><span class="n">y</span><span class="p">)]</span> <span class="o">+=</span> <span class="mi">1</span>
+                        <span class="n">worker_message</span> <span class="o">+=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">wt</span><span class="o">.</span><span class="fm">__str__</span><span class="p">()</span><span class="si">}</span><span class="s2"> number </span><span class="si">{</span><span class="n">wn</span><span class="si">}</span><span class="s2"> accessed &quot;</span> \
+                                          <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">curr_sched</span><span class="o">.</span><span class="n">v</span><span class="o">.</span><span class="n">vertex_type</span><span class="o">.</span><span class="fm">__str__</span><span class="p">()</span><span class="si">}</span><span class="s2"> at &quot;</span> \
+                                          <span class="sa">f</span><span class="s2">&quot;(</span><span class="si">{</span><span class="n">curr_sched</span><span class="o">.</span><span class="n">v</span><span class="o">.</span><span class="n">x</span><span class="si">}</span><span class="s2">, </span><span class="si">{</span><span class="n">curr_sched</span><span class="o">.</span><span class="n">v</span><span class="o">.</span><span class="n">y</span><span class="si">}</span><span class="s2">) at time step </span><span class="si">{</span><span class="n">t</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span>
+                    <span class="n">t</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="k">return</span> <span class="n">accesses</span><span class="p">,</span> <span class="n">worker_message</span></div>
+
+    <span class="c1"># Method to return maximum revenue for graph</span>
+<div class="viewcode-block" id="Configuration.get_max_revenue"><a class="viewcode-back" href="../../lyra_graphtool.html#lyra_graphtool.configuration.Configuration.get_max_revenue">[docs]</a>    <span class="k">def</span> <span class="nf">get_max_revenue</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        # Method to return maximum revenue for graph</span>
+
+<span class="sd">            Arguments:</span>
+<span class="sd">                None</span>
+
+<span class="sd">            Return:</span>
+<span class="sd">                int, maximum revenue</span>
+<span class="sd">                    max_revenue = amount_of_sites * single_reward</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="n">max_revenue</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">for</span> <span class="n">site_type</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">graph</span><span class="o">.</span><span class="n">vertices</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">accessible_types</span><span class="p">():</span>
+            <span class="n">amount_of_sites</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">graph</span><span class="o">.</span><span class="n">get_vertices_type</span><span class="p">(</span><span class="n">site_type</span><span class="p">))</span>
+            <span class="k">if</span> <span class="n">amount_of_sites</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="k">continue</span>
+            <span class="n">single_reward</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">graph</span><span class="o">.</span><span class="n">get_vertices_type</span><span class="p">(</span><span class="n">site_type</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">reward</span>
+            <span class="n">max_revenue</span> <span class="o">+=</span> <span class="n">amount_of_sites</span> <span class="o">*</span> <span class="n">single_reward</span>
+        <span class="k">return</span> <span class="n">max_revenue</span></div>
+
+    <span class="c1"># True if site v is being accessed at time t in configuration</span>
+    <span class="c1"># False otherwise</span>
+<div class="viewcode-block" id="Configuration.site_accessed_at_time"><a class="viewcode-back" href="../../lyra_graphtool.html#lyra_graphtool.configuration.Configuration.site_accessed_at_time">[docs]</a>    <span class="k">def</span> <span class="nf">site_accessed_at_time</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">v</span><span class="p">:</span> <span class="n">Vertex</span><span class="p">,</span> <span class="n">t</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        # Returns bool value to determine if site is being accessed at time t in configuration</span>
+
+<span class="sd">            Arguments:</span>
+<span class="sd">                v: Vertex object, from lyra_graphtool.vertex</span>
+<span class="sd">                </span>
+<span class="sd">                t: int, time step value </span>
+
+<span class="sd">            Returns: </span>
+<span class="sd">                bool </span>
+<span class="sd">                    True if site v is being accessed at time t in configuration, False otherwise</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+
+        <span class="k">for</span> <span class="n">wt</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">worker_types</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">wn</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="n">wt</span><span class="p">])):</span>
+                <span class="n">max_time</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="n">wt</span><span class="p">][</span><span class="n">wn</span><span class="p">])</span> <span class="o">-</span> <span class="mi">1</span>
+
+                <span class="k">if</span> <span class="n">t</span> <span class="o">&gt;</span> <span class="n">max_time</span><span class="p">:</span>
+                    <span class="k">continue</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">cs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="n">wt</span><span class="p">][</span><span class="n">wn</span><span class="p">][</span><span class="n">t</span><span class="p">]</span>
+                    <span class="k">if</span> <span class="n">cs</span><span class="o">.</span><span class="n">v</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                        <span class="k">if</span> <span class="n">cs</span><span class="o">.</span><span class="n">v</span> <span class="o">==</span> <span class="n">v</span> <span class="ow">and</span> <span class="n">cs</span><span class="o">.</span><span class="n">access</span><span class="p">:</span>
+                            <span class="k">return</span> <span class="kc">True</span>
+
+        <span class="k">return</span> <span class="kc">False</span></div>
+
+    <span class="c1"># True if site v is being accessed in configuration</span>
+    <span class="c1"># False otherwise</span>
+<div class="viewcode-block" id="Configuration.site_accessed"><a class="viewcode-back" href="../../lyra_graphtool.html#lyra_graphtool.configuration.Configuration.site_accessed">[docs]</a>    <span class="k">def</span> <span class="nf">site_accessed</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">v</span><span class="p">:</span> <span class="n">Vertex</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        # Returns bool value to determine if site is being accessed in configuration</span>
+
+<span class="sd">            Arguments:</span>
+<span class="sd">                v: Vertex object, from lyra_graphtool.vertex</span>
+
+<span class="sd">            Returns: </span>
+<span class="sd">                bool </span>
+<span class="sd">                    True if site v is being accessed in configuration, False otherwise</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">for</span> <span class="n">wt</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">worker_types</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">wn</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="n">wt</span><span class="p">])):</span>
+                <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="n">wt</span><span class="p">][</span><span class="n">wn</span><span class="p">])):</span>
+                    <span class="n">cs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="n">wt</span><span class="p">][</span><span class="n">wn</span><span class="p">][</span><span class="n">t</span><span class="p">]</span>
+                    <span class="k">if</span> <span class="n">cs</span><span class="o">.</span><span class="n">v</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                        <span class="k">if</span> <span class="n">cs</span><span class="o">.</span><span class="n">v</span> <span class="o">==</span> <span class="n">v</span> <span class="ow">and</span> <span class="n">cs</span><span class="o">.</span><span class="n">access</span><span class="p">:</span>
+                            <span class="k">return</span> <span class="kc">True</span>
+        <span class="k">return</span> <span class="kc">False</span></div>
+
+    <span class="c1"># get length of a one worker schedule, how many timesteps was it active?</span>
+<div class="viewcode-block" id="Configuration.get_sched_path_length"><a class="viewcode-back" href="../../lyra_graphtool.html#lyra_graphtool.configuration.Configuration.get_sched_path_length">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">get_sched_path_length</span><span class="p">(</span><span class="n">sched</span><span class="p">:</span> <span class="n">Dict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        # Method to return length of a one worker schedule. Used to determine how many timesteps was the worker active.</span>
+
+<span class="sd">            Arguments:</span>
+<span class="sd">                sched: dict, schedule </span>
+
+<span class="sd">            Returns: </span>
+<span class="sd">                int, number of active timesteps</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="n">length</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">for</span> <span class="n">t</span><span class="p">,</span> <span class="n">cs</span> <span class="ow">in</span> <span class="n">sched</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="k">if</span> <span class="n">cs</span><span class="o">.</span><span class="n">v</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">length</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="k">return</span> <span class="n">length</span></div>
+
+    <span class="c1"># True if schedule for single worker is empty</span>
+    <span class="c1"># False if otherwise</span>
+<div class="viewcode-block" id="Configuration.is_empty"><a class="viewcode-back" href="../../lyra_graphtool.html#lyra_graphtool.configuration.Configuration.is_empty">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">is_empty</span><span class="p">(</span><span class="n">sched</span><span class="p">:</span> <span class="n">Dict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        # Method to determine if single worker scedule is empty</span>
+
+<span class="sd">            Arguments:</span>
+<span class="sd">                sched: dict, schedule </span>
+
+<span class="sd">            Returns: </span>
+<span class="sd">                bool</span>
+<span class="sd">                    True if schedule for single worker is empty, False if otherwise</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">for</span> <span class="n">t</span><span class="p">,</span> <span class="n">cs</span> <span class="ow">in</span> <span class="n">sched</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="k">if</span> <span class="n">cs</span><span class="o">.</span><span class="n">v</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">return</span> <span class="kc">False</span>
+        <span class="k">return</span> <span class="kc">True</span></div>
+
+    <span class="c1"># Test if schedule is feasible spatially</span>
+    <span class="c1">#   Note: a schedule is a sequence of Config_Single_Time objects</span>
+    <span class="c1">#</span>
+    <span class="c1"># 1. must start at ORIGIN type vertex if origin_flag==True</span>
+    <span class="c1"># 2. ending vertex followed by None vertices</span>
+    <span class="c1"># 3. if hire worker again at later time, must start at ORIGIN</span>
+    <span class="c1">#</span>
+    <span class="c1"># If origin_flag==False, schedule can start/restart at any vertex</span>
+    <span class="c1">#</span>
+    <span class="c1"># sched is Dict with values Config_Single_Time</span>
+    <span class="c1">#</span>
+<div class="viewcode-block" id="Configuration.sched_feasible_space"><a class="viewcode-back" href="../../lyra_graphtool.html#lyra_graphtool.configuration.Configuration.sched_feasible_space">[docs]</a>    <span class="k">def</span> <span class="nf">sched_feasible_space</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sched</span><span class="p">:</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">origin_flag</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        # Method to determine if schedule is spatially feasible</span>
+
+<span class="sd">                Criteria</span>
+<span class="sd">                    1. Must start at ORIGIN type vertex if origin_flag==True</span>
+<span class="sd">                    2. Ending vertex followed by None vertices</span>
+<span class="sd">                    3. If hire worker again at later time, must start at ORIGIN</span>
+<span class="sd">                    Note: If origin_flag==False, schedule can start/restart at any vertex</span>
+
+<span class="sd">            Arguments:</span>
+<span class="sd">                sched: dict, schedule</span>
+<span class="sd">                    Note: a schedule is a sequence of Config_Single_Time objects</span>
+<span class="sd">                    </span>
+<span class="sd">                origin_flag: bool, default True</span>
+
+<span class="sd">            Returns: </span>
+<span class="sd">                bool</span>
+<span class="sd">                    True if schedule is spatially feasible, false if otherwise</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">sched</span><span class="p">)</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">duration_time</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Schedule must have </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">duration_time</span><span class="si">}</span><span class="s1"> keys to match duration_time.&#39;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">sched</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">v</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">origin_flag</span><span class="p">:</span>  <span class="c1"># must start at origin if specified</span>
+            <span class="k">if</span> <span class="n">sched</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">v</span><span class="o">.</span><span class="n">vertex_type</span> <span class="o">!=</span> <span class="n">Vertex_Type</span><span class="o">.</span><span class="n">ORIGIN</span><span class="p">:</span>
+                <span class="k">return</span> <span class="kc">False</span>
+
+        <span class="c1"># make sure adjacent vertices are in edge set</span>
+        <span class="n">v_prev</span> <span class="o">=</span> <span class="n">sched</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">v</span>  <span class="c1"># this may be None</span>
+        <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">duration_time</span><span class="p">):</span>
+
+            <span class="k">if</span> <span class="n">sched</span><span class="p">[</span><span class="n">t</span><span class="p">]</span><span class="o">.</span><span class="n">v</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>  <span class="c1"># current vertex is None</span>
+                <span class="n">v_prev</span> <span class="o">=</span> <span class="kc">None</span>
+                <span class="k">continue</span>
+
+            <span class="k">else</span><span class="p">:</span>  <span class="c1"># actual vertex:  path[t].v is not None</span>
+
+                <span class="k">if</span> <span class="n">v_prev</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>  <span class="c1"># vertex following None</span>
+                    <span class="k">if</span> <span class="n">origin_flag</span><span class="p">:</span>
+                        <span class="k">if</span> <span class="n">sched</span><span class="p">[</span><span class="n">t</span><span class="p">]</span><span class="o">.</span><span class="n">v</span><span class="o">.</span><span class="n">vertex_type</span> <span class="o">!=</span> <span class="n">Vertex_Type</span><span class="o">.</span><span class="n">ORIGIN</span><span class="p">:</span>
+                            <span class="k">return</span> <span class="kc">False</span>
+                        <span class="k">else</span><span class="p">:</span>
+                            <span class="n">v_prev</span> <span class="o">=</span> <span class="n">sched</span><span class="p">[</span><span class="n">t</span><span class="p">]</span><span class="o">.</span><span class="n">v</span>
+                            <span class="k">continue</span>  <span class="c1"># ORIGIN following None is ok</span>
+
+                    <span class="k">else</span><span class="p">:</span>  <span class="c1"># any vertex can follow None</span>
+                        <span class="n">v_prev</span> <span class="o">=</span> <span class="n">sched</span><span class="p">[</span><span class="n">t</span><span class="p">]</span><span class="o">.</span><span class="n">v</span>
+                        <span class="k">continue</span>
+
+                <span class="k">elif</span> <span class="n">sched</span><span class="p">[</span><span class="n">t</span><span class="p">]</span><span class="o">.</span><span class="n">v</span> <span class="o">==</span> <span class="n">v_prev</span><span class="p">:</span>  <span class="c1"># can stay at previous location</span>
+                    <span class="n">v_prev</span> <span class="o">=</span> <span class="n">sched</span><span class="p">[</span><span class="n">t</span><span class="p">]</span><span class="o">.</span><span class="n">v</span>
+                    <span class="k">continue</span>
+
+                <span class="k">else</span><span class="p">:</span>  <span class="c1"># different location: vertex follows vertex (both not None)</span>
+
+                    <span class="c1"># must be an edge in graph</span>
+                    <span class="n">e</span> <span class="o">=</span> <span class="n">Edge</span><span class="p">(</span><span class="n">v_prev</span><span class="p">,</span> <span class="n">sched</span><span class="p">[</span><span class="n">t</span><span class="p">]</span><span class="o">.</span><span class="n">v</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="n">e</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">graph</span><span class="o">.</span><span class="n">edges</span><span class="p">:</span>
+                        <span class="k">return</span> <span class="kc">False</span>
+                    <span class="k">else</span><span class="p">:</span>  <span class="c1"># it is an edge</span>
+                        <span class="n">v_prev</span> <span class="o">=</span> <span class="n">sched</span><span class="p">[</span><span class="n">t</span><span class="p">]</span><span class="o">.</span><span class="n">v</span>
+        <span class="k">return</span> <span class="kc">True</span></div>
+
+    <span class="c1">#</span>
+    <span class="c1"># Test all schedules for spatial feasibility</span>
+    <span class="c1">#</span>
+<div class="viewcode-block" id="Configuration.sched_all_feasible_space"><a class="viewcode-back" href="../../lyra_graphtool.html#lyra_graphtool.configuration.Configuration.sched_all_feasible_space">[docs]</a>    <span class="k">def</span> <span class="nf">sched_all_feasible_space</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">origin_flag</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        # Method to determine if ALL schedules are spatially feasible</span>
+
+<span class="sd">            Arguments:</span>
+<span class="sd">                origin_flag: bool, default True</span>
+
+<span class="sd">            Returns: </span>
+<span class="sd">                bool</span>
+<span class="sd">                    True if schedule is spatially feasible, false if otherwise</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+
+        <span class="k">for</span> <span class="n">worker_type</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">worker_types</span><span class="p">:</span>
+
+            <span class="k">for</span> <span class="n">worker_number</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="n">worker_type</span><span class="p">])):</span>
+
+                <span class="n">sched</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="n">worker_type</span><span class="p">][</span><span class="n">worker_number</span><span class="p">]</span>
+
+                <span class="n">feas</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sched_feasible_space</span><span class="p">(</span><span class="n">sched</span><span class="p">,</span> <span class="n">origin_flag</span><span class="p">)</span>
+
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">feas</span><span class="p">:</span>
+                    <span class="k">return</span> <span class="kc">False</span>
+        <span class="k">return</span> <span class="kc">True</span></div>
+
+    <span class="c1"># Test if a schedule&#39;s access/extract properties are feasible</span>
+    <span class="c1">#</span>
+    <span class="c1"># 1. Can only access site - cannot access a non-site vertex as BASIC, ORIGIN</span>
+    <span class="c1"># 2. Access constraint - must have Worker &gt;= SITE</span>
+    <span class="c1"># 3. If accessing, must access site for v.days_to_acquire</span>
+    <span class="c1"># 4. Cannot access after expiration time</span>
+    <span class="c1"># 5. Cannot access a site more than once</span>
+    <span class="c1">#</span>
+<div class="viewcode-block" id="Configuration.sched_feasible_access_sites"><a class="viewcode-back" href="../../lyra_graphtool.html#lyra_graphtool.configuration.Configuration.sched_feasible_access_sites">[docs]</a>    <span class="k">def</span> <span class="nf">sched_feasible_access_sites</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sched</span><span class="p">:</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">worker_type</span><span class="p">:</span> <span class="n">Worker_Type</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        # Method to determine if schedule&#39;s access/extract properties are feasible</span>
+
+<span class="sd">                Criteria</span>
+<span class="sd">                    1. Can only access site - cannot access a non-site vertex as BASIC, ORIGIN</span>
+<span class="sd">                    2. Access constraint - must have Worker &gt;= SITE</span>
+<span class="sd">                    3. If accessing, must access site for v.days_to_acquire</span>
+<span class="sd">                    4. Cannot access after expiration time</span>
+<span class="sd">                    5. Cannot access a site more than once</span>
+
+<span class="sd">            Arguments:</span>
+<span class="sd">                sched: dict, schedule</span>
+<span class="sd">                    Note: a schedule is a sequence of Config_Single_Time objects</span>
+<span class="sd">                    </span>
+<span class="sd">                worker_type: Worker_Type (class), from lyra_graphtool.worker</span>
+
+<span class="sd">            Returns: </span>
+<span class="sd">                bool</span>
+<span class="sd">                    True if schedule&#39;s access/extract properties are feasible, False if otherwise</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+
+        <span class="n">sites_accessed</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">t</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">while</span> <span class="n">t</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">sched</span><span class="p">):</span>
+
+            <span class="n">v</span> <span class="o">=</span> <span class="n">sched</span><span class="p">[</span><span class="n">t</span><span class="p">]</span><span class="o">.</span><span class="n">v</span>
+            <span class="n">acc</span> <span class="o">=</span> <span class="n">sched</span><span class="p">[</span><span class="n">t</span><span class="p">]</span><span class="o">.</span><span class="n">access</span>
+
+            <span class="k">if</span> <span class="n">v</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">acc</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">False</span><span class="p">:</span>
+                    <span class="k">return</span> <span class="kc">False</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">t</span> <span class="o">+=</span> <span class="mi">1</span>
+                    <span class="k">continue</span>
+
+            <span class="k">if</span> <span class="n">v</span><span class="o">.</span><span class="n">vertex_type</span> <span class="o">==</span> <span class="n">Vertex_Type</span><span class="o">.</span><span class="n">BASIC</span> <span class="ow">or</span> <span class="n">v</span><span class="o">.</span><span class="n">vertex_type</span> <span class="o">==</span>  <span class="n">Vertex_Type</span><span class="o">.</span><span class="n">ORIGIN</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">acc</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">:</span>
+                    <span class="k">return</span> <span class="kc">False</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">t</span> <span class="o">+=</span> <span class="mi">1</span>
+
+            <span class="k">else</span><span class="p">:</span>  <span class="c1"># default - this vertex is a site</span>
+                <span class="k">if</span> <span class="n">acc</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">:</span>
+
+                    <span class="c1"># test if sites was previously accessed</span>
+                    <span class="k">if</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">sites_accessed</span><span class="p">:</span>
+                        <span class="k">return</span> <span class="kc">False</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="n">sites_accessed</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">v</span><span class="p">)</span>
+
+                    <span class="c1"># test if worker allowed to access</span>
+                    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_worker</span><span class="p">(</span><span class="n">worker_type</span><span class="p">)</span><span class="o">.</span><span class="n">access</span><span class="p">(</span><span class="n">v</span><span class="p">)</span> <span class="ow">is</span> <span class="kc">False</span><span class="p">:</span>
+                        <span class="k">return</span> <span class="kc">False</span>
+
+                    <span class="c1"># test if accessing after expire</span>
+                    <span class="k">if</span> <span class="n">v</span><span class="o">.</span><span class="n">expiration_time</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                        <span class="k">if</span> <span class="n">t</span> <span class="o">&gt;=</span> <span class="n">v</span><span class="o">.</span><span class="n">expiration_time</span><span class="p">:</span>
+                            <span class="k">return</span> <span class="kc">False</span>
+
+                    <span class="c1"># set future times to same vertex with access=True</span>
+                    <span class="k">for</span> <span class="n">t_off</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">v</span><span class="o">.</span><span class="n">time_to_acquire</span><span class="p">):</span>
+                        <span class="k">if</span> <span class="n">t</span> <span class="o">+</span> <span class="n">t_off</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">duration_time</span><span class="p">:</span>
+                            <span class="n">s2</span> <span class="o">=</span> <span class="n">sched</span><span class="p">[</span><span class="n">t</span> <span class="o">+</span> <span class="n">t_off</span><span class="p">]</span>
+                            <span class="n">v2</span><span class="p">,</span> <span class="n">acc2</span> <span class="o">=</span> <span class="n">s2</span><span class="o">.</span><span class="n">v</span><span class="p">,</span> <span class="n">s2</span><span class="o">.</span><span class="n">access</span>
+                        <span class="k">else</span><span class="p">:</span>  <span class="c1"># ran out of time: infeasible</span>
+                            <span class="k">return</span> <span class="kc">False</span>
+
+                        <span class="k">if</span> <span class="n">v2</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                            <span class="k">return</span> <span class="kc">False</span>
+                        <span class="k">elif</span> <span class="n">v2</span> <span class="o">!=</span> <span class="n">v</span> <span class="ow">or</span> <span class="n">acc2</span> <span class="ow">is</span> <span class="kc">False</span><span class="p">:</span>
+                            <span class="k">return</span> <span class="kc">False</span>
+
+                    <span class="n">t</span> <span class="o">+=</span> <span class="n">v</span><span class="o">.</span><span class="n">time_to_acquire</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">t</span> <span class="o">+=</span> <span class="mi">1</span>
+
+        <span class="k">return</span> <span class="kc">True</span></div>
+
+    <span class="c1">#</span>
+    <span class="c1"># Test all schedules for access feasibility</span>
+    <span class="c1">#</span>
+    <span class="c1"># 1. Only one worker can access a specific site at a single point in time</span>
+    <span class="c1"># 2. Once a site has been accessed, it can no longer be accessed at subsequent times</span>
+    <span class="c1">#</span>
+    <span class="c1"># noinspection SpellCheckingInspection</span>
+<div class="viewcode-block" id="Configuration.sched_all_feasible_access_sites"><a class="viewcode-back" href="../../lyra_graphtool.html#lyra_graphtool.configuration.Configuration.sched_all_feasible_access_sites">[docs]</a>    <span class="k">def</span> <span class="nf">sched_all_feasible_access_sites</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        # Method to determine if schedule&#39;s access properties are feasible</span>
+
+<span class="sd">                Criteria</span>
+<span class="sd">                    1. Only one worker can access a specific site at a single point in time</span>
+<span class="sd">                    2. Once a site has been accessed, it can no longer be accessed at subsequent times</span>
+
+<span class="sd">            Arguments:</span>
+<span class="sd">                None</span>
+
+<span class="sd">            Return: </span>
+<span class="sd">                bool</span>
+<span class="sd">                    True if schedule&#39;s access properties are feasible, False if otherwise</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+
+        <span class="c1"># check schedule feasibility for each individual worker</span>
+        <span class="k">for</span> <span class="n">worker_type</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">worker_types</span><span class="p">:</span>
+
+            <span class="k">for</span> <span class="n">worker_number</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="n">worker_type</span><span class="p">])):</span>
+
+                <span class="n">sched</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="n">worker_type</span><span class="p">][</span><span class="n">worker_number</span><span class="p">]</span>
+
+                <span class="n">feas</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sched_feasible_access_sites</span><span class="p">(</span><span class="n">sched</span><span class="p">,</span> <span class="n">worker_type</span><span class="p">)</span>
+
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">feas</span><span class="p">:</span>
+                    <span class="k">return</span> <span class="kc">False</span>
+
+        <span class="c1"># check that each site is accessed no more than one time</span>
+        <span class="n">accesses</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_accessed_sites</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="nb">max</span><span class="p">(</span><span class="n">accesses</span><span class="o">.</span><span class="n">values</span><span class="p">())</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">False</span>
+
+        <span class="k">return</span> <span class="kc">True</span></div>
+
+    <span class="c1">#</span>
+    <span class="c1"># Calculate cost of a single-worker schedule</span>
+    <span class="c1">#</span>
+    <span class="c1"># sched is a dict with key=time, value=Config_Single_Time</span>
+    <span class="c1">#   (for a single worker)</span>
+    <span class="c1">#</span>
+<div class="viewcode-block" id="Configuration.cost_sched"><a class="viewcode-back" href="../../lyra_graphtool.html#lyra_graphtool.configuration.Configuration.cost_sched">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">cost_sched</span><span class="p">(</span><span class="n">sched</span><span class="p">:</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">worker</span><span class="p">:</span> <span class="n">Worker</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        # Calculate the cost of a single-worker schedule</span>
+
+<span class="sd">            Arguments:</span>
+<span class="sd">                sched: dict,</span>
+<span class="sd">                    sched is a dict with key=time, value=Config_Single_Time (for a single worker)</span>
+<span class="sd">                    worker: Worker (class), from lyra_graphtool.worker</span>
+
+<span class="sd">            Returns:</span>
+<span class="sd">                float, cost value of a single worker schedule</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+
+        <span class="n">cost_sched</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">sched</span><span class="p">)):</span>
+            <span class="n">v</span> <span class="o">=</span> <span class="n">sched</span><span class="p">[</span><span class="n">t</span><span class="p">]</span><span class="o">.</span><span class="n">v</span>
+            <span class="n">access</span> <span class="o">=</span> <span class="n">sched</span><span class="p">[</span><span class="n">t</span><span class="p">]</span><span class="o">.</span><span class="n">access</span>
+
+            <span class="k">if</span> <span class="n">v</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>  <span class="c1"># worker not on payroll</span>
+                <span class="k">continue</span>
+
+            <span class="k">else</span><span class="p">:</span>  <span class="c1"># worker is on payroll</span>
+
+                <span class="n">cost_base</span> <span class="o">=</span> <span class="n">worker</span><span class="o">.</span><span class="n">worker_cost_rate</span>
+                <span class="n">cost</span> <span class="o">=</span> <span class="n">cost_base</span>
+
+                <span class="k">if</span> <span class="n">access</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">:</span>
+
+                    <span class="c1"># get multipliers</span>
+                    <span class="n">mult_time</span> <span class="o">=</span> <span class="n">v</span><span class="o">.</span><span class="n">mult_time</span>
+                    <span class="n">mult_time_start</span> <span class="o">=</span> <span class="n">v</span><span class="o">.</span><span class="n">mult_time_active</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+                    <span class="n">mult_time_end</span> <span class="o">=</span> <span class="n">v</span><span class="o">.</span><span class="n">mult_time_active</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+                    <span class="n">mult_worker</span> <span class="o">=</span> <span class="n">v</span><span class="o">.</span><span class="n">mult_worker</span>
+
+                    <span class="c1"># cost for time multiplier</span>
+                    <span class="k">if</span> <span class="n">mult_time_start</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">mult_time_end</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                        <span class="k">if</span> <span class="n">mult_time_start</span> <span class="o">&lt;=</span> <span class="n">t</span> <span class="o">&lt;=</span> <span class="n">mult_time_end</span><span class="p">:</span>
+                            <span class="n">cost</span> <span class="o">+=</span> <span class="p">(</span><span class="n">mult_time</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="n">cost_base</span>
+
+                    <span class="c1"># cost for site multiplier</span>
+                    <span class="n">wt</span> <span class="o">=</span> <span class="n">worker</span><span class="o">.</span><span class="n">worker_type</span>
+                    <span class="k">if</span> <span class="n">wt</span> <span class="ow">in</span> <span class="n">mult_worker</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+                        <span class="n">cost</span> <span class="o">+=</span> <span class="p">(</span><span class="n">mult_worker</span><span class="p">[</span><span class="n">wt</span><span class="p">]</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="n">cost_base</span>
+
+                <span class="n">cost_sched</span> <span class="o">+=</span> <span class="n">cost</span>
+
+        <span class="k">return</span> <span class="n">cost_sched</span></div>
+
+    <span class="c1">#</span>
+    <span class="c1"># Calculate cost of entire configuration</span>
+    <span class="c1">#</span>
+    <span class="c1"># sched is a dict with key=time, value=Config_Single_Time</span>
+    <span class="c1">#   (for a single worker)</span>
+    <span class="c1">#</span>
+    <span class="c1"># NOTE: default worker_cost_rate is used for each worker type</span>
+<div class="viewcode-block" id="Configuration.cost"><a class="viewcode-back" href="../../lyra_graphtool.html#lyra_graphtool.configuration.Configuration.cost">[docs]</a>    <span class="k">def</span> <span class="nf">cost</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        # Calculate the cost of the entire configuration</span>
+<span class="sd">                Note: default worker_cost_rate is used for each worker type</span>
+
+<span class="sd">            Arguments:</span>
+<span class="sd">                None</span>
+
+<span class="sd">            Returns:</span>
+<span class="sd">                float, cost value of entire configuration</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+
+        <span class="n">cost_config</span> <span class="o">=</span> <span class="mi">0</span>
+
+        <span class="k">for</span> <span class="n">wt</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">worker_types</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">wn</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="n">wt</span><span class="p">])):</span>
+                <span class="n">sched</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="n">wt</span><span class="p">][</span><span class="n">wn</span><span class="p">]</span>
+                <span class="n">worker</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_worker</span><span class="p">(</span><span class="n">wt</span><span class="p">)</span>
+                <span class="n">cost_config</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">cost_sched</span><span class="p">(</span><span class="n">sched</span><span class="p">,</span> <span class="n">worker</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">cost_config</span></div>
+
+    <span class="c1"># Budget Feasibility of Configuration</span>
+<div class="viewcode-block" id="Configuration.budget_feasible"><a class="viewcode-back" href="../../lyra_graphtool.html#lyra_graphtool.configuration.Configuration.budget_feasible">[docs]</a>    <span class="k">def</span> <span class="nf">budget_feasible</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        # Method to determine if budget is feasible for configuration. If Cost &lt;= Budget then Feasible else Not Feasible</span>
+
+<span class="sd">            Arguments:</span>
+<span class="sd">                None</span>
+
+<span class="sd">            Returns:</span>
+<span class="sd">                bool</span>
+<span class="sd">                    True if budget is feasible, False if otherwise</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">cost</span><span class="p">()</span> <span class="o">&lt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">budget</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">True</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">False</span></div>
+
+    <span class="c1"># test overall feasibility of config using above methods</span>
+<div class="viewcode-block" id="Configuration.feasible"><a class="viewcode-back" href="../../lyra_graphtool.html#lyra_graphtool.configuration.Configuration.feasible">[docs]</a>    <span class="k">def</span> <span class="nf">feasible</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        # Method to test the overall feasibily using sched_all_feasibility_space()</span>
+<span class="sd">        , sched_all_feasible_access_sites(), and budget_feasible()</span>
+
+<span class="sd">            Arguments:</span>
+<span class="sd">                None</span>
+
+<span class="sd">            Returns:</span>
+<span class="sd">                bool</span>
+<span class="sd">                    True if all functions are feasible, False if otherwise</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+
+        <span class="n">feas_space</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sched_all_feasible_space</span><span class="p">()</span>
+        <span class="n">feas_access</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sched_all_feasible_access_sites</span><span class="p">()</span>
+        <span class="n">feas_budget</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">budget_feasible</span><span class="p">()</span>
+
+        <span class="n">feas</span> <span class="o">=</span> <span class="n">feas_space</span> <span class="ow">and</span> <span class="n">feas_access</span> <span class="ow">and</span> <span class="n">feas_budget</span>
+
+        <span class="k">return</span> <span class="n">feas</span></div>
+
+    <span class="c1"># calculate returns/revenue from schedule for single worker</span>
+    <span class="c1">#</span>
+    <span class="c1"># sched should be tested for feasibility by sched_feasible_access_sites</span>
+    <span class="c1"># before calling this funciton</span>
+    <span class="c1">#</span>
+    <span class="c1"># Note: revenue depends on worker_type</span>
+<div class="viewcode-block" id="Configuration.sched_revenue"><a class="viewcode-back" href="../../lyra_graphtool.html#lyra_graphtool.configuration.Configuration.sched_revenue">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">sched_revenue</span><span class="p">(</span><span class="n">sched</span><span class="p">:</span> <span class="n">Dict</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        # Method to calculate revenue from schedule for single worker</span>
+<span class="sd">                Note: Sched should be tested for feasibility by sched_feasible_access_sites</span>
+<span class="sd">                before calling this function</span>
+
+<span class="sd">            Arguments:</span>
+<span class="sd">                sched: dict, schedule</span>
+<span class="sd">                    sched is a dict with key=time, value=Config_Single_Time (for a single worker)</span>
+<span class="sd">                    worker: Worker (class), from lyra_graphtool.worker</span>
+
+<span class="sd">            Returns:</span>
+<span class="sd">                int, revenue (depends on worker_type)</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+
+        <span class="n">revenue</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">t</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">while</span> <span class="n">t</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">sched</span><span class="p">):</span>
+
+            <span class="n">v</span> <span class="o">=</span> <span class="n">sched</span><span class="p">[</span><span class="n">t</span><span class="p">]</span><span class="o">.</span><span class="n">v</span>
+            <span class="n">acc</span> <span class="o">=</span> <span class="n">sched</span><span class="p">[</span><span class="n">t</span><span class="p">]</span><span class="o">.</span><span class="n">access</span>
+
+            <span class="k">if</span> <span class="n">acc</span> <span class="ow">is</span> <span class="kc">False</span><span class="p">:</span>  <span class="c1"># this covers non-SITEx vertices and .v = None</span>
+                <span class="n">t</span> <span class="o">+=</span> <span class="mi">1</span>
+                <span class="k">continue</span>
+
+            <span class="c1"># at SITEx vertex AND accessing</span>
+            <span class="n">revenue</span> <span class="o">+=</span> <span class="n">v</span><span class="o">.</span><span class="n">reward</span>
+            <span class="n">t</span> <span class="o">+=</span> <span class="n">v</span><span class="o">.</span><span class="n">time_to_acquire</span>
+
+        <span class="k">return</span> <span class="n">revenue</span></div>
+
+    <span class="c1"># calculate returns/revenue for entire configuration</span>
+    <span class="c1">#</span>
+    <span class="c1"># sched should be tested for feasibility by sched_feasible_access_sites</span>
+    <span class="c1"># before calling this funciton</span>
+    <span class="c1">#</span>
+<div class="viewcode-block" id="Configuration.revenue"><a class="viewcode-back" href="../../lyra_graphtool.html#lyra_graphtool.configuration.Configuration.revenue">[docs]</a>    <span class="k">def</span> <span class="nf">revenue</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        # Method to calculate revenue from schedule for entire configuration</span>
+<span class="sd">                Note: Sched should be tested for feasibility by sched_feasible_access_sites</span>
+<span class="sd">                before calling this function</span>
+
+<span class="sd">            Arguments:</span>
+<span class="sd">                None</span>
+
+<span class="sd">            Returns:</span>
+<span class="sd">                int, revenue value for entire configuration</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+
+        <span class="n">revenue</span> <span class="o">=</span> <span class="mi">0</span>
+
+        <span class="k">for</span> <span class="n">wt</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">worker_types</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">wn</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="n">wt</span><span class="p">])):</span>
+                <span class="n">sched</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="n">wt</span><span class="p">][</span><span class="n">wn</span><span class="p">]</span>
+                <span class="n">revenue</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sched_revenue</span><span class="p">(</span><span class="n">sched</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">revenue</span></div>
+
+    <span class="c1"># save configuration to file</span>
+<div class="viewcode-block" id="Configuration.save"><a class="viewcode-back" href="../../lyra_graphtool.html#lyra_graphtool.configuration.Configuration.save">[docs]</a>    <span class="k">def</span> <span class="nf">save</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">file_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        # Save configuration file to pickle format</span>
+
+<span class="sd">            Arguments:</span>
+<span class="sd">                filename: str, filepath for file to be saved</span>
+
+<span class="sd">            Returns:</span>
+<span class="sd">                None</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="n">fn</span> <span class="o">=</span> <span class="n">file_name</span>
+
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">fn</span><span class="p">,</span> <span class="s1">&#39;wb&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+            <span class="n">pickle</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">f</span><span class="p">)</span></div>
+
+    <span class="c1"># save Configuration.config schedule dictionary to json</span>
+<div class="viewcode-block" id="Configuration.save_to_json"><a class="viewcode-back" href="../../lyra_graphtool.html#lyra_graphtool.configuration.Configuration.save_to_json">[docs]</a>    <span class="k">def</span> <span class="nf">save_to_json</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">file_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        # Save configuration schedule dictionary to json format</span>
+
+<span class="sd">            Arguments:</span>
+<span class="sd">                filename: str, filepath for file to be saved</span>
+
+<span class="sd">            Returns:</span>
+<span class="sd">                None</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="n">config_json</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">wt</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">worker_types</span><span class="p">:</span>
+            <span class="n">config_json</span><span class="p">[</span><span class="n">wt</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+            <span class="k">for</span> <span class="n">wn</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="n">wt</span><span class="p">])):</span>
+                <span class="n">config_json</span><span class="p">[</span><span class="n">wt</span><span class="p">][</span><span class="n">wn</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+                <span class="n">sched</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="n">wt</span><span class="p">][</span><span class="n">wn</span><span class="p">]</span>
+                <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">sched</span><span class="p">)):</span>
+                    <span class="n">cs</span> <span class="o">=</span> <span class="n">sched</span><span class="p">[</span><span class="n">t</span><span class="p">]</span>
+                    <span class="n">v</span><span class="p">,</span> <span class="n">access</span> <span class="o">=</span> <span class="n">cs</span><span class="o">.</span><span class="n">v</span><span class="p">,</span> <span class="n">cs</span><span class="o">.</span><span class="n">access</span>
+                    <span class="k">if</span> <span class="n">v</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                        <span class="n">cs_basic</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;None&#39;</span><span class="p">,</span> <span class="n">cs</span><span class="o">.</span><span class="n">access</span><span class="p">]</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="n">cs_basic</span> <span class="o">=</span> <span class="p">[</span><span class="nb">float</span><span class="p">(</span><span class="n">v</span><span class="o">.</span><span class="n">x</span><span class="p">),</span> <span class="nb">float</span><span class="p">(</span><span class="n">v</span><span class="o">.</span><span class="n">y</span><span class="p">),</span> <span class="n">cs</span><span class="o">.</span><span class="n">access</span><span class="p">]</span>
+                    <span class="n">config_json</span><span class="p">[</span><span class="n">wt</span><span class="p">][</span><span class="n">wn</span><span class="p">][</span><span class="n">t</span><span class="p">]</span> <span class="o">=</span> <span class="n">cs_basic</span>
+        <span class="c1"># save to json</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">file_name</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+            <span class="n">json</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">config_json</span><span class="p">,</span> <span class="n">f</span><span class="p">)</span></div>
+
+    <span class="c1"># load json config into Configuration.config</span>
+<div class="viewcode-block" id="Configuration.load_from_json"><a class="viewcode-back" href="../../lyra_graphtool.html#lyra_graphtool.configuration.Configuration.load_from_json">[docs]</a>    <span class="k">def</span> <span class="nf">load_from_json</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">file_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        # Load configuration schedule dictionary from json format into Configuration.config</span>
+
+<span class="sd">            Arguments:</span>
+<span class="sd">                filename: str, json filepath to import</span>
+
+<span class="sd">            Returns:</span>
+<span class="sd">                None</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+
+        <span class="k">def</span> <span class="nf">jsonKeys2int</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+                <span class="k">return</span> <span class="p">{</span><span class="nb">int</span><span class="p">(</span><span class="n">k</span><span class="p">):</span> <span class="n">v</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">x</span><span class="o">.</span><span class="n">items</span><span class="p">()}</span>
+            <span class="k">return</span> <span class="n">x</span>
+
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">file_name</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+            <span class="n">d</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">object_hook</span><span class="o">=</span><span class="n">jsonKeys2int</span><span class="p">)</span>
+
+        <span class="n">config</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">wt</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">worker_types</span><span class="p">:</span>
+            <span class="n">config</span><span class="p">[</span><span class="n">wt</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+            <span class="k">for</span> <span class="n">wn</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="n">wt</span><span class="p">])):</span>
+                <span class="n">config</span><span class="p">[</span><span class="n">wt</span><span class="p">][</span><span class="n">wn</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+                <span class="n">sched</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="n">wt</span><span class="p">][</span><span class="n">wn</span><span class="p">]</span>
+                <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">sched</span><span class="p">)):</span>
+                    <span class="k">if</span> <span class="n">wt</span> <span class="ow">in</span> <span class="n">d</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+                        <span class="k">if</span> <span class="n">wn</span> <span class="ow">in</span> <span class="n">d</span><span class="p">[</span><span class="n">wt</span><span class="p">]</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+                            <span class="k">if</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">d</span><span class="p">[</span><span class="n">wt</span><span class="p">][</span><span class="n">wn</span><span class="p">]</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+                                <span class="n">csj</span> <span class="o">=</span> <span class="n">d</span><span class="p">[</span><span class="n">wt</span><span class="p">][</span><span class="n">wn</span><span class="p">][</span><span class="n">t</span><span class="p">]</span>
+                                <span class="k">if</span> <span class="n">csj</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;None&#39;</span><span class="p">:</span>
+                                    <span class="n">config</span><span class="p">[</span><span class="n">wt</span><span class="p">][</span><span class="n">wn</span><span class="p">][</span><span class="n">t</span><span class="p">]</span> <span class="o">=</span> <span class="n">Config_Single_Time</span><span class="p">()</span>
+                                <span class="k">else</span><span class="p">:</span>
+                                    <span class="n">msg_err</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;json dictionary in file </span><span class="si">{</span><span class="n">file_name</span><span class="si">}</span><span class="s1"> must have triple (float,float,bool) &#39;</span> <span class="o">+</span> \
+                                              <span class="sa">f</span><span class="s1">&#39;at index </span><span class="si">{</span><span class="p">[</span><span class="n">wt</span><span class="p">,</span><span class="w"> </span><span class="n">wn</span><span class="p">,</span><span class="w"> </span><span class="n">t</span><span class="p">]</span><span class="si">}</span><span class="s1">.&#39;</span>
+                                    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">csj</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">3</span><span class="p">:</span>
+                                        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">msg_err</span><span class="p">)</span>
+                                    <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">access</span> <span class="o">=</span> <span class="n">csj</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">csj</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">csj</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
+                                    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="nb">float</span><span class="p">)</span> <span class="ow">or</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="nb">float</span><span class="p">)</span> <span class="ow">or</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">access</span><span class="p">,</span>
+                                                                                                              <span class="nb">bool</span><span class="p">):</span>
+                                        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">msg_err</span><span class="p">)</span>
+                                    <span class="n">v</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">graph</span><span class="o">.</span><span class="n">get_vertex_xy</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+                                    <span class="k">if</span> <span class="n">v</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                                        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                                            <span class="sa">f</span><span class="s1">&#39;Vertex in json file </span><span class="si">{</span><span class="n">file_name</span><span class="si">}</span><span class="s1"> with coords </span><span class="si">{</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="n">y</span><span class="p">)</span><span class="si">}</span><span class="s1"> not found in graph.&#39;</span><span class="p">)</span>
+
+                                    <span class="n">config</span><span class="p">[</span><span class="n">wt</span><span class="p">][</span><span class="n">wn</span><span class="p">][</span><span class="n">t</span><span class="p">]</span> <span class="o">=</span> <span class="n">Config_Single_Time</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">access</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">config</span> <span class="o">=</span> <span class="n">config</span>  <span class="c1"># no errors, copy config</span></div>
+
+    <span class="c1"># override python deepcopy function, which is very slow</span>
+    <span class="c1"># 1. use pickle.dumps() to write object to binary file</span>
+    <span class="c1"># 2. use pickle.loads() to read binary file into new object</span>
+    <span class="c1"># Argument</span>
+    <span class="c1">#        memo: dummy variable to match format of deepcopy from copy library</span>
+    <span class="c1"># Returns</span>
+    <span class="c1">#        Node: deepcopy of original configuration</span>
+    <span class="c1">#</span>
+    <span class="k">def</span> <span class="nf">__deepcopy__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">memo</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">pickle</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">pickle</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">))</span>  <span class="c1"># -1 uses most recent protocol</span></div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, Xeek.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
