@@ -13,7 +13,7 @@ Package dependencies:
 * dependencies here
 
 
-Access `lyra_graphtool` docs can be found [here](https://www.github.com/studio-x-llc/lyra_graphtool)
+Access `lyra_graphtool` docs can be found [here](./docs/lyra_graphtool/index.html)
 
 `lyra_graphtool` tutorial notebook can be found [here](./notebooks/lyra_graphtool_tutorial.ipynb)
 
