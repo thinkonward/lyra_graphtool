@@ -12,9 +12,9 @@ from lyra_graphtool import Configuration, Config_Single_Time, Edge, Graph, Graph
 Package dependencies:
 * dependencies here
 ​
-​
-Access `lyra_graphtool` docs can be found [here](https://www.github.com/studio-x-llc/lyra_graphtool)
-​
-`lyra_graphtool` tutorial notebook can be found [here](./notebooks/lyra_graphtool_tutorial.ipynb)
-​
-Example notebook can be found [here](./notebooks/Lyra-starter-v0.ipynb)
+Notebooks:
+* Access `lyra_graphtool` docs can be found [here](https://www.github.com/studio-x-llc/lyra_graphtool)
+
+* `lyra_graphtool` tutorial notebook can be found [here](./notebooks/lyra_graphtool_tutorial.ipynb)
+
+* Example notebook can be found [here](./notebooks/Lyra-starter-v0.ipynb)
