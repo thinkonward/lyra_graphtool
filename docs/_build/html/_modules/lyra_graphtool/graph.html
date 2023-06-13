@@ -1,0 +1,905 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>lyra_graphtool.graph &mdash; Lyra Graphtool 0.0.1 documentation</title>
+      <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/doctools.js"></script>
+        <script src="../../_static/sphinx_highlight.js"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            Lyra Graphtool
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../install.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../depend.html">Dependencies</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../lyra_graphtool.html">API Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../tutorials.html">Tutorials</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">Lyra Graphtool</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">lyra_graphtool.graph</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for lyra_graphtool.graph</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">json</span>
+<span class="kn">import</span> <span class="nn">pickle</span>
+<span class="kn">import</span> <span class="nn">warnings</span>
+<span class="kn">from</span> <span class="nn">copy</span> <span class="kn">import</span> <span class="n">deepcopy</span>
+<span class="kn">from</span> <span class="nn">enum</span> <span class="kn">import</span> <span class="n">IntEnum</span>
+<span class="kn">from</span> <span class="nn">random</span> <span class="kn">import</span> <span class="n">choices</span><span class="p">,</span> <span class="n">sample</span><span class="p">,</span> <span class="n">shuffle</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Generic</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">TypeVar</span>
+
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">math</span>
+
+<span class="kn">import</span> <span class="nn">lyra_graphtool.utils</span> <span class="k">as</span> <span class="nn">utils</span>
+<span class="kn">from</span> <span class="nn">lyra_graphtool.edge</span> <span class="kn">import</span> <span class="n">Edge</span>
+<span class="kn">from</span> <span class="nn">lyra_graphtool.utils</span> <span class="kn">import</span> <span class="n">vertices_array</span>
+<span class="kn">from</span> <span class="nn">lyra_graphtool.worker</span> <span class="kn">import</span> <span class="n">Worker_Type</span>
+<span class="kn">from</span> <span class="nn">lyra_graphtool.vertex</span> <span class="kn">import</span> <span class="n">Vertex</span><span class="p">,</span> <span class="n">Vertex_Type</span>
+
+<span class="n">Graph</span> <span class="o">=</span> <span class="n">TypeVar</span><span class="p">(</span><span class="s1">&#39;Graph&#39;</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="Graph_Type"><a class="viewcode-back" href="../../lyra_graphtool.html#lyra_graphtool.graph.Graph_Type">[docs]</a><span class="k">class</span> <span class="nc">Graph_Type</span><span class="p">(</span><span class="n">IntEnum</span><span class="p">):</span>
+    <span class="n">RANDOM</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">GRID</span> <span class="o">=</span> <span class="mi">1</span></div>
+
+
+<span class="c1"># graph object</span>
+<div class="viewcode-block" id="Graph"><a class="viewcode-back" href="../../lyra_graphtool.html#lyra_graphtool.graph.Graph">[docs]</a><span class="k">class</span> <span class="nc">Graph</span><span class="p">(</span><span class="n">Generic</span><span class="p">[</span><span class="n">Graph</span><span class="p">]):</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">num_vertices</span><span class="p">,</span> <span class="n">max_x</span><span class="p">,</span> <span class="n">max_y</span><span class="p">,</span> <span class="n">site_structures</span><span class="p">,</span>
+                 <span class="n">gr_type</span><span class="o">=</span><span class="n">Graph_Type</span><span class="o">.</span><span class="n">RANDOM</span><span class="p">,</span> <span class="n">int_pairs</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+<span class="w">        </span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Graph object set up graph and vertices for process</span>
+
+<span class="sd">            Arguments:</span>
+
+<span class="sd">                num_vertices:</span>
+
+<span class="sd">                max_x:</span>
+
+<span class="sd">                max_y:</span>
+
+<span class="sd">                site_structures:</span>
+
+<span class="sd">                gr_type: Graph_Type.RANDOM, loaded from Graph_Type(class)</span>
+
+<span class="sd">                int_pairs: bool, default=True</span>
+
+<span class="sd">            Return:</span>
+
+<span class="sd">                None</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">vertices</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">edges</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">graph_type</span> <span class="o">=</span> <span class="n">gr_type</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">generate_integer_pairs</span> <span class="o">=</span> <span class="n">int_pairs</span>  <span class="c1"># locations (x,y) integer pairs?</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">site_structures</span> <span class="o">=</span> <span class="n">site_structures</span>
+
+        <span class="k">if</span> <span class="n">num_vertices</span> <span class="o">&gt;</span> <span class="n">max_x</span> <span class="o">*</span> <span class="n">max_y</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Number of vertices (</span><span class="si">{</span><span class="n">num_vertices</span><span class="si">}</span><span class="s1">) must be &lt; max_x * max_y (</span><span class="si">{</span><span class="n">max_x</span><span class="si">}</span><span class="s1">*</span><span class="si">{</span><span class="n">max_y</span><span class="si">}</span><span class="s1">)&#39;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">gr_type</span> <span class="o">==</span> <span class="n">Graph_Type</span><span class="o">.</span><span class="n">RANDOM</span><span class="p">:</span>
+
+            <span class="c1"># make sure generated points are unique</span>
+            <span class="n">unique_flag</span> <span class="o">=</span> <span class="kc">False</span>
+            <span class="n">ctr</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="k">while</span> <span class="ow">not</span> <span class="n">unique_flag</span> <span class="ow">and</span> <span class="n">ctr</span> <span class="o">&lt;</span> <span class="mi">10000</span><span class="p">:</span>  <span class="c1"># if &gt;10000 tries, do below</span>
+                <span class="n">ctr</span> <span class="o">+=</span> <span class="mi">1</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">generate_integer_pairs</span><span class="p">:</span>
+                    <span class="n">x_rand</span> <span class="o">=</span> <span class="n">choices</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="n">max_x</span><span class="p">),</span> <span class="n">k</span><span class="o">=</span><span class="n">num_vertices</span><span class="p">)</span>
+                    <span class="n">y_rand</span> <span class="o">=</span> <span class="n">choices</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="n">max_y</span><span class="p">),</span> <span class="n">k</span><span class="o">=</span><span class="n">num_vertices</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>  <span class="c1"># generate real-valued x,y</span>
+                    <span class="n">x_rand</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">uniform</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">max_x</span><span class="p">,</span> <span class="n">num_vertices</span><span class="p">)</span>
+                    <span class="n">y_rand</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">uniform</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">max_y</span><span class="p">,</span> <span class="n">num_vertices</span><span class="p">)</span>
+
+                <span class="n">t</span> <span class="o">=</span> <span class="p">[(</span><span class="n">x_rand</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">y_rand</span><span class="p">[</span><span class="n">i</span><span class="p">])</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_vertices</span><span class="p">)]</span>
+
+                <span class="n">unique</span> <span class="o">=</span> <span class="p">{}</span>
+                <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">t</span><span class="p">:</span>
+                    <span class="n">unique</span><span class="p">[</span><span class="n">p</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
+
+                <span class="n">unique_flag</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">unique</span><span class="p">)</span> <span class="o">==</span> <span class="n">num_vertices</span>
+
+            <span class="c1"># if one could not generate integer pairs, use sample approach</span>
+            <span class="c1">#</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">unique_flag</span><span class="p">:</span>
+                <span class="n">sample_space</span> <span class="o">=</span> <span class="p">[[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">max_x</span><span class="p">)</span> <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">max_y</span><span class="p">)]</span>
+                <span class="n">shuffle</span><span class="p">(</span><span class="n">sample_space</span><span class="p">)</span>
+                <span class="n">x_rand</span> <span class="o">=</span> <span class="p">[</span><span class="n">sample_space</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_vertices</span><span class="p">)]</span>
+                <span class="n">y_rand</span> <span class="o">=</span> <span class="p">[</span><span class="n">sample_space</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_vertices</span><span class="p">)]</span>
+
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_vertices</span><span class="p">):</span>
+                <span class="n">v</span> <span class="o">=</span> <span class="n">Vertex</span><span class="p">(</span><span class="n">x_rand</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">y_rand</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">Vertex_Type</span><span class="o">.</span><span class="n">BASIC</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">vertices</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">v</span><span class="p">)</span>
+
+        <span class="k">else</span><span class="p">:</span>  <span class="c1"># grid graph</span>
+
+            <span class="n">radius</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">floor</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">num_vertices</span><span class="p">))</span>
+
+            <span class="n">radius</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="nb">min</span><span class="p">(</span><span class="n">radius</span><span class="p">,</span> <span class="n">max_x</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">max_y</span> <span class="o">+</span> <span class="mi">1</span><span class="p">))</span>
+
+            <span class="c1"># fill up a cube first</span>
+            <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">radius</span><span class="p">):</span>
+                <span class="k">for</span> <span class="n">y</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">radius</span><span class="p">):</span>
+                    <span class="n">v</span> <span class="o">=</span> <span class="n">Vertex</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">Vertex_Type</span><span class="o">.</span><span class="n">BASIC</span><span class="p">)</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">vertices</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">v</span><span class="p">)</span>
+
+            <span class="c1"># fill up right side, then top with rest</span>
+            <span class="n">remainder</span> <span class="o">=</span> <span class="n">num_vertices</span> <span class="o">-</span> <span class="n">radius</span> <span class="o">**</span> <span class="mi">2</span>
+
+            <span class="k">for</span> <span class="n">y</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">min</span><span class="p">(</span><span class="n">remainder</span><span class="p">,</span> <span class="n">radius</span><span class="p">)):</span>
+                <span class="n">v</span> <span class="o">=</span> <span class="n">Vertex</span><span class="p">(</span><span class="n">radius</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">Vertex_Type</span><span class="o">.</span><span class="n">BASIC</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">vertices</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">v</span><span class="p">)</span>
+
+            <span class="n">remainder_horiz</span> <span class="o">=</span> <span class="n">remainder</span> <span class="o">-</span> <span class="n">radius</span>
+
+            <span class="k">if</span> <span class="n">remainder_horiz</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">y</span> <span class="o">=</span> <span class="n">radius</span>
+                <span class="k">for</span> <span class="n">offset</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">remainder_horiz</span><span class="p">):</span>
+                    <span class="n">x</span> <span class="o">=</span> <span class="n">radius</span> <span class="o">-</span> <span class="n">offset</span>
+                    <span class="n">v</span> <span class="o">=</span> <span class="n">Vertex</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">Vertex_Type</span><span class="o">.</span><span class="n">BASIC</span><span class="p">)</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">vertices</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">v</span><span class="p">)</span>
+
+        <span class="c1">#</span>
+        <span class="c1"># set up edges for travel: in_graph() method</span>
+        <span class="c1"># defined in Edge class</span>
+        <span class="c1">#</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_edges</span><span class="p">()</span>
+
+    <span class="c1"># return numpy array of vertices v: v = [ [x0,y0], [x1,y1], ... ]</span>
+<div class="viewcode-block" id="Graph.vertices_array"><a class="viewcode-back" href="../../lyra_graphtool.html#lyra_graphtool.graph.Graph.vertices_array">[docs]</a>    <span class="k">def</span> <span class="nf">vertices_array</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Method to get numpy array of vertices v: v = [ [x0,y0], [x1,y1], ... ]</span>
+
+<span class="sd">            Arguments:</span>
+<span class="sd">                None</span>
+
+<span class="sd">            Return:</span>
+<span class="sd">                np.ndarray, vertices</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">return</span> <span class="n">vertices_array</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">vertices</span><span class="p">)</span></div>
+
+    <span class="c1"># get info about vertices: coords and type</span>
+    <span class="c1"># if no arg passed, get info about all vertices in graph</span>
+<div class="viewcode-block" id="Graph.vertices_info"><a class="viewcode-back" href="../../lyra_graphtool.html#lyra_graphtool.graph.Graph.vertices_info">[docs]</a>    <span class="k">def</span> <span class="nf">vertices_info</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">vert_list</span><span class="p">:</span> <span class="n">List</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Get info about vertices: coordinates and type. If no arg passed, get info about all vertices in graph.</span>
+
+<span class="sd">            Arguments:</span>
+<span class="sd">                vert_list: list, default = None</span>
+<span class="sd">                    list of vertices to recieve info about</span>
+
+<span class="sd">            Return:</span>
+<span class="sd">                dict, vertice information</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="n">info</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">if</span> <span class="n">vert_list</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">vert_list</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">vertices</span>
+        <span class="n">none_ct</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">vert_list</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">v</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">ct</span> <span class="o">=</span> <span class="mi">1</span>
+                <span class="k">if</span> <span class="p">(</span><span class="n">v</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="n">v</span><span class="o">.</span><span class="n">y</span><span class="p">)</span> <span class="ow">in</span> <span class="n">info</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+                    <span class="n">ct</span> <span class="o">=</span> <span class="n">info</span><span class="p">[(</span><span class="n">v</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="n">v</span><span class="o">.</span><span class="n">y</span><span class="p">)][</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="mi">1</span>
+                <span class="n">info</span><span class="p">[(</span><span class="n">v</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="n">v</span><span class="o">.</span><span class="n">y</span><span class="p">)]</span> <span class="o">=</span> <span class="p">(</span><span class="n">v</span><span class="o">.</span><span class="n">vertex_type</span><span class="p">,</span> <span class="n">ct</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>  <span class="c1"># None</span>
+                <span class="n">none_ct</span> <span class="o">+=</span> <span class="mi">1</span>
+
+            <span class="k">if</span> <span class="n">none_ct</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">info</span><span class="p">[</span><span class="s1">&#39;None&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">none_ct</span>
+
+        <span class="k">return</span> <span class="n">info</span></div>
+
+    <span class="c1"># get vertices of specific type</span>
+<div class="viewcode-block" id="Graph.get_vertices_type"><a class="viewcode-back" href="../../lyra_graphtool.html#lyra_graphtool.graph.Graph.get_vertices_type">[docs]</a>    <span class="k">def</span> <span class="nf">get_vertices_type</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">v_type</span><span class="p">:</span> <span class="n">Vertex_Type</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Get vertices of a specific type</span>
+
+<span class="sd">            Arguments:</span>
+<span class="sd">                v_type: Vertex_Type (Class)</span>
+
+<span class="sd">            Return:</span>
+<span class="sd">                list, vertices of a given type</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="c1"># make sure type is legitimate</span>
+        <span class="k">if</span> <span class="n">v_type</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">Vertex_Type</span><span class="p">:</span>
+            <span class="n">types</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">Vertex_Type</span><span class="o">.</span><span class="n">__members__</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;vertex type </span><span class="si">{</span><span class="n">v_type</span><span class="si">}</span><span class="s1"> is not in vertex_type.</span><span class="si">{</span><span class="n">types</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+
+        <span class="c1"># get vertices of given type</span>
+        <span class="n">verts</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">vertices</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">v</span><span class="o">.</span><span class="n">vertex_type</span> <span class="o">==</span> <span class="n">v_type</span><span class="p">:</span>
+                <span class="n">verts</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">v</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">verts</span></div>
+
+    <span class="c1"># get vertex with specified coordinates (x,y)</span>
+<div class="viewcode-block" id="Graph.get_vertex_xy"><a class="viewcode-back" href="../../lyra_graphtool.html#lyra_graphtool.graph.Graph.get_vertex_xy">[docs]</a>    <span class="k">def</span> <span class="nf">get_vertex_xy</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">y</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Vertex</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Get vertex with specified coordinates (x,y)</span>
+
+<span class="sd">            Arguments:</span>
+<span class="sd">                x: float, x vertice value</span>
+
+<span class="sd">                y: float, y vertice value</span>
+
+<span class="sd">            Return:</span>
+<span class="sd">                Vertex (Class)</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">vertices</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">v</span><span class="o">.</span><span class="n">x</span> <span class="o">==</span> <span class="n">x</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">v</span><span class="o">.</span><span class="n">y</span> <span class="o">==</span> <span class="n">y</span><span class="p">:</span>
+                    <span class="k">return</span> <span class="n">v</span>
+        <span class="k">return</span> <span class="kc">None</span></div>
+
+    <span class="c1"># set the type of vertex at coords (x,y)</span>
+<div class="viewcode-block" id="Graph.set_vertex_type"><a class="viewcode-back" href="../../lyra_graphtool.html#lyra_graphtool.graph.Graph.set_vertex_type">[docs]</a>    <span class="k">def</span> <span class="nf">set_vertex_type</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">v_type</span><span class="p">:</span> <span class="n">Vertex_Type</span><span class="p">,</span> <span class="n">v</span><span class="p">:</span> <span class="n">Vertex</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">x</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">y</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Vertex</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Set the type of vertex as given coordinates (x,y)</span>
+
+<span class="sd">            Arguments:</span>
+<span class="sd">                v_type: Vertex_Type (Class)</span>
+
+<span class="sd">                v: Vertex (class), default = None</span>
+
+<span class="sd">                x: float, x vertice value, default = None</span>
+
+<span class="sd">                y: float, y vertice value, default = None</span>
+
+<span class="sd">            Return:</span>
+<span class="sd">                Vertex (class)</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+
+        <span class="k">if</span> <span class="n">v</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">x</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">y</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;must specify either vertex or (x,y)&#39;</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">v</span> <span class="o">=</span> <span class="n">Vertex</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">vertices</span><span class="p">)):</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">vertices</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">==</span> <span class="n">v</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">vertices</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">vertex_type</span> <span class="o">=</span> <span class="n">v_type</span>
+                <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">vertices</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+
+        <span class="k">return</span> <span class="kc">None</span></div>
+
+    <span class="c1"># set the type of vertex at coords (x,y)</span>
+<div class="viewcode-block" id="Graph.set_vertex_coords"><a class="viewcode-back" href="../../lyra_graphtool.html#lyra_graphtool.graph.Graph.set_vertex_coords">[docs]</a>    <span class="k">def</span> <span class="nf">set_vertex_coords</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">v</span><span class="p">:</span> <span class="n">Vertex</span><span class="p">,</span> <span class="n">x</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">y</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Vertex</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Set the type of vertex as coordinates (x,y)</span>
+
+<span class="sd">            Arguments:</span>
+<span class="sd">                v: Vertex (class)</span>
+
+<span class="sd">                x: float, x vertice value</span>
+
+<span class="sd">                y: float, y vertice value</span>
+
+<span class="sd">            Return:</span>
+<span class="sd">                list, vertices of a given type</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">vertices</span><span class="p">)):</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">vertices</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">==</span> <span class="n">v</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">vertices</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">x</span> <span class="o">=</span> <span class="n">x</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">vertices</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">y</span> <span class="o">=</span> <span class="n">y</span>
+                <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">vertices</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+
+        <span class="k">return</span> <span class="kc">None</span></div>
+    
+    <span class="c1"># set vertex on graph</span>
+<div class="viewcode-block" id="Graph.add_vertex"><a class="viewcode-back" href="../../lyra_graphtool.html#lyra_graphtool.graph.Graph.add_vertex">[docs]</a>    <span class="k">def</span> <span class="nf">add_vertex</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">v</span><span class="p">:</span> <span class="n">Vertex</span><span class="p">):</span>
+        
+        <span class="c1"># check if vertex not in graph already</span>
+        <span class="k">for</span> <span class="n">graph_v</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">vertices</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">graph_v</span><span class="o">.</span><span class="n">x</span> <span class="o">==</span> <span class="n">v</span><span class="o">.</span><span class="n">x</span> <span class="ow">and</span> <span class="n">graph_v</span><span class="o">.</span><span class="n">y</span> <span class="o">==</span> <span class="n">v</span><span class="o">.</span><span class="n">y</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Vertex already in the graph&quot;</span><span class="p">)</span>
+        
+        <span class="c1"># set other parameters for vertex</span>
+        <span class="n">v</span><span class="o">.</span><span class="n">time_to_acquire</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">site_structures</span><span class="o">.</span><span class="n">site_acquire_times</span><span class="p">[</span><span class="n">v</span><span class="o">.</span><span class="n">vertex_type</span><span class="p">]</span>
+        <span class="n">v</span><span class="o">.</span><span class="n">reward</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">site_structures</span><span class="o">.</span><span class="n">site_rewards</span><span class="p">[</span><span class="n">v</span><span class="o">.</span><span class="n">vertex_type</span><span class="p">]</span>
+        <span class="n">v</span><span class="o">.</span><span class="n">mult_time</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">site_structures</span><span class="o">.</span><span class="n">site_mult_time</span><span class="p">[</span><span class="n">v</span><span class="o">.</span><span class="n">vertex_type</span><span class="p">]</span>
+        <span class="n">v</span><span class="o">.</span><span class="n">mult_time_active</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">site_structures</span><span class="o">.</span><span class="n">site_mult_time_active</span><span class="p">[</span><span class="n">v</span><span class="o">.</span><span class="n">vertex_type</span><span class="p">]</span>
+        <span class="n">v</span><span class="o">.</span><span class="n">mult_worker</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">site_structures</span><span class="o">.</span><span class="n">site_mult_worker</span><span class="p">[</span><span class="n">v</span><span class="o">.</span><span class="n">vertex_type</span><span class="p">]</span>
+        <span class="n">v</span><span class="o">.</span><span class="n">expiration_time</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">site_structures</span><span class="o">.</span><span class="n">site_expiration_times</span><span class="p">[</span><span class="n">v</span><span class="o">.</span><span class="n">vertex_type</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">vertices</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">v</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">make_graph_connected</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_edges</span><span class="p">()</span></div>
+    
+    <span class="c1"># remove vertex from graph</span>
+<div class="viewcode-block" id="Graph.remove_vertex"><a class="viewcode-back" href="../../lyra_graphtool.html#lyra_graphtool.graph.Graph.remove_vertex">[docs]</a>    <span class="k">def</span> <span class="nf">remove_vertex</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">y</span><span class="p">:</span> <span class="nb">float</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">vertices</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">v</span><span class="o">.</span><span class="n">x</span> <span class="o">==</span> <span class="n">x</span> <span class="ow">and</span> <span class="n">v</span><span class="o">.</span><span class="n">y</span> <span class="o">==</span> <span class="n">y</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">vertices</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_edges</span><span class="p">()</span></div>
+                
+    <span class="k">def</span> <span class="nf">_set_site_structures</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">vertices</span><span class="p">:</span>
+            <span class="n">vt</span> <span class="o">=</span> <span class="n">v</span><span class="o">.</span><span class="n">vertex_type</span>
+            <span class="k">if</span> <span class="n">vt</span> <span class="ow">in</span> <span class="n">v</span><span class="o">.</span><span class="n">accessible_types</span><span class="p">():</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">site_structures</span><span class="o">.</span><span class="n">site_acquire_times</span><span class="p">[</span><span class="n">vt</span><span class="p">]</span> <span class="o">!=</span> <span class="n">utils</span><span class="o">.</span><span class="n">NotSpecI</span><span class="p">:</span>
+                    <span class="n">v</span><span class="o">.</span><span class="n">time_to_acquire</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">site_structures</span><span class="o">.</span><span class="n">site_acquire_times</span><span class="p">[</span><span class="n">vt</span><span class="p">]</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">site_structures</span><span class="o">.</span><span class="n">site_rewards</span><span class="p">[</span><span class="n">vt</span><span class="p">]</span> <span class="o">!=</span> <span class="n">utils</span><span class="o">.</span><span class="n">NotSpecF</span><span class="p">:</span>
+                    <span class="n">v</span><span class="o">.</span><span class="n">reward</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">site_structures</span><span class="o">.</span><span class="n">site_rewards</span><span class="p">[</span><span class="n">vt</span><span class="p">]</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">site_structures</span><span class="o">.</span><span class="n">site_mult_time</span><span class="p">[</span><span class="n">vt</span><span class="p">]</span> <span class="o">!=</span> <span class="n">utils</span><span class="o">.</span><span class="n">NotSpecF</span><span class="p">:</span>
+                    <span class="n">v</span><span class="o">.</span><span class="n">mult_time</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">site_structures</span><span class="o">.</span><span class="n">site_mult_time</span><span class="p">[</span><span class="n">vt</span><span class="p">]</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">site_structures</span><span class="o">.</span><span class="n">site_mult_time_active</span><span class="p">[</span><span class="n">vt</span><span class="p">]</span> <span class="o">!=</span> <span class="n">utils</span><span class="o">.</span><span class="n">NotSpecI</span><span class="p">:</span>
+                    <span class="n">v</span><span class="o">.</span><span class="n">mult_time_active</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">site_structures</span><span class="o">.</span><span class="n">site_mult_time_active</span><span class="p">[</span><span class="n">vt</span><span class="p">]</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">site_structures</span><span class="o">.</span><span class="n">site_mult_worker</span><span class="p">[</span><span class="n">vt</span><span class="p">]</span> <span class="o">!=</span> <span class="n">utils</span><span class="o">.</span><span class="n">NotSpecF</span><span class="p">:</span>
+                    <span class="n">v</span><span class="o">.</span><span class="n">mult_worker</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">site_structures</span><span class="o">.</span><span class="n">site_mult_worker</span><span class="p">[</span><span class="n">vt</span><span class="p">]</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">site_structures</span><span class="o">.</span><span class="n">site_expiration_times</span><span class="p">[</span><span class="n">vt</span><span class="p">]</span> <span class="o">!=</span> <span class="n">utils</span><span class="o">.</span><span class="n">NotSpecI</span><span class="p">:</span>
+                    <span class="n">v</span><span class="o">.</span><span class="n">expiration_time</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">site_structures</span><span class="o">.</span><span class="n">site_expiration_times</span><span class="p">[</span><span class="n">vt</span><span class="p">]</span>
+
+    <span class="c1"># closest vertices to specified vertex</span>
+<div class="viewcode-block" id="Graph.closest_vertices"><a class="viewcode-back" href="../../lyra_graphtool.html#lyra_graphtool.graph.Graph.closest_vertices">[docs]</a>    <span class="k">def</span> <span class="nf">closest_vertices</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">v</span><span class="p">:</span> <span class="n">Vertex</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">:</span>
+        <span class="c1"># get distances to other vertices</span>
+        <span class="n">dist</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">v2</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">vertices</span><span class="p">:</span>
+            <span class="n">d</span> <span class="o">=</span> <span class="n">Edge</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">v2</span><span class="p">)</span><span class="o">.</span><span class="n">length</span>
+            <span class="k">if</span> <span class="n">d</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">dist</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">d</span><span class="p">)</span>
+
+        <span class="n">dist_min</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">dist</span><span class="p">)</span>
+
+        <span class="n">verts_closest</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">v2</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">vertices</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">Edge</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">v2</span><span class="p">)</span><span class="o">.</span><span class="n">length</span> <span class="o">==</span> <span class="n">dist_min</span><span class="p">:</span>
+                <span class="n">verts_closest</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">v2</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">verts_closest</span></div>
+
+    <span class="c1"># get isolated vertices - those with no nearest neighbor</span>
+    <span class="c1"># Return: list of deep copies of isolated vertices</span>
+<div class="viewcode-block" id="Graph.isolated_vertices"><a class="viewcode-back" href="../../lyra_graphtool.html#lyra_graphtool.graph.Graph.isolated_vertices">[docs]</a>    <span class="k">def</span> <span class="nf">isolated_vertices</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">:</span>
+        <span class="n">isol</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">vertices</span><span class="p">:</span>
+            <span class="n">vc</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">closest_vertices</span><span class="p">(</span><span class="n">v</span><span class="p">)</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">vc</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">Edge</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">vc</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span><span class="o">.</span><span class="n">nearest_neighbor</span><span class="p">():</span>
+                    <span class="k">continue</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">isol</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">v</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">isol</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">v</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">isol</span></div>
+
+    <span class="c1"># get adjacent vertices to specified vertex via edges</span>
+<div class="viewcode-block" id="Graph.adjacent_vertices"><a class="viewcode-back" href="../../lyra_graphtool.html#lyra_graphtool.graph.Graph.adjacent_vertices">[docs]</a>    <span class="k">def</span> <span class="nf">adjacent_vertices</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">v</span><span class="p">:</span> <span class="n">Vertex</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">:</span>
+        <span class="n">edges_v</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_edges_at_vertex</span><span class="p">(</span><span class="n">v</span><span class="p">)</span>
+
+        <span class="n">verts_adj</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="n">edges_v</span><span class="p">:</span>
+            <span class="n">v1</span><span class="p">,</span> <span class="n">v2</span> <span class="o">=</span> <span class="n">e</span><span class="o">.</span><span class="n">v1</span><span class="p">,</span> <span class="n">e</span><span class="o">.</span><span class="n">v2</span>
+            <span class="k">if</span> <span class="n">v1</span> <span class="o">!=</span> <span class="n">v</span><span class="p">:</span>
+                <span class="n">verts_adj</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">v1</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">verts_adj</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">v2</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">verts_adj</span></div>
+
+    <span class="c1">#</span>
+    <span class="c1"># set up edges for travel: in_graph() method</span>
+    <span class="c1"># defined in Edge class</span>
+    <span class="c1"># Note: this method needs to be called if vertices are changed</span>
+    <span class="c1">#</span>
+<div class="viewcode-block" id="Graph.set_edges"><a class="viewcode-back" href="../../lyra_graphtool.html#lyra_graphtool.graph.Graph.set_edges">[docs]</a>    <span class="k">def</span> <span class="nf">set_edges</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">:</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">edges</span> <span class="o">=</span> <span class="p">[]</span>  <span class="c1"># delete old edge set if there was one</span>
+        <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">vertices</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">v2</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">vertices</span><span class="p">:</span>
+                <span class="n">e</span> <span class="o">=</span> <span class="n">Edge</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">v2</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">e</span><span class="o">.</span><span class="n">in_graph</span><span class="p">():</span>  <span class="c1"># does this edge meet the conditions to be in graph?</span>
+                    <span class="k">if</span> <span class="n">e</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">edges</span><span class="p">:</span>  <span class="c1"># may have (v2,v1) in edges</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">edges</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">edges</span></div>
+
+    <span class="c1"># get list of edges in given list</span>
+    <span class="c1"># if edge list is not given, get info for all edges in graph</span>
+<div class="viewcode-block" id="Graph.edges_info"><a class="viewcode-back" href="../../lyra_graphtool.html#lyra_graphtool.graph.Graph.edges_info">[docs]</a>    <span class="k">def</span> <span class="nf">edges_info</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">edge_list</span><span class="p">:</span> <span class="n">List</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">:</span>
+        <span class="n">info</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">if</span> <span class="n">edge_list</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">edge_list</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">edges</span>
+        <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="n">edge_list</span><span class="p">:</span>
+            <span class="n">x1</span><span class="p">,</span> <span class="n">y1</span> <span class="o">=</span> <span class="n">e</span><span class="o">.</span><span class="n">v1</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="n">e</span><span class="o">.</span><span class="n">v1</span><span class="o">.</span><span class="n">y</span>
+            <span class="n">x2</span><span class="p">,</span> <span class="n">y2</span> <span class="o">=</span> <span class="n">e</span><span class="o">.</span><span class="n">v2</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="n">e</span><span class="o">.</span><span class="n">v2</span><span class="o">.</span><span class="n">y</span>
+            <span class="n">coords</span> <span class="o">=</span> <span class="p">((</span><span class="n">x1</span><span class="p">,</span> <span class="n">y1</span><span class="p">),</span> <span class="p">(</span><span class="n">x2</span><span class="p">,</span> <span class="n">y2</span><span class="p">))</span>
+            <span class="n">ct</span> <span class="o">=</span> <span class="mi">1</span>
+            <span class="k">if</span> <span class="n">coords</span> <span class="ow">in</span> <span class="n">info</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+                <span class="n">ct</span> <span class="o">=</span> <span class="n">info</span><span class="p">[</span><span class="n">coords</span><span class="p">]</span> <span class="o">+</span> <span class="mi">1</span>
+            <span class="n">info</span><span class="p">[((</span><span class="n">x1</span><span class="p">,</span> <span class="n">y1</span><span class="p">),</span> <span class="p">(</span><span class="n">x2</span><span class="p">,</span> <span class="n">y2</span><span class="p">))]</span> <span class="o">=</span> <span class="n">ct</span>
+
+        <span class="k">return</span> <span class="n">info</span></div>
+
+    <span class="c1"># return edges containing specified vertex</span>
+<div class="viewcode-block" id="Graph.get_edges_at_vertex"><a class="viewcode-back" href="../../lyra_graphtool.html#lyra_graphtool.graph.Graph.get_edges_at_vertex">[docs]</a>    <span class="k">def</span> <span class="nf">get_edges_at_vertex</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">v</span><span class="p">:</span> <span class="n">Vertex</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">:</span>
+        <span class="n">edges</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">edges</span><span class="p">:</span>
+            <span class="n">v1</span><span class="p">,</span> <span class="n">v2</span> <span class="o">=</span> <span class="n">e</span><span class="o">.</span><span class="n">v1</span><span class="p">,</span> <span class="n">e</span><span class="o">.</span><span class="n">v2</span>
+            <span class="k">if</span> <span class="n">v</span> <span class="o">==</span> <span class="n">v1</span> <span class="ow">or</span> <span class="n">v</span> <span class="o">==</span> <span class="n">v2</span><span class="p">:</span>
+                <span class="n">edges</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">edges</span></div>
+
+    <span class="c1"># randomly set origin and sites</span>
+<div class="viewcode-block" id="Graph.set_random_sites_origin"><a class="viewcode-back" href="../../lyra_graphtool.html#lyra_graphtool.graph.Graph.set_random_sites_origin">[docs]</a>    <span class="k">def</span> <span class="nf">set_random_sites_origin</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n_site1</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">n_site2</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">n_site3</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+
+        <span class="n">num_sites</span> <span class="o">=</span> <span class="n">n_site1</span> <span class="o">+</span> <span class="n">n_site2</span> <span class="o">+</span> <span class="n">n_site3</span>
+        <span class="n">num_v</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">vertices</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">num_v</span> <span class="o">&lt;</span> <span class="n">num_sites</span> <span class="o">+</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Not enough vertices on graph: require number vertices (</span><span class="si">{</span><span class="n">num_v</span><span class="si">}</span><span class="s1">) &#39;</span> <span class="o">+</span>
+                             <span class="sa">f</span><span class="s1">&#39;&gt;= num site 1 (</span><span class="si">{</span><span class="n">n_site1</span><span class="si">}</span><span class="s1">) + num site 2 (</span><span class="si">{</span><span class="n">n_site2</span><span class="si">}</span><span class="s1">) &#39;</span> <span class="o">+</span>
+                             <span class="sa">f</span><span class="s1">&#39;+ num site 3 (</span><span class="si">{</span><span class="n">n_site3</span><span class="si">}</span><span class="s1">)+ 1&#39;</span>
+                             <span class="p">)</span>
+
+        <span class="n">index_verts</span> <span class="o">=</span> <span class="n">sample</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">num_v</span><span class="p">),</span> <span class="n">num_sites</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>  <span class="c1"># sites and origin</span>
+
+        <span class="c1"># set sites</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">index_verts</span><span class="p">[:</span><span class="n">n_site1</span><span class="p">]:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">vertices</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">vertex_type</span> <span class="o">=</span> <span class="n">Vertex_Type</span><span class="o">.</span><span class="n">SITE1</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">index_verts</span><span class="p">[</span><span class="n">n_site1</span><span class="p">:</span> <span class="n">n_site1</span> <span class="o">+</span> <span class="n">n_site2</span><span class="p">]:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">vertices</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">vertex_type</span> <span class="o">=</span> <span class="n">Vertex_Type</span><span class="o">.</span><span class="n">SITE2</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">index_verts</span><span class="p">[</span><span class="o">-</span><span class="n">n_site3</span> <span class="o">-</span> <span class="mi">1</span><span class="p">:</span> <span class="o">-</span><span class="mi">1</span><span class="p">]:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">vertices</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">vertex_type</span> <span class="o">=</span> <span class="n">Vertex_Type</span><span class="o">.</span><span class="n">SITE3</span>
+
+        <span class="c1"># set last to origin</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">vertices</span><span class="p">[</span><span class="n">index_verts</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]]</span><span class="o">.</span><span class="n">vertex_type</span> <span class="o">=</span> <span class="n">Vertex_Type</span><span class="o">.</span><span class="n">ORIGIN</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_set_site_structures</span><span class="p">()</span></div>
+
+    <span class="c1"># return edge of minimum distance between two sets of vertices</span>
+    <span class="c1"># this is the minimum distance of points (v1,v2) v1 in set1, v2 in set2</span>
+<div class="viewcode-block" id="Graph.distance"><a class="viewcode-back" href="../../lyra_graphtool.html#lyra_graphtool.graph.Graph.distance">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">distance</span><span class="p">(</span><span class="n">vert_list_1</span><span class="p">:</span> <span class="n">List</span><span class="p">,</span> <span class="n">vert_list_2</span><span class="p">:</span> <span class="n">List</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Edge</span><span class="p">:</span>
+
+        <span class="n">edges</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">v1</span> <span class="ow">in</span> <span class="n">vert_list_1</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">v2</span> <span class="ow">in</span> <span class="n">vert_list_2</span><span class="p">:</span>
+                <span class="n">edges</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">Edge</span><span class="p">(</span><span class="n">v1</span><span class="p">,</span> <span class="n">v2</span><span class="p">))</span>
+
+        <span class="n">edge_lens</span> <span class="o">=</span> <span class="p">[</span><span class="n">e</span><span class="o">.</span><span class="n">length</span> <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="n">edges</span><span class="p">]</span>
+
+        <span class="n">min_len</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">edge_lens</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">edges</span><span class="p">[</span><span class="n">edge_lens</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">min_len</span><span class="p">)]</span></div>
+
+    <span class="c1"># depth first search</span>
+<div class="viewcode-block" id="Graph.depth_first_search"><a class="viewcode-back" href="../../lyra_graphtool.html#lyra_graphtool.graph.Graph.depth_first_search">[docs]</a>    <span class="k">def</span> <span class="nf">depth_first_search</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">v</span><span class="p">:</span> <span class="n">Vertex</span><span class="p">,</span> <span class="n">visited</span><span class="p">:</span> <span class="n">List</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">:</span>
+
+        <span class="c1"># mark current vertex as visited</span>
+        <span class="n">visited</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">v</span><span class="p">)</span>
+
+        <span class="c1"># repeat for all vertices adjacent to v</span>
+        <span class="k">for</span> <span class="n">v2</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">adjacent_vertices</span><span class="p">(</span><span class="n">v</span><span class="p">):</span>
+
+            <span class="k">if</span> <span class="n">v2</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">visited</span><span class="p">:</span>
+                <span class="c1"># update the visited list</span>
+                <span class="n">visited</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">depth_first_search</span><span class="p">(</span><span class="n">v2</span><span class="p">,</span> <span class="n">visited</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">visited</span></div>
+
+    <span class="c1"># connected components</span>
+<div class="viewcode-block" id="Graph.connected_components"><a class="viewcode-back" href="../../lyra_graphtool.html#lyra_graphtool.graph.Graph.connected_components">[docs]</a>    <span class="k">def</span> <span class="nf">connected_components</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">:</span>
+
+        <span class="n">visited</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">cc</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">vertices</span><span class="p">:</span>
+
+            <span class="k">if</span> <span class="n">v</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">visited</span><span class="p">:</span>
+                <span class="n">comp_v</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">depth_first_search</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="p">[])</span>
+                <span class="n">visited</span> <span class="o">+=</span> <span class="n">comp_v</span>
+                <span class="n">cc</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">comp_v</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">cc</span></div>
+
+    <span class="c1"># make graph connected by moving connected components in x then y directions</span>
+    <span class="c1"># towards the largest component until the number of components is reduced</span>
+<div class="viewcode-block" id="Graph.make_graph_connected"><a class="viewcode-back" href="../../lyra_graphtool.html#lyra_graphtool.graph.Graph.make_graph_connected">[docs]</a>    <span class="k">def</span> <span class="nf">make_graph_connected</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">vertices</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="k">return</span>
+
+        <span class="c1"># get largest component as anchor</span>
+        <span class="n">cc</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">connected_components</span><span class="p">()</span>
+        <span class="n">cc_len</span> <span class="o">=</span> <span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="n">c</span><span class="p">)</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">cc</span><span class="p">]</span>
+        <span class="n">ind_max</span> <span class="o">=</span> <span class="n">cc_len</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="nb">max</span><span class="p">(</span><span class="n">cc_len</span><span class="p">))</span>
+        <span class="n">anchor_component</span> <span class="o">=</span> <span class="n">cc</span><span class="p">[</span><span class="n">ind_max</span><span class="p">]</span>
+        <span class="n">components</span> <span class="o">=</span> <span class="n">cc</span><span class="p">[:</span><span class="n">ind_max</span><span class="p">]</span> <span class="o">+</span> <span class="n">cc</span><span class="p">[</span><span class="n">ind_max</span> <span class="o">+</span> <span class="mi">1</span><span class="p">:]</span>
+
+        <span class="k">while</span> <span class="nb">len</span><span class="p">(</span><span class="n">components</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+
+            <span class="n">c0</span> <span class="o">=</span> <span class="n">components</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+            <span class="c1"># get vertices of min distance</span>
+            <span class="n">e_min</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">distance</span><span class="p">(</span><span class="n">anchor_component</span><span class="p">,</span> <span class="n">c0</span><span class="p">)</span>
+
+            <span class="n">v1</span><span class="p">,</span> <span class="n">v2</span> <span class="o">=</span> <span class="n">e_min</span><span class="o">.</span><span class="n">v1</span><span class="p">,</span> <span class="n">e_min</span><span class="o">.</span><span class="n">v2</span>
+
+            <span class="k">if</span> <span class="n">v1</span> <span class="ow">in</span> <span class="n">anchor_component</span><span class="p">:</span>
+                <span class="n">va</span><span class="p">,</span> <span class="n">v0</span> <span class="o">=</span> <span class="n">v1</span><span class="p">,</span> <span class="n">v2</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">va</span><span class="p">,</span> <span class="n">v0</span> <span class="o">=</span> <span class="n">v2</span><span class="p">,</span> <span class="n">v1</span>
+
+            <span class="c1"># move c0 towards anchor</span>
+            <span class="n">sx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sign</span><span class="p">(</span><span class="n">va</span><span class="o">.</span><span class="n">x</span> <span class="o">-</span> <span class="n">v0</span><span class="o">.</span><span class="n">x</span><span class="p">)</span>
+            <span class="n">sy</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sign</span><span class="p">(</span><span class="n">va</span><span class="o">.</span><span class="n">y</span> <span class="o">-</span> <span class="n">v0</span><span class="o">.</span><span class="n">y</span><span class="p">)</span>
+
+            <span class="n">cl</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">components</span><span class="p">)</span>
+
+            <span class="n">c0_translate_x</span> <span class="o">=</span> <span class="n">deepcopy</span><span class="p">(</span><span class="n">c0</span><span class="p">)</span>
+            <span class="n">ind_v0</span> <span class="o">=</span> <span class="n">c0_translate_x</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">v0</span><span class="p">)</span>
+            <span class="n">x_diff</span> <span class="o">=</span> <span class="n">sx</span>
+            <span class="n">y_diff</span> <span class="o">=</span> <span class="n">sy</span>
+
+            <span class="c1"># keep translating until:</span>
+            <span class="c1">#   - number of connected components decrease, or</span>
+            <span class="c1">#   - the set we are translating is directly above or below anchor</span>
+            <span class="c1">#     ie  sx changes to zero (at this point, we&#39;ll translate in y dir)</span>
+            <span class="k">while</span> <span class="nb">len</span><span class="p">(</span><span class="n">components</span><span class="p">)</span> <span class="o">==</span> <span class="n">cl</span> <span class="ow">and</span> <span class="n">x_diff</span> <span class="o">==</span> <span class="n">sx</span> <span class="ow">and</span> <span class="n">x_diff</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+
+                <span class="c1"># translate x components of c0</span>
+                <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">c0</span><span class="p">)):</span>
+                    <span class="n">c</span> <span class="o">=</span> <span class="n">c0</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+                    <span class="c1"># note  cmin is translated to va + (sx,0)</span>
+                    <span class="c1"># which is a translation by (vax + sx - v0x)</span>
+                    <span class="n">x_new</span> <span class="o">=</span> <span class="n">c</span><span class="o">.</span><span class="n">x</span> <span class="o">+</span> <span class="n">sx</span>
+                    <span class="n">y_new</span> <span class="o">=</span> <span class="n">c</span><span class="o">.</span><span class="n">y</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">set_vertex_coords</span><span class="p">(</span><span class="n">v</span><span class="o">=</span><span class="n">c</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="n">x_new</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="n">y_new</span><span class="p">)</span>  <span class="c1"># change graph vert</span>
+                    <span class="n">c0_translate_x</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="n">c0_translate_x</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">y</span> <span class="o">=</span> <span class="n">x_new</span><span class="p">,</span> <span class="n">y_new</span>
+
+                <span class="bp">self</span><span class="o">.</span><span class="n">set_edges</span><span class="p">()</span>  <span class="c1"># update edges since vertices were changed</span>
+
+                <span class="c1"># recompute the number of connected components &amp; anchor</span>
+                <span class="n">cc</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">connected_components</span><span class="p">()</span>
+                <span class="n">cc_len</span> <span class="o">=</span> <span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="n">c</span><span class="p">)</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">cc</span><span class="p">]</span>
+                <span class="n">ind_max</span> <span class="o">=</span> <span class="n">cc_len</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="nb">max</span><span class="p">(</span><span class="n">cc_len</span><span class="p">))</span>
+                <span class="n">anchor_component</span> <span class="o">=</span> <span class="n">cc</span><span class="p">[</span><span class="n">ind_max</span><span class="p">]</span>
+                <span class="n">components</span> <span class="o">=</span> <span class="n">cc</span><span class="p">[:</span><span class="n">ind_max</span><span class="p">]</span> <span class="o">+</span> <span class="n">cc</span><span class="p">[</span><span class="n">ind_max</span> <span class="o">+</span> <span class="mi">1</span><span class="p">:]</span>
+
+                <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">components</span><span class="p">)</span> <span class="o">==</span> <span class="n">cl</span><span class="p">:</span>
+                    <span class="n">x0</span> <span class="o">=</span> <span class="n">c0_translate_x</span><span class="p">[</span><span class="n">ind_v0</span><span class="p">]</span><span class="o">.</span><span class="n">x</span>
+                    <span class="n">x_diff</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sign</span><span class="p">(</span><span class="n">va</span><span class="o">.</span><span class="n">x</span> <span class="o">-</span> <span class="n">x0</span><span class="p">)</span>
+
+            <span class="c1"># translate y components of c0_translate_x</span>
+            <span class="n">c0_translate_y</span> <span class="o">=</span> <span class="n">deepcopy</span><span class="p">(</span><span class="n">c0_translate_x</span><span class="p">)</span>
+
+            <span class="c1"># keep translating until:</span>
+            <span class="c1">#   - number of connected components decrease, or</span>
+            <span class="c1">#   - the set we are translating is directly left or right of anchor</span>
+            <span class="c1">#     ie  sy changes to zero</span>
+            <span class="k">while</span> <span class="nb">len</span><span class="p">(</span><span class="n">components</span><span class="p">)</span> <span class="o">==</span> <span class="n">cl</span> <span class="ow">and</span> <span class="n">y_diff</span> <span class="o">==</span> <span class="n">sy</span> <span class="ow">and</span> <span class="n">y_diff</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+
+                <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">c0_translate_y</span><span class="p">)):</span>
+                    <span class="n">c</span> <span class="o">=</span> <span class="n">c0_translate_y</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+                    <span class="c1"># note  cmin is translated to va + (0,sy)</span>
+                    <span class="c1"># which is a translation by (vay + sy - v0y)</span>
+                    <span class="n">x_new</span> <span class="o">=</span> <span class="n">c</span><span class="o">.</span><span class="n">x</span>
+                    <span class="n">y_new</span> <span class="o">=</span> <span class="n">c</span><span class="o">.</span><span class="n">y</span> <span class="o">+</span> <span class="n">sy</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">set_vertex_coords</span><span class="p">(</span><span class="n">v</span><span class="o">=</span><span class="n">c</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="n">x_new</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="n">y_new</span><span class="p">)</span>
+                    <span class="n">c0_translate_y</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="n">c0_translate_y</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">y</span> <span class="o">=</span> <span class="n">x_new</span><span class="p">,</span> <span class="n">y_new</span>
+
+                <span class="bp">self</span><span class="o">.</span><span class="n">set_edges</span><span class="p">()</span>  <span class="c1"># update edges since vertices were changed</span>
+
+                <span class="c1"># recompute the number of connected components &amp; anchor</span>
+                <span class="n">cc</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">connected_components</span><span class="p">()</span>
+                <span class="n">cc_len</span> <span class="o">=</span> <span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="n">c</span><span class="p">)</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">cc</span><span class="p">]</span>
+                <span class="n">ind_max</span> <span class="o">=</span> <span class="n">cc_len</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="nb">max</span><span class="p">(</span><span class="n">cc_len</span><span class="p">))</span>
+                <span class="n">anchor_component</span> <span class="o">=</span> <span class="n">cc</span><span class="p">[</span><span class="n">ind_max</span><span class="p">]</span>
+                <span class="n">components</span> <span class="o">=</span> <span class="n">cc</span><span class="p">[:</span><span class="n">ind_max</span><span class="p">]</span> <span class="o">+</span> <span class="n">cc</span><span class="p">[</span><span class="n">ind_max</span> <span class="o">+</span> <span class="mi">1</span><span class="p">:]</span>
+
+                <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">components</span><span class="p">)</span> <span class="o">==</span> <span class="n">cl</span><span class="p">:</span>
+                    <span class="n">y0</span> <span class="o">=</span> <span class="n">c0_translate_y</span><span class="p">[</span><span class="n">ind_v0</span><span class="p">]</span><span class="o">.</span><span class="n">y</span>
+                    <span class="n">y_diff</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sign</span><span class="p">(</span><span class="n">va</span><span class="o">.</span><span class="n">y</span> <span class="o">-</span> <span class="n">y0</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">components</span><span class="p">)</span> <span class="o">==</span> <span class="n">cl</span><span class="p">:</span>
+                <span class="c1"># neither translation above resulted in the nearest neighboring of sets</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;after translations in x and y, no reduction in components&#39;</span><span class="p">)</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;components:&#39;</span><span class="p">)</span>
+                <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">components</span><span class="p">:</span>
+                    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">vertices_info</span><span class="p">(</span><span class="n">c</span><span class="p">)</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+                <span class="k">return</span>
+
+        <span class="c1">#</span>
+        <span class="c1"># make minimum x and y coords of graph zero</span>
+        <span class="c1">#</span>
+        <span class="n">x_coords</span> <span class="o">=</span> <span class="p">[</span><span class="n">v</span><span class="o">.</span><span class="n">x</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">vertices</span><span class="p">]</span>
+        <span class="n">y_coords</span> <span class="o">=</span> <span class="p">[</span><span class="n">v</span><span class="o">.</span><span class="n">y</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">vertices</span><span class="p">]</span>
+
+        <span class="n">x_min</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">x_coords</span><span class="p">)</span>
+        <span class="n">y_min</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">y_coords</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">vertices</span><span class="p">:</span>
+            <span class="n">v</span><span class="o">.</span><span class="n">x</span> <span class="o">=</span> <span class="n">v</span><span class="o">.</span><span class="n">x</span> <span class="o">-</span> <span class="n">x_min</span>
+            <span class="n">v</span><span class="o">.</span><span class="n">y</span> <span class="o">=</span> <span class="n">v</span><span class="o">.</span><span class="n">y</span> <span class="o">-</span> <span class="n">y_min</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_edges</span><span class="p">()</span>  <span class="c1"># update edges since vertices were changed</span>
+
+        <span class="k">return</span></div>
+
+    <span class="c1"># graph vertices</span>
+    <span class="c1"># color vertices in verts_list OTHER color</span>
+<div class="viewcode-block" id="Graph.print_graph"><a class="viewcode-back" href="../../lyra_graphtool.html#lyra_graphtool.graph.Graph.print_graph">[docs]</a>    <span class="k">def</span> <span class="nf">print_graph</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">vert_list</span><span class="p">:</span> <span class="n">List</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">filename_out</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">color_dict</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s1">&#39;BASIC&#39;</span><span class="p">:</span> <span class="s1">&#39;black&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;ORIGIN&#39;</span><span class="p">:</span> <span class="s1">&#39;yellow&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;SITE1&#39;</span><span class="p">:</span> <span class="s1">&#39;red&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;SITE2&#39;</span><span class="p">:</span> <span class="s1">&#39;blue&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;SITE3&#39;</span><span class="p">:</span> <span class="s1">&#39;green&#39;</span>
+        <span class="p">}</span>
+
+        <span class="n">types</span> <span class="o">=</span> <span class="n">color_dict</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span>
+
+        <span class="c1"># plot edges</span>
+        <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">edges</span><span class="p">:</span>
+            <span class="n">x_values</span> <span class="o">=</span> <span class="p">[</span><span class="n">e</span><span class="o">.</span><span class="n">v1</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="n">e</span><span class="o">.</span><span class="n">v2</span><span class="o">.</span><span class="n">x</span><span class="p">]</span>
+            <span class="n">y_values</span> <span class="o">=</span> <span class="p">[</span><span class="n">e</span><span class="o">.</span><span class="n">v1</span><span class="o">.</span><span class="n">y</span><span class="p">,</span> <span class="n">e</span><span class="o">.</span><span class="n">v2</span><span class="o">.</span><span class="n">y</span><span class="p">]</span>
+            <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">x_values</span><span class="p">,</span> <span class="n">y_values</span><span class="p">,</span> <span class="n">linestyle</span><span class="o">=</span><span class="s2">&quot;--&quot;</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;black&#39;</span><span class="p">)</span>
+
+        <span class="n">plots</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">types</span><span class="p">:</span>
+            <span class="n">verts</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_vertices_type</span><span class="p">(</span><span class="n">Vertex_Type</span><span class="p">[</span><span class="n">t</span><span class="p">])</span>
+            <span class="n">x</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="n">vertices_array</span><span class="p">(</span><span class="n">verts</span><span class="p">)</span><span class="o">.</span><span class="n">T</span>
+            <span class="n">p</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="n">color_dict</span><span class="p">[</span><span class="n">t</span><span class="p">])</span>
+            <span class="n">plots</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">p</span><span class="p">)</span>
+
+        <span class="c1"># color vertices in vert_list orange</span>
+        <span class="k">if</span> <span class="n">vert_list</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">x</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="n">vertices_array</span><span class="p">(</span><span class="n">vert_list</span><span class="p">)</span><span class="o">.</span><span class="n">T</span>
+            <span class="n">plt</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;orange&#39;</span><span class="p">)</span>
+
+        <span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="nb">tuple</span><span class="p">(</span><span class="n">plots</span><span class="p">),</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">types</span><span class="p">),</span> <span class="n">scatterpoints</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+                   <span class="n">bbox_to_anchor</span><span class="o">=</span><span class="p">(</span><span class="mf">0.5</span><span class="p">,</span> <span class="o">-</span><span class="mf">.2</span><span class="p">),</span>
+                   <span class="n">loc</span><span class="o">=</span><span class="s1">&#39;lower center&#39;</span><span class="p">,</span>
+                   <span class="n">ncol</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span>
+                   <span class="n">fontsize</span><span class="o">=</span><span class="mi">8</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">filename_out</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">plt</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="n">filename_out</span><span class="p">)</span>
+
+        <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span></div>
+
+    <span class="c1"># save graph to file</span>
+<div class="viewcode-block" id="Graph.save"><a class="viewcode-back" href="../../lyra_graphtool.html#lyra_graphtool.graph.Graph.save">[docs]</a>    <span class="k">def</span> <span class="nf">save</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">file_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">fn</span> <span class="o">=</span> <span class="n">file_name</span>
+
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">fn</span><span class="p">,</span> <span class="s1">&#39;wb&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+            <span class="n">pickle</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">f</span><span class="p">)</span></div>
+
+        <span class="c1"># get all paths from vertex v1 to vertex v2</span>
+        <span class="c1"># return: List of lists, each member list being vertices that represent the path</span>
+        <span class="c1"># Note:</span>
+        <span class="c1">#  - adjacent vertices in the list are adjacent in the graph - ie compose an edge</span>
+        <span class="c1">#  - returned paths do not have cycles - each vertex in the path is visited only once</span>
+        <span class="c1">#  - max_len argument, if set, will limit paths to this maximum length</span>
+
+<div class="viewcode-block" id="Graph.paths"><a class="viewcode-back" href="../../lyra_graphtool.html#lyra_graphtool.graph.Graph.paths">[docs]</a>    <span class="k">def</span> <span class="nf">paths</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">v1</span><span class="p">:</span> <span class="n">Vertex</span><span class="p">,</span> <span class="n">v2</span><span class="p">:</span> <span class="n">Vertex</span><span class="p">,</span> <span class="n">max_len</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">inf</span><span class="p">,</span> <span class="n">visited</span><span class="p">:</span> <span class="n">List</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">:</span>
+
+        <span class="k">if</span> <span class="n">visited</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">visited</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="n">visited</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">v1</span><span class="p">)</span>
+
+        <span class="n">adj_list</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">adjacent_vertices</span><span class="p">(</span><span class="n">v1</span><span class="p">)</span>
+        <span class="n">vnext_list</span> <span class="o">=</span> <span class="p">[</span><span class="n">v</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">adj_list</span> <span class="k">if</span> <span class="n">v</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">visited</span><span class="p">]</span>
+
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">vnext_list</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span> <span class="ow">or</span> <span class="nb">len</span><span class="p">(</span><span class="n">visited</span><span class="p">)</span> <span class="o">&gt;</span> <span class="n">max_len</span><span class="p">:</span>  <span class="c1"># nothing left</span>
+            <span class="k">return</span> <span class="p">[[]]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">paths_return</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="c1"># try next possible paths</span>
+            <span class="k">for</span> <span class="n">vnext</span> <span class="ow">in</span> <span class="n">vnext_list</span><span class="p">:</span>  <span class="c1"># get adj verts not visited</span>
+
+                <span class="n">visited_next</span> <span class="o">=</span> <span class="n">deepcopy</span><span class="p">(</span><span class="n">visited</span><span class="p">)</span>
+
+                <span class="k">if</span> <span class="n">vnext</span> <span class="o">==</span> <span class="n">v2</span><span class="p">:</span>
+                    <span class="n">paths_next</span> <span class="o">=</span> <span class="p">[[</span><span class="n">v2</span><span class="p">]]</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">paths_next</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">paths</span><span class="p">(</span><span class="n">vnext</span><span class="p">,</span> <span class="n">v2</span><span class="p">,</span> <span class="n">max_len</span><span class="p">,</span> <span class="n">visited_next</span><span class="p">)</span>  <span class="c1"># get path vnext to end v2</span>
+
+                <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">paths_next</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">p</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                        <span class="n">paths_return</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="n">v1</span><span class="p">]</span> <span class="o">+</span> <span class="n">p</span><span class="p">)</span>  <span class="c1"># path from start v1 to end v2</span>
+
+            <span class="k">return</span> <span class="n">paths_return</span></div>
+
+        <span class="c1"># save graph data to json</span>
+
+<div class="viewcode-block" id="Graph.save_to_json"><a class="viewcode-back" href="../../lyra_graphtool.html#lyra_graphtool.graph.Graph.save_to_json">[docs]</a>    <span class="k">def</span> <span class="nf">save_to_json</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">file_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">graph_json</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="n">graph_json</span><span class="p">[</span><span class="s1">&#39;vertices&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">vertices</span><span class="p">:</span>  <span class="c1"># set up dict</span>
+            <span class="n">graph_json</span><span class="p">[</span><span class="s1">&#39;vertices&#39;</span><span class="p">][</span><span class="nb">str</span><span class="p">(</span><span class="n">v</span><span class="o">.</span><span class="n">x</span><span class="p">)]</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">vertices</span><span class="p">:</span>  <span class="c1"># set up dict</span>
+            <span class="n">graph_json</span><span class="p">[</span><span class="s1">&#39;vertices&#39;</span><span class="p">][</span><span class="nb">str</span><span class="p">(</span><span class="n">v</span><span class="o">.</span><span class="n">x</span><span class="p">)][</span><span class="nb">str</span><span class="p">(</span><span class="n">v</span><span class="o">.</span><span class="n">y</span><span class="p">)]</span> <span class="o">=</span> <span class="p">{}</span>
+
+        <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">vertices</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">vars</span><span class="p">(</span><span class="n">v</span><span class="p">)</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+                <span class="k">if</span> <span class="n">k</span> <span class="o">!=</span> <span class="s1">&#39;x&#39;</span> <span class="ow">and</span> <span class="n">k</span> <span class="o">!=</span> <span class="s1">&#39;y&#39;</span><span class="p">:</span>
+                    <span class="n">val</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">k</span><span class="p">)</span>
+                    <span class="c1"># print(f&#39;v={(v.x,v.y)}  {k}={k}, type k={type(k)}, val={val}, typev={type(val)}&#39;)</span>
+                    <span class="n">graph_json</span><span class="p">[</span><span class="s1">&#39;vertices&#39;</span><span class="p">][</span><span class="nb">str</span><span class="p">(</span><span class="n">v</span><span class="o">.</span><span class="n">x</span><span class="p">)][</span><span class="nb">str</span><span class="p">(</span><span class="n">v</span><span class="o">.</span><span class="n">y</span><span class="p">)][</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">k</span><span class="p">)</span>
+
+        <span class="n">graph_json</span><span class="p">[</span><span class="s1">&#39;edges&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">edges</span><span class="p">:</span>
+            <span class="n">ej</span> <span class="o">=</span> <span class="p">[</span><span class="n">e</span><span class="o">.</span><span class="n">v1</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="n">e</span><span class="o">.</span><span class="n">v1</span><span class="o">.</span><span class="n">y</span><span class="p">,</span> <span class="n">e</span><span class="o">.</span><span class="n">v2</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="n">e</span><span class="o">.</span><span class="n">v2</span><span class="o">.</span><span class="n">y</span><span class="p">]</span>
+            <span class="n">ejs</span> <span class="o">=</span> <span class="p">[</span><span class="nb">str</span><span class="p">(</span><span class="n">val</span><span class="p">)</span> <span class="k">for</span> <span class="n">val</span> <span class="ow">in</span> <span class="n">ej</span><span class="p">]</span>
+            <span class="n">graph_json</span><span class="p">[</span><span class="s1">&#39;edges&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">ejs</span><span class="p">)</span>
+
+        <span class="c1"># save to json</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">file_name</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+            <span class="n">json</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">graph_json</span><span class="p">,</span> <span class="n">f</span><span class="p">)</span></div>
+
+        <span class="c1"># load graph data from json</span>
+
+<div class="viewcode-block" id="Graph.load_from_json"><a class="viewcode-back" href="../../lyra_graphtool.html#lyra_graphtool.graph.Graph.load_from_json">[docs]</a>    <span class="k">def</span> <span class="nf">load_from_json</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">file_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="c1"># dict to convert integer keys to Worker_Type keys</span>
+        <span class="n">wt_dict</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="n">lwt</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">Worker_Type</span><span class="o">.</span><span class="n">__members__</span><span class="o">.</span><span class="n">values</span><span class="p">())</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">lwt</span><span class="p">)):</span>
+            <span class="n">wt</span> <span class="o">=</span> <span class="n">lwt</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+            <span class="n">wt_dict</span><span class="p">[</span><span class="n">wt</span><span class="o">.</span><span class="n">value</span><span class="p">]</span> <span class="o">=</span> <span class="n">wt</span>
+
+        <span class="c1"># dict to convert integer keys to Vertex_Type keys</span>
+        <span class="n">vt_dict</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="n">lvt</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">Vertex_Type</span><span class="o">.</span><span class="n">__members__</span><span class="o">.</span><span class="n">values</span><span class="p">())</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">lvt</span><span class="p">)):</span>
+            <span class="n">vt</span> <span class="o">=</span> <span class="n">lvt</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+            <span class="n">vt_dict</span><span class="p">[</span><span class="n">vt</span><span class="o">.</span><span class="n">value</span><span class="p">]</span> <span class="o">=</span> <span class="n">vt</span>
+
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">file_name</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+            <span class="n">gj</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+
+        <span class="n">vertsj</span> <span class="o">=</span> <span class="n">gj</span><span class="p">[</span><span class="s1">&#39;vertices&#39;</span><span class="p">]</span>
+        <span class="n">edgesj</span> <span class="o">=</span> <span class="n">gj</span><span class="p">[</span><span class="s1">&#39;edges&#39;</span><span class="p">]</span>
+
+        <span class="n">vertices</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">xs</span> <span class="ow">in</span> <span class="n">vertsj</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+            <span class="n">x</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">xs</span><span class="p">)</span>
+            <span class="n">vertsj_x</span> <span class="o">=</span> <span class="n">vertsj</span><span class="p">[</span><span class="n">xs</span><span class="p">]</span>
+            <span class="k">for</span> <span class="n">ys</span> <span class="ow">in</span> <span class="n">vertsj_x</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+                <span class="n">y</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">ys</span><span class="p">)</span>
+                <span class="n">vj</span> <span class="o">=</span> <span class="n">vertsj_x</span><span class="p">[</span><span class="n">ys</span><span class="p">]</span>
+                <span class="n">v</span> <span class="o">=</span> <span class="n">Vertex</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+
+                <span class="c1"># set properties</span>
+                <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">vj</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+                    <span class="k">if</span> <span class="n">k</span> <span class="ow">in</span> <span class="p">(</span><span class="s1">&#39;reward&#39;</span><span class="p">,</span> <span class="s1">&#39;mult_time&#39;</span><span class="p">):</span>
+                        <span class="nb">setattr</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">k</span><span class="p">,</span> <span class="nb">float</span><span class="p">(</span><span class="n">vj</span><span class="p">[</span><span class="n">k</span><span class="p">]))</span>
+
+                    <span class="k">elif</span> <span class="n">k</span> <span class="ow">in</span> <span class="p">(</span><span class="s1">&#39;expiration_time&#39;</span><span class="p">,</span> <span class="s1">&#39;time_to_acquire&#39;</span><span class="p">):</span>
+                        <span class="k">if</span> <span class="n">vj</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                            <span class="n">val</span> <span class="o">=</span> <span class="kc">None</span>
+                        <span class="k">else</span><span class="p">:</span>
+                            <span class="n">val</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">vj</span><span class="p">[</span><span class="n">k</span><span class="p">])</span>
+
+                        <span class="nb">setattr</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">k</span><span class="p">,</span> <span class="n">val</span><span class="p">)</span>
+
+                    <span class="k">elif</span> <span class="n">k</span> <span class="o">==</span> <span class="s1">&#39;vertex_type&#39;</span><span class="p">:</span>
+                        <span class="nb">setattr</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">k</span><span class="p">,</span> <span class="n">vt_dict</span><span class="p">[</span><span class="nb">int</span><span class="p">(</span><span class="n">vj</span><span class="p">[</span><span class="n">k</span><span class="p">])])</span>
+
+                    <span class="k">elif</span> <span class="n">k</span> <span class="o">==</span> <span class="s1">&#39;mult_worker&#39;</span><span class="p">:</span>
+                        <span class="c1"># create Worker_Type keys</span>
+                        <span class="n">mult_worker</span> <span class="o">=</span> <span class="p">{}</span>
+                        <span class="k">for</span> <span class="n">kwt</span> <span class="ow">in</span> <span class="n">vj</span><span class="p">[</span><span class="n">k</span><span class="p">]</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+                            <span class="n">mult_worker</span><span class="p">[</span><span class="n">wt_dict</span><span class="p">[</span><span class="nb">int</span><span class="p">(</span><span class="n">kwt</span><span class="p">)]]</span> <span class="o">=</span> <span class="n">vj</span><span class="p">[</span><span class="n">k</span><span class="p">][</span><span class="n">kwt</span><span class="p">]</span>
+                        <span class="nb">setattr</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">k</span><span class="p">,</span> <span class="n">mult_worker</span><span class="p">)</span>
+
+                    <span class="k">elif</span> <span class="n">k</span> <span class="o">==</span> <span class="s1">&#39;mult_time_active&#39;</span><span class="p">:</span>
+                        <span class="nb">setattr</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">k</span><span class="p">,</span> <span class="p">(</span><span class="n">vj</span><span class="p">[</span><span class="n">k</span><span class="p">][</span><span class="mi">0</span><span class="p">],</span> <span class="n">vj</span><span class="p">[</span><span class="n">k</span><span class="p">][</span><span class="mi">1</span><span class="p">]))</span>
+
+                <span class="n">vertices</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">v</span><span class="p">)</span>
+
+        <span class="n">edges</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">ej</span> <span class="ow">in</span> <span class="n">edgesj</span><span class="p">:</span>
+            <span class="n">x1</span><span class="p">,</span> <span class="n">y1</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">ej</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span> <span class="nb">float</span><span class="p">(</span><span class="n">ej</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+            <span class="n">x2</span><span class="p">,</span> <span class="n">y2</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">ej</span><span class="p">[</span><span class="mi">2</span><span class="p">]),</span> <span class="nb">float</span><span class="p">(</span><span class="n">ej</span><span class="p">[</span><span class="mi">3</span><span class="p">])</span>
+
+            <span class="c1"># get v1 and v2</span>
+            <span class="n">v1</span><span class="p">,</span> <span class="n">v2</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span>
+            <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">vertices</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">v</span><span class="o">.</span><span class="n">x</span> <span class="o">==</span> <span class="n">x1</span> <span class="ow">and</span> <span class="n">v</span><span class="o">.</span><span class="n">y</span> <span class="o">==</span> <span class="n">y1</span><span class="p">:</span>
+                    <span class="n">v1</span> <span class="o">=</span> <span class="n">v</span>
+                <span class="k">if</span> <span class="n">v</span><span class="o">.</span><span class="n">x</span> <span class="o">==</span> <span class="n">x2</span> <span class="ow">and</span> <span class="n">v</span><span class="o">.</span><span class="n">y</span> <span class="o">==</span> <span class="n">y2</span><span class="p">:</span>
+                    <span class="n">v2</span> <span class="o">=</span> <span class="n">v</span>
+
+            <span class="k">if</span> <span class="n">v1</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="p">(</span><span class="n">x1</span><span class="p">,</span><span class="w"> </span><span class="n">y1</span><span class="p">)</span><span class="si">}</span><span class="s1"> in json file edges, but not in json file vertices&#39;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">v2</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="p">(</span><span class="n">x2</span><span class="p">,</span><span class="w"> </span><span class="n">y2</span><span class="p">)</span><span class="si">}</span><span class="s1"> in json file edges, but not in json file vertices&#39;</span><span class="p">)</span>
+
+            <span class="n">e</span> <span class="o">=</span> <span class="n">Edge</span><span class="p">(</span><span class="n">v1</span><span class="p">,</span> <span class="n">v2</span><span class="p">)</span>
+            <span class="n">edges</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">vertices</span> <span class="o">=</span> <span class="n">vertices</span>  <span class="c1"># no errors, set up verts &amp; edges</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">edges</span> <span class="o">=</span> <span class="n">edges</span></div></div>
+
+
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, Studio X.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
