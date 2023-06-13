@@ -1,4 +1,4 @@
-Dependencies
+Package Dependencies
 ============
 
 * Python==3.10.9
