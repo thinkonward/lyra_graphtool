@@ -3,7 +3,7 @@
 Lyra Graphtool API Documentation
 =============
  
-.. automodule:: docs/lyra_graphtool/
+.. automodule:: src/lyra_graphtool/
   :members:
   :undoc-members:
  
