@@ -3,7 +3,7 @@ Installation
 
 To install the package, clone the repository into your project folder and run the following lines of code:
 
-..code-block:: Python
+.. code-block:: Python
 
     import lyra_graphtool as lgtool
 
