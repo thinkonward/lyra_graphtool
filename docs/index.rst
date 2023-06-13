@@ -12,7 +12,6 @@ Welcome to Lyra Graphtool's documentation!
    install
    depend
    modules
-   tutorials
 
 
 Indices and tables
