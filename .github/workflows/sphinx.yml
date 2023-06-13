@@ -13,7 +13,6 @@ jobs:
           pip install sphinx sphinx_rtd_theme
       - name: Sphinx build
         run: |
-          cd docs/
           sphinx-build doc _build
       - name: Deploy
         uses: peaceiris/actions-gh-pages@v3
