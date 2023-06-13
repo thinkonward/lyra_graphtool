@@ -11,7 +11,8 @@ from lyra_graphtool import Configuration, Config_Single_Time, Edge, Graph, Graph
 ​
 Package dependencies:
 * dependencies here
-​
+
+
 Notebooks:
 * Access `lyra_graphtool` docs can be found [here](https://www.github.com/studio-x-llc/lyra_graphtool)
 
