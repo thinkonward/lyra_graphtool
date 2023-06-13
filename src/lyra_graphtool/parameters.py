@@ -3,7 +3,7 @@ import itertools
 import json
 import os
 import pickle
-from argparse import ArgumentParser
+from argparse import ArgumentParser, ArgumentError
 from copy import deepcopy
 from typing import Generic, List, TypeVar
 
@@ -30,28 +30,30 @@ class Parameters(Generic[Parameters]):
 
 # noinspection DuplicatedCode,SpellCheckingInspection
 class ProcessArgs:
-    """
-    Set up args and graph. Get graph from this class object after instantiating.
-    """
 
     def __init__(self, args_list: List = None, verbose=False):
         # noinspection PyUnresolvedReferences
         """
-                set up args
-                Arguments:
-                    args_list - list of form
+        Set up args and graph. Get graph from this class object after instantiating.
 
-                                    ['--budget', '1000', '--duration', '20', ...]
+            Arguments:
+                args_list - list of form
 
-                                args followed by values.
-                                If args_list = '', default values will be used.
+                    Example: ['--budget', '1000', '--duration', '20', ...]
 
-                        Note: If args_list contains a value for 'filename_graph',
-                                the graph will be loaded (pickle file).
-                                specified args will OVERRIDE graph parameters.
-                              If there is no value for 'filename_graph', a graph will be created
-                              using arg parameters.
-                """
+                    Args followed by values in a list.
+                    If args_list = '', default values will be used.
+
+                    Note: If args_list contains a value for 'filename_graph',
+                    the graph will be loaded (pickle file). Specified args will OVERRIDE graph parameters.
+                    If there is no value for 'filename_graph', a graph will be created
+                    using arg parameters.
+
+                verbose: bool, default = False
+
+            Return:
+                None
+        """
 
         # set these below
         self.args = None
@@ -59,7 +61,6 @@ class ProcessArgs:
         self.graph = None
         self.site_structures = None
         self.worker_cost_rate = None
-
         self.keys_gen = [
             'trial_name', 'filename_graph',
             # graph geometric properties
@@ -80,7 +81,7 @@ class ProcessArgs:
             'site1_exp_time', 'site2_exp_time', 'site3_exp_time'
         ]
 
-        parser = ArgumentParser(description='Args for Lyra')
+        parser = ArgumentParser(description='Args for Lyra', exit_on_error=False)
 
         # trial name
         parser.add_argument('--trial_name', type=str, required=False, default="Lyra_trial", help='name of trial')
@@ -167,7 +168,11 @@ class ProcessArgs:
                             help='duration - number of time steps (eg days) in simulation')
 
         if args_list is None:
-            self.args = parser.parse_args()
+            if parser.prog == 'ipykernel_launcher.py':
+                self.args = parser.parse_args('')
+            else:
+                self.args = parser.parse_args()
+            
         else:
             self.args = parser.parse_args(args_list)
 
@@ -197,6 +202,15 @@ class ProcessArgs:
         self.graph = self.load_graph(verbose)
 
     def load_graph(self, verbose=False) -> Graph:
+        '''
+        Load graph from filename into SiteStructures
+
+            Arguments:
+                verbost: bool, default = False
+
+            Return:
+                Graph (class)
+        '''
 
         filename_graph = self.args.filename_graph
 
@@ -211,8 +225,7 @@ class ProcessArgs:
             #
             # default dict for site access times in class Parameter - graph vars set in Configuration instantiation
             try:
-                graph_type = Graph_Type.RANDOM
-                graph = Graph(self.args.num_verts, self.args.max_x, self.args.max_y, graph_type)
+                graph = Graph(self.args.num_verts, self.args.max_x, self.args.max_y, self.site_structures)
                 graph.load_from_json(filename_graph)
             except Exception as msg_e:
                 msg = f'Could not load graph file "{filename_graph}" from current directory {os.getcwd()}: {msg_e}.'
@@ -309,7 +322,7 @@ class ProcessArgs:
                 else:
                     graph_type = Graph_Type.GRID
 
-                graph = Graph(self.args.num_verts, self.args.max_x, self.args.max_y, graph_type)
+                graph = Graph(self.args.num_verts, self.args.max_x, self.args.max_y, self.site_structures, graph_type)
 
                 graph.make_graph_connected()
 
@@ -325,21 +338,21 @@ class ProcessArgs:
         #
         # check for argument overrides in parser.add_argument above
         # if the argument has a default value, it was not specified - so don't override
-        for v in graph.vertices:
-            vt = v.vertex_type
-            if vt in v.accessible_types():
-                if self.site_structures.site_acquire_times[vt] != utils.NotSpecI:
-                    v.time_to_acquire = self.site_structures.site_acquire_times[vt]
-                if self.site_structures.site_rewards[vt] != utils.NotSpecF:
-                    v.reward = self.site_structures.site_rewards[vt]
-                if self.site_structures.site_mult_time[vt] != utils.NotSpecF:
-                    v.mult_time = self.site_structures.site_mult_time[vt]
-                if self.site_structures.site_mult_time_active[vt] != utils.NotSpecI:
-                    v.mult_time_active = self.site_structures.site_mult_time_active[vt]
-                if self.site_structures.site_mult_worker[vt] != utils.NotSpecF:
-                    v.mult_worker = self.site_structures.site_mult_worker[vt]
-                if self.site_structures.site_expiration_times[vt] != utils.NotSpecI:
-                    v.expiration_time = self.site_structures.site_expiration_times[vt]
+        # for v in graph.vertices:
+        #     vt = v.vertex_type
+        #     if vt in v.accessible_types():
+        #         if self.site_structures.site_acquire_times[vt] != utils.NotSpecI:
+        #             v.time_to_acquire = self.site_structures.site_acquire_times[vt]
+        #         if self.site_structures.site_rewards[vt] != utils.NotSpecF:
+        #             v.reward = self.site_structures.site_rewards[vt]
+        #         if self.site_structures.site_mult_time[vt] != utils.NotSpecF:
+        #             v.mult_time = self.site_structures.site_mult_time[vt]
+        #         if self.site_structures.site_mult_time_active[vt] != utils.NotSpecI:
+        #             v.mult_time_active = self.site_structures.site_mult_time_active[vt]
+        #         if self.site_structures.site_mult_worker[vt] != utils.NotSpecF:
+        #             v.mult_worker = self.site_structures.site_mult_worker[vt]
+        #         if self.site_structures.site_expiration_times[vt] != utils.NotSpecI:
+        #             v.expiration_time = self.site_structures.site_expiration_times[vt]
 
         # copy possible overridden values to args
         args_temp = deepcopy(self.args)
@@ -357,11 +370,13 @@ class ProcessArgs:
 
     def values_to_args(self) -> List:
         """
-        Arguments:
-                args - from argparse.ArgumentParser copy class variables to these args
-        Return:
-                arg_list - command-line-style argument list that can be
-                        used as input to Process_Args()
+        Get the arg values needed for input into Process_Args()
+            Arguments:
+                    args - from argparse.ArgumentParser copy class variables to these args
+                    
+            Return:
+                    arg_list - command-line-style argument list that can be
+                            used as input to Process_Args()
         """
 
         arg_list = []
@@ -372,7 +387,12 @@ class ProcessArgs:
 
     def save(self, filename: str = None):
         """
-        save trial arguments to text file
+        Method to save arguments dict as json
+            Arguments:
+                filename: str, path to file to save
+
+            Return:
+                None
         """
         if filename is None:
             timestr = datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S.txt")
@@ -381,20 +401,22 @@ class ProcessArgs:
             json.dump(self.args_trial.__dict__, f)
 
     @classmethod
-    def load(cls, filename: str = None, graph_file: str = None):
+    def load(cls, arguments_file: str = None, graph_file: str = None):
         """
         Method to load arguments
-        :param
-            filename: path to file with arguments
-            graph_file: path to file with graph
-        :return:
-            list of arguments
+            Arguments:
+                filename: str, path to file with arguments
+
+                graph_file: str, path to file with graph
+
+            Return:
+                list, list of arguments
         """
         def json_to_list(x):
             lst_tup = [('--' + k, str(v)) for k, v in args_dict.items()]
             return list(itertools.chain(*lst_tup))
 
-        with open(filename) as f:
+        with open(arguments_file) as f:
             args_dict = json.load(f)
 
         if graph_file is not None and os.path.isfile(graph_file):
@@ -410,15 +432,17 @@ class Site_Structures:
 
     def __init__(self, args, use_arg_defaults=True):
         """
-        Arguments:
+        Set up structures used for problem classes
+                Note: properties below can be set/varied at SITEs individually
+
+            Arguments:
                 args - from argparse.ArgumentParser from which to get values
 
                 use_arg_defaults -
                     True: use defaults in parser.add_argument() below
                     False: use defaults specified here - these defaults override NotSpecI and NotSpecF values
-
-        all site variables below must be set directly in graph
-        NOTE: properties below can be set/varied at SITEs individually
+            Return:
+                None
         """
 
         ad = use_arg_defaults
@@ -469,10 +493,13 @@ class Site_Structures:
     # noinspection DuplicatedCode
     def values_to_args(self, args) -> List:
         """
-        Arguments:
-                args - from argparse.ArgumentParser copy class variables to these args
-        Return:
-                arg_list - command-line-style argument list that can be
+        Return argument list for input into Process_Args()
+
+            Arguments:
+                args: from argparse.ArgumentParser copy class variables to these args
+
+            Return:
+                list, arg_list: command-line-style argument list that can be
                         used as input to Process_Args()
         """
 

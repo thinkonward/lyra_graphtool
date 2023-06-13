@@ -7,6 +7,10 @@ Vertex = TypeVar('Vertex')
 
 
 class Vertex_Type(IntEnum):
+    '''
+    Used to define type of location.
+        Note: BASIC is a location in space, neither a SITE nor ORIGIN
+    '''
     BASIC = 0   # location in space; neither a site nor origin
     ORIGIN = 1
     SITE1 = 2
@@ -18,6 +22,7 @@ class Vertex_Type(IntEnum):
 
 # create and return a vertex object
 class Vertex(Generic[Vertex]):
+
     def __init__(self, x, y,
                  v_type=Vertex_Type.BASIC,
                  reward=0,  # reward given
@@ -27,6 +32,34 @@ class Vertex(Generic[Vertex]):
                  expiration_time=None,  # reward = 0 after this time (in days)
                  time_to_acquire=0,  # site must be accessed for this many time steps
                  ):
+        '''
+        Used to create and return a vertex object
+
+            Arguments:
+
+                v_type: Vertex_Type.BASIC
+
+                reward: int, default = 0
+                    reward given
+
+                mult_time: int, default = 1
+                    multiplied by cost
+
+                mult_time_active: int pair, default = (None, None)
+                    mult_time applies t1 <= time <= t2 (t1,t2)
+
+                mult_worker: int, default = None
+                    multiplied by cost for this type, eg {Worker_Type.WORKER1: 1.5}
+
+                expiration_time: int, default = None
+                    reward = 0 after this time (in days)
+
+                time_to_acquire: int, default = 0
+                    site must be accessed for this many time steps
+
+            Return:
+                None
+        '''
         if mult_worker is None:
             mult_worker = {}
         self.x = x
@@ -45,6 +78,15 @@ class Vertex(Generic[Vertex]):
 
     # display info about vertex
     def info(self, verbose=False) -> List:
+        '''
+        Get information about vertex
+
+            Arguments:
+                verbose: bool, default=False
+
+            Return:
+                list, vertices information list
+        '''
         x, y = self.x, self.y
         v_type = self.vertex_type
         if verbose:

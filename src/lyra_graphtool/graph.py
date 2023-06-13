@@ -1,5 +1,6 @@
 import json
 import pickle
+import warnings
 from copy import deepcopy
 from enum import IntEnum
 from random import choices, sample, shuffle
@@ -9,6 +10,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import math
 
+import lyra_graphtool.utils as utils
 from lyra_graphtool.edge import Edge
 from lyra_graphtool.utils import vertices_array
 from lyra_graphtool.worker import Worker_Type
@@ -25,13 +27,36 @@ class Graph_Type(IntEnum):
 # graph object
 class Graph(Generic[Graph]):
 
-    def __init__(self, num_vertices, max_x, max_y,
+    def __init__(self, num_vertices, max_x, max_y, site_structures,
                  gr_type=Graph_Type.RANDOM, int_pairs=True):
+        
+        '''
+        Graph object set up graph and vertices for process
+
+            Arguments:
+
+                num_vertices:
+
+                max_x:
+
+                max_y:
+
+                site_structures:
+
+                gr_type: Graph_Type.RANDOM, loaded from Graph_Type(class)
+
+                int_pairs: bool, default=True
+
+            Return:
+
+                None
+        '''
 
         self.vertices = []
         self.edges = []
         self.graph_type = gr_type
         self.generate_integer_pairs = int_pairs  # locations (x,y) integer pairs?
+        self.site_structures = site_structures
 
         if num_vertices > max_x * max_y:
             raise ValueError(f'Number of vertices ({num_vertices}) must be < max_x * max_y ({max_x}*{max_y})')
@@ -106,11 +131,30 @@ class Graph(Generic[Graph]):
 
     # return numpy array of vertices v: v = [ [x0,y0], [x1,y1], ... ]
     def vertices_array(self) -> np.ndarray:
+        '''
+        Method to get numpy array of vertices v: v = [ [x0,y0], [x1,y1], ... ]
+
+            Arguments:
+                None
+
+            Return:
+                np.ndarray, vertices
+        '''
         return vertices_array(self.vertices)
 
     # get info about vertices: coords and type
     # if no arg passed, get info about all vertices in graph
     def vertices_info(self, vert_list: List = None) -> Dict:
+        '''
+        Get info about vertices: coordinates and type. If no arg passed, get info about all vertices in graph.
+
+            Arguments:
+                vert_list: list, default = None
+                    list of vertices to recieve info about
+
+            Return:
+                dict, vertice information
+        '''
         info = {}
         if vert_list is None:
             vert_list = self.vertices
@@ -131,6 +175,15 @@ class Graph(Generic[Graph]):
 
     # get vertices of specific type
     def get_vertices_type(self, v_type: Vertex_Type) -> List:
+        '''
+        Get vertices of a specific type
+
+            Arguments:
+                v_type: Vertex_Type (Class)
+
+            Return:
+                list, vertices of a given type
+        '''
         # make sure type is legitimate
         if v_type not in Vertex_Type:
             types = list(Vertex_Type.__members__)
@@ -146,6 +199,17 @@ class Graph(Generic[Graph]):
 
     # get vertex with specified coordinates (x,y)
     def get_vertex_xy(self, x: float, y: float) -> Vertex:
+        '''
+        Get vertex with specified coordinates (x,y)
+
+            Arguments:
+                x: float, x vertice value
+
+                y: float, y vertice value
+
+            Return:
+                Vertex (Class)
+        '''
         for v in self.vertices:
             if v.x == x:
                 if v.y == y:
@@ -154,6 +218,21 @@ class Graph(Generic[Graph]):
 
     # set the type of vertex at coords (x,y)
     def set_vertex_type(self, v_type: Vertex_Type, v: Vertex = None, x: float = None, y: float = None) -> Vertex:
+        '''
+        Set the type of vertex as given coordinates (x,y)
+
+            Arguments:
+                v_type: Vertex_Type (Class)
+
+                v: Vertex (class), default = None
+
+                x: float, x vertice value, default = None
+
+                y: float, y vertice value, default = None
+
+            Return:
+                Vertex (class)
+        '''
 
         if v is None:
             if x is None or y is None:
@@ -170,6 +249,19 @@ class Graph(Generic[Graph]):
 
     # set the type of vertex at coords (x,y)
     def set_vertex_coords(self, v: Vertex, x: float, y: float) -> Vertex:
+        '''
+        Set the type of vertex as coordinates (x,y)
+
+            Arguments:
+                v: Vertex (class)
+
+                x: float, x vertice value
+
+                y: float, y vertice value
+
+            Return:
+                list, vertices of a given type
+        '''
 
         for i in range(len(self.vertices)):
             if self.vertices[i] == v:
@@ -178,6 +270,49 @@ class Graph(Generic[Graph]):
                 return self.vertices[i]
 
         return None
+    
+    # set vertex on graph
+    def add_vertex(self, v: Vertex):
+        
+        # check if vertex not in graph already
+        for graph_v in self.vertices:
+            if graph_v.x == v.x and graph_v.y == v.y:
+                raise ValueError("Vertex already in the graph")
+        
+        # set other parameters for vertex
+        v.time_to_acquire = self.site_structures.site_acquire_times[v.vertex_type]
+        v.reward = self.site_structures.site_rewards[v.vertex_type]
+        v.mult_time = self.site_structures.site_mult_time[v.vertex_type]
+        v.mult_time_active = self.site_structures.site_mult_time_active[v.vertex_type]
+        v.mult_worker = self.site_structures.site_mult_worker[v.vertex_type]
+        v.expiration_time = self.site_structures.site_expiration_times[v.vertex_type]
+        self.vertices.append(v)
+        self.make_graph_connected()
+        self.set_edges()
+    
+    # remove vertex from graph
+    def remove_vertex(self, x: float, y: float):
+        for i, v in enumerate(self.vertices):
+            if v.x == x and v.y == y:
+                self.vertices.pop(i)
+        self.set_edges()
+                
+    def _set_site_structures(self):
+        for v in self.vertices:
+            vt = v.vertex_type
+            if vt in v.accessible_types():
+                if self.site_structures.site_acquire_times[vt] != utils.NotSpecI:
+                    v.time_to_acquire = self.site_structures.site_acquire_times[vt]
+                if self.site_structures.site_rewards[vt] != utils.NotSpecF:
+                    v.reward = self.site_structures.site_rewards[vt]
+                if self.site_structures.site_mult_time[vt] != utils.NotSpecF:
+                    v.mult_time = self.site_structures.site_mult_time[vt]
+                if self.site_structures.site_mult_time_active[vt] != utils.NotSpecI:
+                    v.mult_time_active = self.site_structures.site_mult_time_active[vt]
+                if self.site_structures.site_mult_worker[vt] != utils.NotSpecF:
+                    v.mult_worker = self.site_structures.site_mult_worker[vt]
+                if self.site_structures.site_expiration_times[vt] != utils.NotSpecI:
+                    v.expiration_time = self.site_structures.site_expiration_times[vt]
 
     # closest vertices to specified vertex
     def closest_vertices(self, v: Vertex) -> List:
@@ -294,6 +429,7 @@ class Graph(Generic[Graph]):
 
         # set last to origin
         self.vertices[index_verts[-1]].vertex_type = Vertex_Type.ORIGIN
+        self._set_site_structures()
 
     # return edge of minimum distance between two sets of vertices
     # this is the minimum distance of points (v1,v2) v1 in set1, v2 in set2

@@ -24,6 +24,9 @@ WORKER_COST_RATE = {
 class Worker(Generic[Worker]):
 
     def __init__(self, w_type: Worker_Type = Worker_Type.WORKER1, rates: Dict = None):
+        '''
+        Object to set and extract worker type and cost
+        '''
 
         self.worker_type = w_type
         self.worker_cost_rate = rates[w_type] or WORKER_COST_RATE[w_type]

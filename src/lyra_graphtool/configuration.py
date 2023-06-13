@@ -21,12 +21,27 @@ Configuration = TypeVar('Configuration')
 class Config_Single_Time(Generic[Config_Single_Time]):
 
     def __init__(self, v: Vertex = None, access: bool = False):
+        '''
+        Class controls single-time-step configuration
+        
+            Note: objects will have a deepcopy of the vertex. To modify a vertex
+                in the graph, use graph methods to get the graph's vertex.
+        '''
 
         self.v = deepcopy(v)  # occupy this vertex at corresponding time
         self.access = access  # True: access this vertex's resources; False: don't access
 
     # display info about object
     def info(self, verbose=False) -> List:
+        '''
+        Displays list of information about the object
+        
+            Arguments:
+                verbose : bool, default = False
+
+            Return: 
+                list
+        '''
         if self.v is not None:
             x, y = self.v.x, self.v.y
             vtype = self.v.vertex_type
@@ -43,7 +58,23 @@ class Config_Single_Time(Generic[Config_Single_Time]):
 class Configuration(Generic[Configuration]):
 
     def __init__(self, params: Parameters):
+        '''
+        Generic class for configuring budget, worker type, duration, graphing, and worker costs
 
+            Arguments:
+                params:
+                    budget - 
+                    
+                    duration_time - 
+
+                    graph - 
+
+                    worker_cost_rate - 
+
+            Return:
+                None
+
+        '''
         self.parameters = params
         self.budget = params.budget
         self.duration_time = params.duration_time
@@ -94,6 +125,18 @@ class Configuration(Generic[Configuration]):
     # Note: this allows for generalizations - should avoid hard-coding
     #       constraints outside this class (ie by solvers)
     def get_vertices_start(self) -> List:
+        '''
+        Get list the vertices from which a worker's path must start
+            
+                Note: this allows for generalizations - should avoid hard-coding
+                    constraints outside this class (ie by solvers)
+            
+            Arguments:
+                None
+            
+            Return:
+                list
+        '''
 
         verts_graph = self.graph.get_vertices_type(Vertex_Type.ORIGIN)
 
@@ -106,6 +149,21 @@ class Configuration(Generic[Configuration]):
     # add schedule (deepcopy) to configuration
     # at wt, wn
     def add_sched(self, wt: Worker_Type, wn: int, sched: Dict) -> None:
+        '''    
+        Add a schedule (deepcopy) to configuration at wt, wn
+        
+            Arguments:
+
+                wt: Worker_Type (class), int
+
+                wn: int, number of workers
+                
+                sched: dict, schedule
+            
+            Return:
+
+                None
+        '''
 
         if len(sched) == self.duration_time:
             self.config[wt][wn] = deepcopy(sched)
@@ -115,6 +173,17 @@ class Configuration(Generic[Configuration]):
     # display info on given schedule
     @staticmethod
     def sched_info(sched: Dict) -> List:
+        '''
+        Display the info of the given schedule
+
+            Arguments:
+
+                sched: dict, schedule
+
+            Return:
+            
+                list
+        '''
         info = []
         for t in range(len(sched)):
             i = sched[t].info()  # [ (x,y), vtype, access ]
@@ -123,10 +192,28 @@ class Configuration(Generic[Configuration]):
 
     # Method to return Worker object, that has rates compliant with configuration
     def get_worker(self, wt: Worker_Type) -> Worker:
+        '''
+        Method to return Worker object, that has rates compliant with configuration
+
+            Arguments:
+                wt: int, Worker_Type(class)\n
+
+            Return:
+                Worker(class)
+        '''
         return Worker(wt, rates=self.worker_cost_rate)
 
     # Method returning dict of workers used in configuration
     def get_current_workers(self, config: Dict) -> Dict:
+        '''
+        Method returning dict of workers used in configuration
+
+            Arguments:
+                config: dict
+
+            Returns: 
+                dict
+        '''
         used_workers = {}
         for wt in self.worker_types:
             used_workers[wt] = 0
@@ -139,15 +226,27 @@ class Configuration(Generic[Configuration]):
     # Method to return sites accessed in schedule
     # Return: dict with key (x,y) , value access_count: int
     # Note: access_count = 1 means the site v appeared v.time_to_acquire adjacent times in a schedule
-    def get_accessed_sites(self, config: Dict) -> Tuple[Dict, str]:
+    def get_accessed_sites(self, schedule: Dict) -> Tuple[Dict, str]:
+        '''
+        Method to return sites accessed in a schedule
+        
+                Note: access_count = 1 means the site v appeared v.time_to_acquire adjacent times in a schedule
 
+            Parameters:
+                schedule: dict
+            
+            Return: 
+                dict with key (x,y) 
+
+                value access_count: int
+        '''
         accesses = {(vertex.x, vertex.y): 0 for vertex in self.graph.vertices
                     if vertex.vertex_type in self.graph.vertices[0].accessible_types()
                     }
         worker_message = "Log of accesses:\n"
 
         for wt in self.worker_types:
-            for wn, sched in config[wt].items():
+            for wn, sched in schedule[wt].items():
                 t = 0
                 while t < len(sched):
                     curr_sched = sched[t]
@@ -162,6 +261,16 @@ class Configuration(Generic[Configuration]):
 
     # Method to return maximum revenue for graph
     def get_max_revenue(self):
+        '''
+        Method to return maximum revenue for graph
+
+            Arguments:
+                None
+
+            Return:
+                int, maximum revenue
+                    max_revenue = amount_of_sites * single_reward
+        '''
         max_revenue = 0
         for site_type in self.graph.vertices[0].accessible_types():
             amount_of_sites = len(self.graph.get_vertices_type(site_type))
@@ -174,6 +283,18 @@ class Configuration(Generic[Configuration]):
     # True if site v is being accessed at time t in configuration
     # False otherwise
     def site_accessed_at_time(self, v: Vertex, t: int) -> bool:
+        '''
+        Returns bool value to determine if site is being accessed at time t in configuration
+
+            Arguments:
+                v: Vertex object, from lyra_graphtool.vertex
+                
+                t: int, time step value 
+
+            Returns: 
+                bool 
+                    True if site v is being accessed at time t in configuration, False otherwise
+        '''
 
         for wt in self.worker_types:
             for wn in range(len(self.config[wt])):
@@ -192,7 +313,16 @@ class Configuration(Generic[Configuration]):
     # True if site v is being accessed in configuration
     # False otherwise
     def site_accessed(self, v: Vertex) -> bool:
+        '''
+        Returns bool value to determine if site is being accessed in configuration
 
+            Arguments:
+                v: Vertex object, from lyra_graphtool.vertex
+
+            Returns: 
+                bool 
+                    True if site v is being accessed in configuration, False otherwise
+        '''
         for wt in self.worker_types:
             for wn in range(len(self.config[wt])):
                 for t in range(len(self.config[wt][wn])):
@@ -205,6 +335,15 @@ class Configuration(Generic[Configuration]):
     # get length of a one worker schedule, how many timesteps was it active?
     @staticmethod
     def get_sched_path_length(sched: Dict) -> int:
+        '''
+        Method to return length of a one worker schedule. Used to determine how many timesteps was the worker active.
+
+            Arguments:
+                sched: dict, schedule 
+
+            Returns: 
+                int, number of active timesteps
+        '''
         length = 0
         for t, cs in sched.items():
             if cs.v is not None:
@@ -215,6 +354,16 @@ class Configuration(Generic[Configuration]):
     # False if otherwise
     @staticmethod
     def is_empty(sched: Dict) -> bool:
+        '''
+        Method to determine if single worker scedule is empty
+
+            Arguments:
+                sched: dict, schedule 
+
+            Returns: 
+                bool
+                    True if schedule for single worker is empty, False if otherwise
+        '''
         for t, cs in sched.items():
             if cs.v is not None:
                 return False
@@ -232,7 +381,25 @@ class Configuration(Generic[Configuration]):
     # sched is Dict with values Config_Single_Time
     #
     def sched_feasible_space(self, sched: Dict, origin_flag=True) -> bool:
+        '''
+        Method to determine if schedule is spatially feasible
 
+                Criteria
+                    1. Must start at ORIGIN type vertex if origin_flag==True
+                    2. Ending vertex followed by None vertices
+                    3. If hire worker again at later time, must start at ORIGIN
+                    Note: If origin_flag==False, schedule can start/restart at any vertex
+
+            Arguments:
+                sched: dict, schedule
+                    Note: a schedule is a sequence of Config_Single_Time objects
+                    
+                origin_flag: bool, default True
+
+            Returns: 
+                bool
+                    True if schedule is spatially feasible, false if otherwise
+        '''
         if len(sched) != self.duration_time:
             raise ValueError(f'Schedule must have {self.duration_time} keys to match duration_time.')
 
@@ -280,6 +447,16 @@ class Configuration(Generic[Configuration]):
     # Test all schedules for spatial feasibility
     #
     def sched_all_feasible_space(self, origin_flag=True) -> bool:
+        '''
+        Method to determine if ALL schedules are spatially feasible
+
+            Arguments:
+                origin_flag: bool, default True
+
+            Returns: 
+                bool
+                    True if schedule is spatially feasible, false if otherwise
+        '''
 
         for worker_type in self.worker_types:
 
@@ -302,6 +479,26 @@ class Configuration(Generic[Configuration]):
     # 5. Cannot access a site more than once
     #
     def sched_feasible_access_sites(self, sched: Dict, worker_type: Worker_Type) -> bool:
+        '''
+        Method to determine if schedule's access/extract properties are feasible
+
+                Criteria
+                    1. Can only access site - cannot access a non-site vertex as BASIC, ORIGIN
+                    2. Access constraint - must have Worker >= SITE
+                    3. If accessing, must access site for v.days_to_acquire
+                    4. Cannot access after expiration time
+                    5. Cannot access a site more than once
+
+            Arguments:
+                sched: dict, schedule
+                    Note: a schedule is a sequence of Config_Single_Time objects
+                    
+                worker_type: Worker_Type (class), from lyra_graphtool.worker
+
+            Returns: 
+                bool
+                    True if schedule's access/extract properties are feasible, False if otherwise
+        '''
 
         sites_accessed = []
         t = 0
@@ -368,6 +565,20 @@ class Configuration(Generic[Configuration]):
     #
     # noinspection SpellCheckingInspection
     def sched_all_feasible_access_sites(self) -> bool:
+        '''
+        Method to determine if schedule's access properties are feasible
+
+                Criteria
+                    1. Only one worker can access a specific site at a single point in time
+                    2. Once a site has been accessed, it can no longer be accessed at subsequent times
+
+            Arguments:
+                None
+
+            Return: 
+                bool
+                    True if schedule's access properties are feasible, False if otherwise
+        '''
 
         # check schedule feasibility for each individual worker
         for worker_type in self.worker_types:
@@ -397,6 +608,17 @@ class Configuration(Generic[Configuration]):
     #
     @staticmethod
     def cost_sched(sched: Dict, worker: Worker) -> float:
+        '''
+        Calculate the cost of a single-worker schedule
+
+            Arguments:
+                sched: dict,
+                    sched is a dict with key=time, value=Config_Single_Time (for a single worker)
+                    worker: Worker (class), from lyra_graphtool.worker
+
+            Returns:
+                float, cost value of a single worker schedule
+        '''
 
         cost_sched = 0
         for t in range(len(sched)):
@@ -441,6 +663,16 @@ class Configuration(Generic[Configuration]):
     #
     # NOTE: default worker_cost_rate is used for each worker type
     def cost(self) -> float:
+        '''
+        Calculate the cost of the entire configuration
+                Note: default worker_cost_rate is used for each worker type
+
+            Arguments:
+                None
+
+            Returns:
+                float, cost value of entire configuration
+        '''
 
         cost_config = 0
 
@@ -454,6 +686,16 @@ class Configuration(Generic[Configuration]):
 
     # Budget Feasibility of Configuration
     def budget_feasible(self) -> bool:
+        '''
+        Method to determine if budget is feasible for configuration. If Cost <= Budget then Feasible else Not Feasible
+
+            Arguments:
+                None
+
+            Returns:
+                bool
+                    True if budget is feasible, False if otherwise
+        '''
 
         if self.cost() <= self.budget:
             return True
@@ -462,6 +704,17 @@ class Configuration(Generic[Configuration]):
 
     # test overall feasibility of config using above methods
     def feasible(self) -> bool:
+        '''
+        Method to test the overall feasibily using sched_all_feasibility_space()
+        , sched_all_feasible_access_sites(), and budget_feasible()
+
+            Arguments:
+                None
+
+            Returns:
+                bool
+                    True if all functions are feasible, False if otherwise
+        '''
 
         feas_space = self.sched_all_feasible_space()
         feas_access = self.sched_all_feasible_access_sites()
@@ -479,6 +732,19 @@ class Configuration(Generic[Configuration]):
     # Note: revenue depends on worker_type
     @staticmethod
     def sched_revenue(sched: Dict):
+        '''
+        Method to calculate revenue from schedule for single worker
+                Note: Sched should be tested for feasibility by sched_feasible_access_sites
+                before calling this function
+
+            Arguments:
+                sched: dict, schedule
+                    sched is a dict with key=time, value=Config_Single_Time (for a single worker)
+                    worker: Worker (class), from lyra_graphtool.worker
+
+            Returns:
+                int, revenue (depends on worker_type)
+        '''
 
         revenue = 0
         t = 0
@@ -503,6 +769,17 @@ class Configuration(Generic[Configuration]):
     # before calling this funciton
     #
     def revenue(self):
+        '''
+        Method to calculate revenue from schedule for entire configuration
+                Note: Sched should be tested for feasibility by sched_feasible_access_sites
+                before calling this function
+
+            Arguments:
+                None
+
+            Returns:
+                int, revenue value for entire configuration
+        '''
 
         revenue = 0
 
@@ -515,6 +792,15 @@ class Configuration(Generic[Configuration]):
 
     # save configuration to file
     def save(self, file_name: str) -> None:
+        '''
+        Save configuration file to pickle format
+
+            Arguments:
+                filename: str, filepath for file to be saved
+
+            Returns:
+                None
+        '''
         fn = file_name
 
         with open(fn, 'wb') as f:
@@ -522,6 +808,15 @@ class Configuration(Generic[Configuration]):
 
     # save Configuration.config schedule dictionary to json
     def save_to_json(self, file_name: str) -> None:
+        '''
+        Save configuration schedule dictionary to json format
+
+            Arguments:
+                filename: str, filepath for file to be saved
+
+            Returns:
+                None
+        '''
         config_json = {}
         for wt in self.worker_types:
             config_json[wt] = {}
@@ -542,6 +837,15 @@ class Configuration(Generic[Configuration]):
 
     # load json config into Configuration.config
     def load_from_json(self, file_name: str) -> None:
+        '''
+        Load configuration schedule dictionary from json format into Configuration.config
+
+            Arguments:
+                filename: str, json filepath to import
+
+            Returns:
+                None
+        '''
 
         def jsonKeys2int(x):
             if isinstance(x, dict):

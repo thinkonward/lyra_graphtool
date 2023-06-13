@@ -24,6 +24,15 @@ class Edge(Generic[Edge]):
 
     # display info about edge
     def info(self, verbose=False) -> List:
+        '''
+        Displays list of information about the object
+        
+            Arguments:
+                verbose : bool, default False
+
+            Return: 
+                list
+        '''
         x0, y0 = self.v1.x, self.v1.y
         x1, y1 = self.v2.x, self.v2.y
         if verbose:
@@ -33,9 +42,30 @@ class Edge(Generic[Edge]):
     # THIS DEFINES "nearest neighbor"
     # True - edge consists of "nearest neighbors", False otherwise
     def nearest_neighbor(self) -> bool:
+        '''
+        Defines "nearest neighbor"
+        
+            Arguments:
+                None
+
+            Return: 
+                bool
+                    True if edge consists of "nearest neighbors", False otherwise
+        '''
         return self.length == 1.
 
     # True - edge is allowed for travel in 1 timestep: add to graph
     # False - cannot travel across edge in 1 timestep: do not add to graph
     def in_graph(self) -> bool:
+        '''
+        This determines if edge is allowed to travel in 1 timestep
+        
+            Arguments:
+                None
+
+            Return: 
+                bool
+                    True - edge is allowed for travel in 1 timestep: add to graph
+                    False - cannot travel across edge in 1 timestep: do not add to graph
+        '''
         return self.nearest_neighbor()
