@@ -20,25 +20,8 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v2.2.1
         with:
-          python-version: 3.9
+          python-version: 3.10
  
-      - name: Install dependencies
-        run: |
-          python -m pip install -U sphinx
-          python -m pip install sphinx-rtd-theme
-          python -m pip install sphinx-autoapi
-          python -m pip install myst-nb
-          python -m pip install jupyter
-          python -m pip install nbconvert
-
-#      - name: Switch to the refactoring branch
-#        run: git checkout refactoring
-
-      - name: convert the notebooks to markdown
-        run: |
-          cp -R examples docs/source
-          jupyter nbconvert --to markdown docs/source/examples/*.ipynb
-
       - name: make the sphinx docs
         run: |
           make -C docs clean 
