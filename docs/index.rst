@@ -14,6 +14,11 @@ Welcome to Lyra Graphtool's documentation!
    modules
    tutorial
 
+.. toctree::
+   :maxdepth: 2
+
+   examples/00_lyra_graphtool_tutorial
+
 Indices and tables
 ==================
 
