@@ -2,6 +2,6 @@ Tutorial
 ========
 
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 1
    
    examples/00_lyra_graphtool_tutorial
