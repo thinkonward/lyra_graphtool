@@ -12,7 +12,7 @@ Welcome to Lyra Graphtool's documentation!
    install
    depend
    modules
-   tutorial
+
 
 .. toctree::
    :maxdepth: 2
