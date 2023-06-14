@@ -14,6 +14,9 @@ jobs:
       - name: Sphinx build
         run: |
           sphinx-build docs _build
+      - name: Sphinx linkcheck
+        run: |
+          sphinx-build docs -W -b linkcheck -d _build/doctrees _build/html
       - name: Deploy
         uses: peaceiris/actions-gh-pages@v3
         if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
