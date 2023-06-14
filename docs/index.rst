@@ -12,7 +12,12 @@ Welcome to Lyra Graphtool's documentation!
    install
    depend
    modules
-   tutorial
+
+.. toctree::
+   :caption: Lyra Graphtool Tutorial
+   :maxdepth: 2
+
+   examples/00_lyra_graphtool_tutorial
 
 Indices and tables
 ==================
