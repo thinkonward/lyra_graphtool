@@ -1,0 +1,1983 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Lyra Graphtool Tutorial &mdash; Lyra Graphtool 0.0.1 documentation</title>
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script src="../_static/sphinx_highlight.js"></script>
+        <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="prev" title="Tutorial" href="../tutorial.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            Lyra Graphtool
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../install.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../depend.html">Package Dependencies</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../modules.html">API Documentation</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../tutorial.html">Tutorial</a><ul class="current">
+<li class="toctree-l2 current"><a class="current reference internal" href="#"><strong>Lyra Graphtool Tutorial</strong></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#welcome-to-the-off-the-beaten-path-xeek-challenge">Welcome to the Off the Beaten Path Xeek Challenge!</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#this-is-a-fun-and-unique-variation-of-the-traditional-travelling-salesman-problem">This is a fun and unique variation of the traditional travelling salesman problem.</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#in-the-traditional-travelling-salesman-problem-the-goal-is-to-optimize-the-route-that-the-salesman-has-to-walk-this-challenge-introduces-additional-constraints-and-additional-degrees-of-freedom-variables-to-the-problem-not-only-will-you-be-considering-the-distance-to-travel-but-additional-factors-like-simulation-duration-budget-amount-of-rewards-extracted-from-a-particular-site-and-the-cost-of-a-worker-the-solution-to-the-challenge-is-not-only-the-plan-but-also-an-algorithm-that-will-be-tested-on-other-problem-setups-different-graphs-to-explore-different-values-of-constraints-therefore-you-have-to-keep-in-mind-that-you-are-developing-a-universal-tool-for-finding-a-solution">In the traditional travelling salesman problem, the goal is to optimize the route that the “salesman” has to walk. This challenge introduces additional constraints and additional degrees of freedom (variables) to the problem. Not only will you be considering the distance to travel, but additional factors like simulation duration, budget, amount of rewards extracted from a particular site, and the cost of a worker. <strong>The solution to the challenge is not only the plan, but also an algorithm that will be tested on other problem setups (different graphs to explore, different values of constraints), therefore you have to keep in mind, that you are developing a universal tool for finding a solution.</strong></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#the-xeek-team-has-built-a-unique-and-powerful-tool-called-lyra-graphtool-to-help-you-skip-the-graph-setup-part-of-the-challenge-and-get-to-the-important-part-generating-an-algorithm-to-optimize-the-problem-this-notebook-as-well-as-a-random-walk-exmaple-solution-and-api-documentation-will-serve-as-your-documenation-and-learning-resources-for-the-challenge">The Xeek team has built a unique and powerful tool, called <code class="docutils literal notranslate"><span class="pre">lyra_graphtool</span></code>, to help you skip the graph setup part of the challenge and get to the important part; generating an algorithm to optimize the problem! This notebook, as well as a random walk exmaple solution and API Documentation will serve as your documenation and learning resources for the challenge.</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#please-use-the-links-below-if-you-would-like-to-jump-to-a-specific-object-in-this-notebook-as-well-as-a-starter-notebook-with-an-example-solution">Please use the links below if you would like to jump to a specific Object in this notebook, as well as a starter notebook with an example solution!</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#u-main-index-u"><strong><u>Main Index</u></strong></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#u-parameters-module-u"><strong><u>Parameters Module</u></strong></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#u-configuration-module-u"><strong><u>Configuration Module</u></strong></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#u-edge-module-u"><strong><u>Edge Module</u></strong></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#u-graph-module-u"><strong><u>Graph Module</u></strong></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#u-vertex-module-u"><strong><u>Vertex Module</u></strong></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#u-worker-module-u"><strong><u>Worker Module</u></strong></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#initial-setup"><strong>Initial Setup</strong></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#upon-starting-this-challenge-competitors-will-need-to-download-the-required-matrials-from-the-off-the-beaten-path-challenge-page">Upon starting this challenge, competitors will need to download the required matrials from the Off the Beaten Path challenge page.</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#the-xeek-team-will-provide">The Xeek team will provide:</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#an-arguments-file-that-will-contain-information-to-set-up-the-problem-all-participants-will-recieve-the-same-arguments-file-this-file-will-contain-information-like-total-budget-site-rewards-and-duration-of-the-simulation">An arguments file that will contain information to set up the problem. All participants will recieve the same arguments file. This file will contain information like <strong>total budget</strong>, <strong>site rewards</strong>, and <strong>duration</strong> of the simulation.</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#a-graph-json-file-all-participants-will-recieve-the-same-graph-json-file-this-will-be-loaded-into-the-lyra-graphtool-graph-object-to-set-up-the-graph-vertices-and-site-information">A graph JSON file. All participants will recieve the same <code class="docutils literal notranslate"><span class="pre">graph.json</span></code> file. This will be loaded into the <code class="docutils literal notranslate"><span class="pre">lyra_graphtool.Graph</span></code> object to set up the graph vertices and site information.</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#a-starter-notebook-similar-to-the-example-solution-but-without-the-example-solution-this-notebook-will-be-your-playground-to-write-an-algorithm-to-solve-the-off-the-beaten-path-challenge">A starter notebook, similar to the <span class="xref myst">example solution</span>, but without the example solution. This notebook will be your playground to write an algorithm to solve the Off the Beaten Path Challenge!</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#note-ensure-that-the-lyra-graphtool-folder-is-saved-in-your-project-folder-to-avoid-import-issues">Note: Ensure that the <code class="docutils literal notranslate"><span class="pre">lyra_graphtool</span></code> folder is saved in your project folder to avoid import issues</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#now-let-s-get-started"><strong>Now let’s get started!</strong></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#run-the-next-3-code-cells-in-order-to-setup-graphs-budgets-worker-costs-rewards-and-duration-double-check-to-make-sure-the-file-paths-for-the-lgtool-processargs-load-are-correct">Run the next 3 code cells in order to setup graphs, budgets, worker costs, rewards, and duration. Double check to make sure the file paths for the <code class="docutils literal notranslate"><span class="pre">lgtool.ProcessArgs.load()</span></code> are correct.</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#processargs-object"><strong>ProcessArgs Object</strong></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#the-processargs-object-will-be-used-in-the-intial-setup-of-the-problem-xeek-will-provide-the-setup-parameters-for-the-graph-and-arguments-file-for-the-challenge-challengers-do-however-have-the-tools-to-create-their-own-argument-files-remember-the-final-scoring-will-occur-on-a-different-argument-file-than-what-is-provided-so-it-is-to-your-advantage-to-create-your-own-argument-file-s-and-test-your-algorithm-to-see-if-it-is-effiecient-for-all-scenarios-below-will-explore-the-functionality-of-the-proceesargs-object-by-building-a-test-arguments-graph-file">The ProcessArgs object will be used in the intial setup of the problem. Xeek will provide the setup parameters for the graph and arguments file for the challenge. Challengers do, however, have the tools to create their own argument files. Remember, the final scoring will occur on a different argument file than what is provided, so it is to your advantage to create your own argument file(s) and test your algorithm to see if it is effiecient for all scenarios. Below will explore the functionality of the ProceesArgs object, by building a test arguments/graph file.</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#processargs-save"><strong>ProcessArgs.save()</strong></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#processargs-load"><strong>ProcessArgs.load()</strong></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#load-graph"><strong>load_graph()</strong></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#processargs-values-to-args"><strong>ProcessArgs.values_to_args()</strong></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#parameters-object"><strong>Parameters Object</strong></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#the-loaded-arguments-and-graph-can-be-wrapped-with-lgtool-parameters-class-which-can-be-further-passed-to-the-lgtool-configuration-object">The loaded arguments and graph can be wrapped with <code class="docutils literal notranslate"><span class="pre">lgtool.Parameters</span></code> class which can be further passed to the <code class="docutils literal notranslate"><span class="pre">lgtool.Configuration()</span></code> object.</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#display"><strong>display()</strong></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#configuration-object"><strong>Configuration Object</strong></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#the-lgtool-configuration-object-contains-not-only-the-graph-to-be-optimized-but-also-problem-constraints-and-setup-like-budget-duration-and-worker-cost-rates-pass-the-arguments-run-through-the-lgtool-parameters-section-for-set-up-this-module-will-be-the-workhorse-to-solve-the-challenge-because-it-allows-users-to-add-update-and-extract-most-parameters-for-the-challenge">The <code class="docutils literal notranslate"><span class="pre">lgtool.Configuration()</span></code> object contains not only the graph to be optimized, but also problem constraints and setup like budget, duration, and worker cost rates. Pass the arguments run through the <code class="docutils literal notranslate"><span class="pre">lgtool.Parameters()</span></code> section for set up. This module will be the workhorse to solve the challenge because it allows users to add, update, and extract most parameters for the challenge.</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#add-sched"><strong>add_sched()</strong></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#budget-feasible"><strong>budget_feasible()</strong></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#cost"><strong>cost()</strong></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#cost-sched"><strong>cost_sched()</strong></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#feasible"><strong>feasible()</strong></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#get-accessed-sites"><strong>get_accessed_sites()</strong></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#get-current-workers"><strong>get_current_workers()</strong></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#get-max-revenue"><strong>get_max_revenue()</strong></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#get-sched-path-length"><strong>get_sched_path_length()</strong></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#get-vertices-start"><strong>get_vertices_start()</strong></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#get-worker"><strong>get_worker()</strong></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#is-empty"><strong>is_empty()</strong></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#load-from-json"><strong>load_from_json()</strong></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#revenue"><strong>revenue()</strong></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#save"><strong>save()</strong></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#save-to-json"><strong>save_to_json()</strong></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#sched-all-feasible-access-sites"><strong>sched_all_feasible_access_sites()</strong></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#sched-all-feasible-space"><strong>sched_all_feasible_space()</strong></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#sched-feasible-access-sites"><strong>sched_feasible_access_sites()</strong></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#sched-feasible-space"><strong>sched_feasible_space()</strong></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#sched-info"><strong>sched_info()</strong></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#sched-revenue"><strong>sched_revenue()</strong></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#site-accessed"><strong>site_accessed()</strong></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#site-accessed-at-time"><strong>site_accessed_at_time()</strong></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#edge-object"><strong>Edge Object</strong></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#edge-info"><strong>Edge.info()</strong></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#in-graph"><strong>in_graph()</strong></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#nearest-neighbor"><strong>nearest_neighbor()</strong></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#graph-object"><strong>Graph Object</strong></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#add-vertex"><strong>add_vertex()</strong></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#adjacent-vertices"><strong>adjacent_vertices()</strong></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#closest-vertices"><strong>closest_vertices()</strong></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#connected-components"><strong>connected_components()</strong></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#depth-first-search"><strong>depth_first_search()</strong></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#distance"><strong>distance()</strong></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#get-edges-at-vertex"><strong>get_edges_at_vertex()</strong></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#edges-info"><strong>edges_info()</strong></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#get-vertex-xy"><strong>get_vertex_xy()</strong></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#get-vertices-type"><strong>get_vertices_type()</strong></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#isolated-vertices"><strong>isolated_vertices()</strong></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#id1"><strong>load_from_json()</strong></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#make-graph-connected"><strong>make_graph_connected()</strong></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#paths"><strong>paths()</strong></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#print-graph"><strong>print_graph()</strong></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#graph-save"><strong>Graph.save()</strong></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#graph-save-to-json"><strong>Graph.save_to_json()</strong></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#set-edges"><strong>set_edges()</strong></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#set-random-sites-origin"><strong>set_random_sites_origin()</strong></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#set-vertex-type"><strong>set_vertex_type()</strong></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#set-vertex-coords"><strong>set_vertex_coords()</strong></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#vertices-array"><strong>vertices_array()</strong></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#vertices-info"><strong>vertices_info()</strong></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#vertex-type-object"><strong>Vertex_Type Object</strong></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#vertex-type-is-used-to-store-and-define-each-location-type-on-the-graph-these-variables-will-contain-spatial-location-information-as-well-as-reward-amount-and-time-to-extract-sites-1-2-and-3-can-contain-varying-reward-amounts">Vertex_Type is used to store and define each location type on the graph. These variables will contain spatial location information, as well as reward amount and time to extract. SITEs 1,2 and 3 can contain varying reward amounts.</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#vertex-type-basic-basic-is-a-location-in-space-neither-a-site-nor-the-origin-regular-point-on-the-graph"><code class="docutils literal notranslate"><span class="pre">Vertex_Type.BASIC</span></code> - BASIC is a location in space, neither a SITE nor the ORIGIN (regular point on the graph)</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#vertex-type-origin-starting-point-for-workers"><code class="docutils literal notranslate"><span class="pre">Vertex_Type.ORIGIN</span></code> - starting point for workers</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#vertex-type-other"><code class="docutils literal notranslate"><span class="pre">Vertex_Type.OTHER</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#vertex-type-other2"><code class="docutils literal notranslate"><span class="pre">Vertex_Type.OTHER2</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#vertex-type-site1-point-on-graph-with-reward"><code class="docutils literal notranslate"><span class="pre">Vertex_Type.SITE1</span></code> - point on graph with reward</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#vertex-type-site2-point-on-graph-with-reward"><code class="docutils literal notranslate"><span class="pre">Vertex_Type.SITE2</span></code> - point on graph with reward</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#id3"><code class="docutils literal notranslate"><span class="pre">Vertex_Type.SITE2</span></code> - point on graph with reward</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#vertex-object"><strong>Vertex Object</strong></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#the-vertex-object-allows-users-to-create-vertices-for-that-graph-by-defining-characteristics-such-as-coordinates-x-y-vertex-type-rewards-available-at-given-site-site-expiration-time-and-time-to-aquire-below-we-create-a-vertex-object-and-assign-attributes">The <code class="docutils literal notranslate"><span class="pre">Vertex</span></code> object allows users to create vertices for that graph by defining characteristics such as coordinates (x,y), Vertex_Type, rewards available at given site, site expiration time, and time to aquire. Below we create a vertex object and assign attributes.</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#vertex-info"><strong>Vertex.info()</strong></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#accessible-types"><strong>accessible_types()</strong></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#worker-type-object"><strong>Worker_Type Object</strong></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#worker-type-holds-the-variable-information-the-three-types-of-workers-worker1-worker2-and-worker3-each-worker-is-assigned-an-order-and-this-can-be-viewed-by-calling-worker-types-on-the-configuration-ocject-created-in-the-initial-setup"><code class="docutils literal notranslate"><span class="pre">Worker_Type</span></code> holds the variable information the three types of workers: WORKER1, WORKER2, and WORKER3. Each worker is assigned an order, and this can be viewed by calling <code class="docutils literal notranslate"><span class="pre">.worker_types</span></code> on the configuration ocject created in the initial setup.</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#in-the-configuration-object-section-above-you-can-see-how-to-get-the-cost-rate-assigned-to-each-worker-for-the-configuration">In the <span class="xref myst">Configuration-Object</span> section above you can see how to get the <span class="xref myst">cost rate</span> assigned to each worker for the configuration.</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#worker-object"><strong>Worker Object</strong></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#the-worker-object-contains-the-information-about-worker-type-and-associated-cost-rate">The Worker object contains the information about worker type and associated cost rate.</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">Lyra Graphtool</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../tutorial.html">Tutorial</a></li>
+      <li class="breadcrumb-item active"><strong>Lyra Graphtool Tutorial</strong></li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/examples/00_lyra_graphtool_tutorial.ipynb.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="lyra-graphtool-tutorial">
+<h1><strong>Lyra Graphtool Tutorial</strong><a class="headerlink" href="#lyra-graphtool-tutorial" title="Permalink to this heading"></a></h1>
+<section id="welcome-to-the-off-the-beaten-path-xeek-challenge">
+<h2>Welcome to the Off the Beaten Path Xeek Challenge!<a class="headerlink" href="#welcome-to-the-off-the-beaten-path-xeek-challenge" title="Permalink to this heading"></a></h2>
+<section id="this-is-a-fun-and-unique-variation-of-the-traditional-travelling-salesman-problem">
+<h3>This is a fun and unique variation of the traditional <a class="reference external" href="https://en.wikipedia.org/wiki/Travelling_salesman_problem">travelling salesman</a> problem.<a class="headerlink" href="#this-is-a-fun-and-unique-variation-of-the-traditional-travelling-salesman-problem" title="Permalink to this heading"></a></h3>
+</section>
+<section id="in-the-traditional-travelling-salesman-problem-the-goal-is-to-optimize-the-route-that-the-salesman-has-to-walk-this-challenge-introduces-additional-constraints-and-additional-degrees-of-freedom-variables-to-the-problem-not-only-will-you-be-considering-the-distance-to-travel-but-additional-factors-like-simulation-duration-budget-amount-of-rewards-extracted-from-a-particular-site-and-the-cost-of-a-worker-the-solution-to-the-challenge-is-not-only-the-plan-but-also-an-algorithm-that-will-be-tested-on-other-problem-setups-different-graphs-to-explore-different-values-of-constraints-therefore-you-have-to-keep-in-mind-that-you-are-developing-a-universal-tool-for-finding-a-solution">
+<h3>In the traditional travelling salesman problem, the goal is to optimize the route that the “salesman” has to walk. This challenge introduces additional constraints and additional degrees of freedom (variables) to the problem. Not only will you be considering the distance to travel, but additional factors like simulation duration, budget, amount of rewards extracted from a particular site, and the cost of a worker. <strong>The solution to the challenge is not only the plan, but also an algorithm that will be tested on other problem setups (different graphs to explore, different values of constraints), therefore you have to keep in mind, that you are developing a universal tool for finding a solution.</strong><a class="headerlink" href="#in-the-traditional-travelling-salesman-problem-the-goal-is-to-optimize-the-route-that-the-salesman-has-to-walk-this-challenge-introduces-additional-constraints-and-additional-degrees-of-freedom-variables-to-the-problem-not-only-will-you-be-considering-the-distance-to-travel-but-additional-factors-like-simulation-duration-budget-amount-of-rewards-extracted-from-a-particular-site-and-the-cost-of-a-worker-the-solution-to-the-challenge-is-not-only-the-plan-but-also-an-algorithm-that-will-be-tested-on-other-problem-setups-different-graphs-to-explore-different-values-of-constraints-therefore-you-have-to-keep-in-mind-that-you-are-developing-a-universal-tool-for-finding-a-solution" title="Permalink to this heading"></a></h3>
+</section>
+<section id="the-xeek-team-has-built-a-unique-and-powerful-tool-called-lyra-graphtool-to-help-you-skip-the-graph-setup-part-of-the-challenge-and-get-to-the-important-part-generating-an-algorithm-to-optimize-the-problem-this-notebook-as-well-as-a-random-walk-exmaple-solution-and-api-documentation-will-serve-as-your-documenation-and-learning-resources-for-the-challenge">
+<h3>The Xeek team has built a unique and powerful tool, called <code class="docutils literal notranslate"><span class="pre">lyra_graphtool</span></code>, to help you skip the graph setup part of the challenge and get to the important part; generating an algorithm to optimize the problem! This notebook, as well as a random walk exmaple solution and API Documentation will serve as your documenation and learning resources for the challenge.<a class="headerlink" href="#the-xeek-team-has-built-a-unique-and-powerful-tool-called-lyra-graphtool-to-help-you-skip-the-graph-setup-part-of-the-challenge-and-get-to-the-important-part-generating-an-algorithm-to-optimize-the-problem-this-notebook-as-well-as-a-random-walk-exmaple-solution-and-api-documentation-will-serve-as-your-documenation-and-learning-resources-for-the-challenge" title="Permalink to this heading"></a></h3>
+</section>
+<section id="please-use-the-links-below-if-you-would-like-to-jump-to-a-specific-object-in-this-notebook-as-well-as-a-starter-notebook-with-an-example-solution">
+<h3>Please use the links below if you would like to jump to a specific Object in this notebook, as well as a starter notebook with an example solution!<a class="headerlink" href="#please-use-the-links-below-if-you-would-like-to-jump-to-a-specific-object-in-this-notebook-as-well-as-a-starter-notebook-with-an-example-solution" title="Permalink to this heading"></a></h3>
+</section>
+</section>
+<section id="u-main-index-u">
+<h2><strong><u>Main Index</u></strong><a class="headerlink" href="#u-main-index-u" title="Permalink to this heading"></a></h2>
+<p><span class="xref myst">Initial Setup</span></p>
+<section id="u-parameters-module-u">
+<h3><strong><u>Parameters Module</u></strong><a class="headerlink" href="#u-parameters-module-u" title="Permalink to this heading"></a></h3>
+<p><span class="xref myst">Parameters Object</span></p>
+<ul class="simple">
+<li><p><span class="xref myst">display()</span> - display the arguments passed through the <code class="docutils literal notranslate"><span class="pre">Parameters</span></code> object</p></li>
+</ul>
+<p><span class="xref myst">ProcessArgs Object</span></p>
+<ul class="simple">
+<li><p><span class="xref myst">ProcessArgs.load()</span> - load arguments file</p></li>
+<li><p><span class="xref myst">load_graph()</span> - load graph file</p></li>
+<li><p><span class="xref myst">ProcessArgs.save()</span> - save process arguments as a <code class="docutils literal notranslate"><span class="pre">.json</span></code> file</p></li>
+<li><p><span class="xref myst">ProcessArgs.values_to_args()</span> - send arguments to a list</p></li>
+</ul>
+<p><span class="xref myst">Site_Structures Object</span></p>
+<ul class="simple">
+<li><p><span class="xref myst">Site_Structures.values_to_args()</span> - send arguments to a list</p></li>
+</ul>
+</section>
+<section id="u-configuration-module-u">
+<h3><strong><u>Configuration Module</u></strong><a class="headerlink" href="#u-configuration-module-u" title="Permalink to this heading"></a></h3>
+<p><span class="xref myst">Configuration_Single_Time Object</span></p>
+<ul class="simple">
+<li><p><span class="xref myst">Config_Single_Time.info()</span> - returns info about Vertex coordinates, type, and whether the site was accessed</p></li>
+</ul>
+<p><span class="xref myst">Configuration Object</span></p>
+<ul class="simple">
+<li><p><span class="xref myst">add_sched()</span> - add a schedule to configuration, given <code class="docutils literal notranslate"><span class="pre">Worker_Type</span></code> and number of workers</p></li>
+<li><p><span class="xref myst">budget_feasible()</span> - tests whether the whole configuration can pass budget constraints</p></li>
+<li><p><span class="xref myst">cost()</span> - returns the cost of the whole configuration</p></li>
+<li><p><span class="xref myst">cost_sched()</span> - returns the cost of a single schedule</p></li>
+<li><p><span class="xref myst">feasible()</span> - tests whether the whole configuration is feasible in all terms</p></li>
+<li><p><span class="xref myst">get_accessed_sites()</span> - returns summary dictionary of accessed sires and a string log of detailed accesses</p></li>
+<li><p><span class="xref myst">get_current_workers()</span> - returns a dictionary of workers that are active in configuration</p></li>
+<li><p><span class="xref myst">get_max_revenue()</span> - returns maximum reward available in current setup</p></li>
+<li><p><span class="xref myst">get_schedule_path_length()</span> - returns path length (i.e. how many timesteps has the worker been active?)</p></li>
+<li><p><span class="xref myst">get_vertices_start()</span> - returns the vertices of Vertex_Type.ORIGIN</p></li>
+<li><p><span class="xref myst">get_worker()</span> - returns Worker object of specific type, making sure it has proper cost_rate assigned</p></li>
+<li><p><span class="xref myst">is_empty()</span> - returns whether the the schedule is empty</p></li>
+<li><p><span class="xref myst">load_from_json()</span> - loads solution from <code class="docutils literal notranslate"><span class="pre">.json</span></code> file</p></li>
+<li><p><span class="xref myst">revenue()</span> - returns the revenue of the whole configuration</p></li>
+<li><p><span class="xref myst">save()</span> - save configuration to pickle format</p></li>
+<li><p><span class="xref myst">save_to_json()</span> - saves the solution to a <code class="docutils literal notranslate"><span class="pre">.json</span></code> file</p></li>
+<li><p><span class="xref myst">sched_all_feasible_access_sites()</span> - tests whether the whole configuration can pass access constraints</p></li>
+<li><p><span class="xref myst">sched_all_feasible_space()</span> - tests whether the whole configuration is spatially feasible</p></li>
+<li><p><span class="xref myst">sched_feasible_access_sites()</span> - tests whether a single schedule can pass access contraints (i.e. one site can be accessed by one worker as a time and once the reward is extracted is doesn’t contain more reward)</p></li>
+<li><p><span class="xref myst">sched_feasible_space()</span> - tests whether a single schedule is spatially feasible</p></li>
+<li><p><span class="xref myst">sched_info()</span> - prints info about specific workers schedule</p></li>
+<li><p><span class="xref myst">sched_revenue()</span> - returns revenue of a single schedule</p></li>
+<li><p><span class="xref myst">site_accessed()</span> - determine whether a site has been accessed at any given time in a schedule, given Vertex information</p></li>
+<li><p><span class="xref myst">site_accessed_at_time()</span> - determine whether a site has been accessed at a particular time step, given Vertex and timestep information</p></li>
+</ul>
+</section>
+<section id="u-edge-module-u">
+<h3><strong><u>Edge Module</u></strong><a class="headerlink" href="#u-edge-module-u" title="Permalink to this heading"></a></h3>
+<p><span class="xref myst">Edge Object</span></p>
+<ul class="simple">
+<li><p><span class="xref myst">in_graph()</span></p></li>
+<li><p><span class="xref myst">Edge.info()</span> - returns coordinates of vertices connected by this edge</p></li>
+<li><p><span class="xref myst">nearest_neighbor()</span></p></li>
+</ul>
+</section>
+<section id="u-graph-module-u">
+<h3><strong><u>Graph Module</u></strong><a class="headerlink" href="#u-graph-module-u" title="Permalink to this heading"></a></h3>
+<p><span class="xref myst">Graph Object</span></p>
+<ul class="simple">
+<li><p><span class="xref myst">add_vertex()</span></p></li>
+<li><p><span class="xref myst">adjacent_vertices()</span> - returns a list of adjacent vertices to a given vertex</p></li>
+<li><p><span class="xref myst">closest_vertices()</span></p></li>
+<li><p><span class="xref myst">connected_components()</span></p></li>
+<li><p><span class="xref myst">depth_first_search()</span></p></li>
+<li><p><span class="xref myst">distance()</span></p></li>
+<li><p><span class="xref myst">edges_info()</span> - returns edges in a graph</p></li>
+<li><p><span class="xref myst">get_edges_at_vertex()</span> - returns a list of edges for a given vertex</p></li>
+<li><p><span class="xref myst">get_vertex_xy()</span> - returns a vertex object of given coordinates</p></li>
+<li><p><span class="xref myst">get_vertices_type()</span> - returns a list of vertices of a given type</p></li>
+<li><p><span class="xref myst">isolated_vertices()</span></p></li>
+<li><p><span class="xref myst">load_from_json()</span> - loads graph from a json file</p></li>
+<li><p><span class="xref myst">make_graph_connected()</span></p></li>
+<li><p><span class="xref myst">paths()</span></p></li>
+<li><p><span class="xref myst">print_graph()</span> - display graph with paths</p></li>
+<li><p><span class="xref myst">Graph.save()</span> - save graph as pickle file</p></li>
+<li><p><span class="xref myst">Graph.save_to_json()</span> - saves graph to a json file</p></li>
+<li><p><span class="xref myst">set_edges()</span></p></li>
+<li><p><span class="xref myst">set_random_sites_origin()</span></p></li>
+<li><p><span class="xref myst">set_vertex_coords()</span> - manually changing Vertex coordinates for a given Vertex</p></li>
+<li><p><span class="xref myst">set_vertex_type()</span> - setting a type of a particular Vertex manually, based on either the Vertex object passed to method or Vertex coordinates (both coordinates to be provided)</p></li>
+<li><p><span class="xref myst">vertices_array()</span> - returns a numpy array of the graph vertices</p></li>
+<li><p><span class="xref myst">vertices_info()</span> - returns coordinates and types of vertices in a graph</p></li>
+</ul>
+<p><span class="xref myst">Graph_Type Object</span></p>
+</section>
+<section id="u-vertex-module-u">
+<h3><strong><u>Vertex Module</u></strong><a class="headerlink" href="#u-vertex-module-u" title="Permalink to this heading"></a></h3>
+<p><span class="xref myst">Vertex Object</span></p>
+<ul class="simple">
+<li><p><span class="xref myst">accessible_types()</span> - returns which types of vertices are accessible</p></li>
+<li><p><span class="xref myst">Vertex.info()</span> - returns coordniates and type of Vertex</p></li>
+</ul>
+<p><span class="xref myst">Vertex_Type Object</span></p>
+</section>
+<section id="u-worker-module-u">
+<h3><strong><u>Worker Module</u></strong><a class="headerlink" href="#u-worker-module-u" title="Permalink to this heading"></a></h3>
+<p><span class="xref myst">Worker Object</span></p>
+<ul class="simple">
+<li><p><span class="xref myst">access()</span> - determine whether Worker has access to given Vertex</p></li>
+</ul>
+<p><span class="xref myst">Worker_Type Object</span></p>
+</section>
+</section>
+<section id="initial-setup">
+<h2><strong>Initial Setup</strong><a class="headerlink" href="#initial-setup" title="Permalink to this heading"></a></h2>
+<section id="upon-starting-this-challenge-competitors-will-need-to-download-the-required-matrials-from-the-off-the-beaten-path-challenge-page">
+<h3>Upon starting this challenge, competitors will need to download the required matrials from the <a class="reference external" href="https://xeek.ai/challenges/off-the-beaten-path">Off the Beaten Path</a> challenge page.<a class="headerlink" href="#upon-starting-this-challenge-competitors-will-need-to-download-the-required-matrials-from-the-off-the-beaten-path-challenge-page" title="Permalink to this heading"></a></h3>
+</section>
+<section id="the-xeek-team-will-provide">
+<h3>The Xeek team will provide:<a class="headerlink" href="#the-xeek-team-will-provide" title="Permalink to this heading"></a></h3>
+<ul class="simple">
+<li></li>
+<li></li>
+<li></li>
+</ul>
+</section>
+<section id="an-arguments-file-that-will-contain-information-to-set-up-the-problem-all-participants-will-recieve-the-same-arguments-file-this-file-will-contain-information-like-total-budget-site-rewards-and-duration-of-the-simulation">
+<h3>An arguments file that will contain information to set up the problem. All participants will recieve the same arguments file. This file will contain information like <strong>total budget</strong>, <strong>site rewards</strong>, and <strong>duration</strong> of the simulation.<a class="headerlink" href="#an-arguments-file-that-will-contain-information-to-set-up-the-problem-all-participants-will-recieve-the-same-arguments-file-this-file-will-contain-information-like-total-budget-site-rewards-and-duration-of-the-simulation" title="Permalink to this heading"></a></h3>
+</section>
+<section id="a-graph-json-file-all-participants-will-recieve-the-same-graph-json-file-this-will-be-loaded-into-the-lyra-graphtool-graph-object-to-set-up-the-graph-vertices-and-site-information">
+<h3>A graph JSON file. All participants will recieve the same <code class="docutils literal notranslate"><span class="pre">graph.json</span></code> file. This will be loaded into the <code class="docutils literal notranslate"><span class="pre">lyra_graphtool.Graph</span></code> object to set up the graph vertices and site information.<a class="headerlink" href="#a-graph-json-file-all-participants-will-recieve-the-same-graph-json-file-this-will-be-loaded-into-the-lyra-graphtool-graph-object-to-set-up-the-graph-vertices-and-site-information" title="Permalink to this heading"></a></h3>
+</section>
+<section id="a-starter-notebook-similar-to-the-example-solution-but-without-the-example-solution-this-notebook-will-be-your-playground-to-write-an-algorithm-to-solve-the-off-the-beaten-path-challenge">
+<h3>A starter notebook, similar to the <span class="xref myst">example solution</span>, but without the example solution. This notebook will be your playground to write an algorithm to solve the Off the Beaten Path Challenge!<a class="headerlink" href="#a-starter-notebook-similar-to-the-example-solution-but-without-the-example-solution-this-notebook-will-be-your-playground-to-write-an-algorithm-to-solve-the-off-the-beaten-path-challenge" title="Permalink to this heading"></a></h3>
+</section>
+<section id="note-ensure-that-the-lyra-graphtool-folder-is-saved-in-your-project-folder-to-avoid-import-issues">
+<h3>Note: Ensure that the <code class="docutils literal notranslate"><span class="pre">lyra_graphtool</span></code> folder is saved in your project folder to avoid import issues<a class="headerlink" href="#note-ensure-that-the-lyra-graphtool-folder-is-saved-in-your-project-folder-to-avoid-import-issues" title="Permalink to this heading"></a></h3>
+</section>
+</section>
+<section id="now-let-s-get-started">
+<h2><strong>Now let’s get started!</strong><a class="headerlink" href="#now-let-s-get-started" title="Permalink to this heading"></a></h2>
+<section id="run-the-next-3-code-cells-in-order-to-setup-graphs-budgets-worker-costs-rewards-and-duration-double-check-to-make-sure-the-file-paths-for-the-lgtool-processargs-load-are-correct">
+<h3>Run the next 3 code cells in order to setup graphs, budgets, worker costs, rewards, and duration. Double check to make sure the file paths for the <code class="docutils literal notranslate"><span class="pre">lgtool.ProcessArgs.load()</span></code> are correct.<a class="headerlink" href="#run-the-next-3-code-cells-in-order-to-setup-graphs-budgets-worker-costs-rewards-and-duration-double-check-to-make-sure-the-file-paths-for-the-lgtool-processargs-load-are-correct" title="Permalink to this heading"></a></h3>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">random</span>
+<span class="kn">from</span> <span class="nn">copy</span> <span class="kn">import</span> <span class="n">deepcopy</span>
+<span class="kn">from</span> <span class="nn">random</span> <span class="kn">import</span> <span class="n">randint</span>
+<span class="kn">import</span> <span class="nn">pprint</span> <span class="k">as</span> <span class="nn">pp</span>
+
+<span class="kn">import</span> <span class="nn">lyra_graphtool</span> <span class="k">as</span> <span class="nn">lgtool</span>
+<span class="kn">from</span> <span class="nn">lyra_graphtool</span> <span class="kn">import</span> <span class="n">Configuration</span><span class="p">,</span> <span class="n">Config_Single_Time</span><span class="p">,</span> <span class="n">Edge</span><span class="p">,</span> <span class="n">Graph</span><span class="p">,</span> <span class="n">Graph_Type</span><span class="p">,</span> <span class="n">Parameters</span><span class="p">,</span> <span class="n">Vertex</span><span class="p">,</span> <span class="n">Worker_Type</span><span class="p">,</span> <span class="n">Vertex_Type</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output traceback highlight-ipythontb notranslate"><div class="highlight"><pre><span></span><span class="gt">---------------------------------------------------------------------------</span>
+<span class="ne">ModuleNotFoundError</span><span class="g g-Whitespace">                       </span>Traceback (most recent call last)
+<span class="n">Cell</span> <span class="n">In</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">line</span> <span class="mi">6</span>
+<span class="g g-Whitespace">      </span><span class="mi">3</span> <span class="kn">from</span> <span class="nn">random</span> <span class="kn">import</span> <span class="n">randint</span>
+<span class="g g-Whitespace">      </span><span class="mi">4</span> <span class="kn">import</span> <span class="nn">pprint</span> <span class="k">as</span> <span class="nn">pp</span>
+<span class="ne">----&gt; </span><span class="mi">6</span> <span class="kn">import</span> <span class="nn">lyra_graphtool</span> <span class="k">as</span> <span class="nn">lgtool</span>
+<span class="g g-Whitespace">      </span><span class="mi">7</span> <span class="kn">from</span> <span class="nn">lyra_graphtool</span> <span class="kn">import</span> <span class="n">Configuration</span><span class="p">,</span> <span class="n">Config_Single_Time</span><span class="p">,</span> <span class="n">Edge</span><span class="p">,</span> <span class="n">Graph</span><span class="p">,</span> <span class="n">Graph_Type</span><span class="p">,</span> <span class="n">Parameters</span><span class="p">,</span> <span class="n">Vertex</span><span class="p">,</span> <span class="n">Worker_Type</span><span class="p">,</span> <span class="n">Vertex_Type</span>
+
+<span class="ne">ModuleNotFoundError</span>: No module named &#39;lyra_graphtool&#39;
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">pargs</span> <span class="o">=</span> <span class="n">lgtool</span><span class="o">.</span><span class="n">ProcessArgs</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">arguments_file</span><span class="o">=</span><span class="s1">&#39;../lyra-challenge/ready_setups/args_random&#39;</span><span class="p">,</span> <span class="n">graph_file</span><span class="o">=</span><span class="s1">&#39;../lyra-challenge/ready_setups/graph_random.json&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">params</span> <span class="o">=</span> <span class="n">lgtool</span><span class="o">.</span><span class="n">Parameters</span><span class="p">(</span><span class="n">pargs</span><span class="o">.</span><span class="n">graph</span><span class="p">,</span> 
+                           <span class="n">budget</span> <span class="o">=</span> <span class="n">pargs</span><span class="o">.</span><span class="n">args_trial</span><span class="o">.</span><span class="n">budget</span><span class="p">,</span> 
+                           <span class="n">duration_time</span> <span class="o">=</span> <span class="n">pargs</span><span class="o">.</span><span class="n">args_trial</span><span class="o">.</span><span class="n">duration</span><span class="p">,</span>
+                           <span class="n">cost_rate</span> <span class="o">=</span> <span class="n">pargs</span><span class="o">.</span><span class="n">worker_cost_rate</span>
+                           <span class="p">)</span>
+
+<span class="n">cfg</span> <span class="o">=</span> <span class="n">lgtool</span><span class="o">.</span><span class="n">Configuration</span><span class="p">(</span><span class="n">params</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">cfg</span><span class="o">.</span><span class="n">load_from_json</span><span class="p">(</span><span class="s1">&#39;./solutions/solution_random.json&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="processargs-object">
+<h2><strong>ProcessArgs Object</strong><a class="headerlink" href="#processargs-object" title="Permalink to this heading"></a></h2>
+<section id="the-processargs-object-will-be-used-in-the-intial-setup-of-the-problem-xeek-will-provide-the-setup-parameters-for-the-graph-and-arguments-file-for-the-challenge-challengers-do-however-have-the-tools-to-create-their-own-argument-files-remember-the-final-scoring-will-occur-on-a-different-argument-file-than-what-is-provided-so-it-is-to-your-advantage-to-create-your-own-argument-file-s-and-test-your-algorithm-to-see-if-it-is-effiecient-for-all-scenarios-below-will-explore-the-functionality-of-the-proceesargs-object-by-building-a-test-arguments-graph-file">
+<h3>The ProcessArgs object will be used in the intial setup of the problem. Xeek will provide the setup parameters for the graph and arguments file for the challenge. Challengers do, however, have the tools to create their own argument files. Remember, the final scoring will occur on a different argument file than what is provided, so it is to your advantage to create your own argument file(s) and test your algorithm to see if it is effiecient for all scenarios. Below will explore the functionality of the ProceesArgs object, by building a test arguments/graph file.<a class="headerlink" href="#the-processargs-object-will-be-used-in-the-intial-setup-of-the-problem-xeek-will-provide-the-setup-parameters-for-the-graph-and-arguments-file-for-the-challenge-challengers-do-however-have-the-tools-to-create-their-own-argument-files-remember-the-final-scoring-will-occur-on-a-different-argument-file-than-what-is-provided-so-it-is-to-your-advantage-to-create-your-own-argument-file-s-and-test-your-algorithm-to-see-if-it-is-effiecient-for-all-scenarios-below-will-explore-the-functionality-of-the-proceesargs-object-by-building-a-test-arguments-graph-file" title="Permalink to this heading"></a></h3>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">duration</span> <span class="o">=</span> <span class="mi">50</span> <span class="c1"># amount of timesteps in problem</span>
+<span class="n">duration</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">duration</span><span class="p">))</span>
+<span class="n">arg_list_new</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="s1">&#39;--trial_name&#39;</span><span class="p">,</span> <span class="s1">&#39;trial1&#39;</span><span class="p">,</span>    <span class="c1"># name of trial</span>
+    <span class="s1">&#39;--budget&#39;</span><span class="p">,</span> <span class="s1">&#39;10000&#39;</span><span class="p">,</span>          <span class="c1"># budget that will be used by hiring workers of different types</span>
+    <span class="s1">&#39;--duration&#39;</span><span class="p">,</span> <span class="n">duration</span><span class="p">,</span>      <span class="c1"># amount of timesteps in problem</span>
+    <span class="s1">&#39;--worker1_cost&#39;</span><span class="p">,</span> <span class="s1">&#39;200&#39;</span><span class="p">,</span>     <span class="c1"># Worker_Type.WORKER1 cost/timestep which reduces our budget</span>
+    <span class="s1">&#39;--worker2_cost&#39;</span><span class="p">,</span> <span class="s1">&#39;400&#39;</span><span class="p">,</span>     <span class="c1"># Worker_Type.WORKER2 cost/timestep which reduces our budget</span>
+    <span class="s1">&#39;--worker3_cost&#39;</span><span class="p">,</span> <span class="s1">&#39;600&#39;</span><span class="p">,</span>     <span class="c1"># Worker_Type.WORKER3 cost/timestep which reduces our budget</span>
+    <span class="c1">################## BELOW GRAPH ARGUMENTS ####################</span>
+    <span class="s1">&#39;--filename_graph&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">,</span>      <span class="c1"># if loading graph, max_x, max_y, num_verts, graph_type, num_site[k] (k=1,2,3) ignored</span>
+    <span class="s1">&#39;--max_x&#39;</span><span class="p">,</span> <span class="s1">&#39;10&#39;</span><span class="p">,</span>             <span class="c1"># max x coordinate during random or grid graph creation</span>
+    <span class="s1">&#39;--max_y&#39;</span><span class="p">,</span> <span class="s1">&#39;10&#39;</span><span class="p">,</span>             <span class="c1"># max y coordinate during random or grid graph creation</span>
+    <span class="s1">&#39;--num_verts&#39;</span><span class="p">,</span> <span class="s1">&#39;30&#39;</span><span class="p">,</span>         <span class="c1"># amount of vertices (travel points) that the graph will have</span>
+    <span class="s1">&#39;--graph_type&#39;</span><span class="p">,</span> <span class="s1">&#39;grid&#39;</span><span class="p">,</span>    <span class="c1"># type of graph, either &#39;random&#39; or &#39;grid&#39; the difference between these is shown further in notebook</span>
+    <span class="s1">&#39;--num_site1&#39;</span><span class="p">,</span> <span class="s1">&#39;3&#39;</span><span class="p">,</span>          <span class="c1"># amount of Vertex_Type.SITE1 on the graph mind that amount of all sites cannot be greater than &#39;num_verts-1&#39;</span>
+    <span class="s1">&#39;--num_site2&#39;</span><span class="p">,</span> <span class="s1">&#39;2&#39;</span><span class="p">,</span>          <span class="c1"># amount of Vertex_Type.SITE2 on the graph mind that amount of all sites cannot be greater than &#39;num_verts-1&#39;</span>
+    <span class="s1">&#39;--num_site3&#39;</span><span class="p">,</span> <span class="s1">&#39;5&#39;</span><span class="p">,</span>          <span class="c1"># amount of Vertex_Type.SITE3 on the graph mind that amount of all sites cannot be greater than &#39;num_verts-1&#39;</span>
+    <span class="s1">&#39;--site1_acquire_time&#39;</span><span class="p">,</span> <span class="s1">&#39;2&#39;</span><span class="p">,</span>    <span class="c1"># if args starting with &#39;site&#39; are specified, they are imposed on loaded graph</span>
+    <span class="s1">&#39;--site2_acquire_time&#39;</span><span class="p">,</span> <span class="s1">&#39;4&#39;</span><span class="p">,</span>    <span class="c1"># timesteps needed to extract Vertex_Type.SITE2 reward</span>
+    <span class="s1">&#39;--site3_acquire_time&#39;</span><span class="p">,</span> <span class="s1">&#39;6&#39;</span><span class="p">,</span>    <span class="c1"># timesteps needed to extract Vertex_Type.SITE3 reward</span>
+    <span class="s1">&#39;--site1_reward&#39;</span><span class="p">,</span> <span class="s1">&#39;100&#39;</span><span class="p">,</span>     <span class="c1"># reward from extracting Vertex_Type.SITE1</span>
+    <span class="s1">&#39;--site2_reward&#39;</span><span class="p">,</span> <span class="s1">&#39;200&#39;</span><span class="p">,</span>     <span class="c1"># reward from extracting Vertex_Type.SITE2</span>
+    <span class="s1">&#39;--site3_reward&#39;</span><span class="p">,</span> <span class="s1">&#39;300&#39;</span><span class="p">,</span>     <span class="c1"># reward from extracting Vertex_Type.SITE3</span>
+<span class="p">]</span>
+</pre></div>
+</div>
+</div>
+</div>
+<section id="create-a-processargs-object-and-pass-the-new-argument-file-through-it">
+<h4>Create a <code class="docutils literal notranslate"><span class="pre">ProcessArgs</span></code> object and pass the new argument file through it<a class="headerlink" href="#create-a-processargs-object-and-pass-the-new-argument-file-through-it" title="Permalink to this heading"></a></h4>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">new_pargs</span> <span class="o">=</span> <span class="n">lgtool</span><span class="o">.</span><span class="n">ProcessArgs</span><span class="p">(</span><span class="n">arg_list_new</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="processargs-save">
+<h3><strong>ProcessArgs.save()</strong><a class="headerlink" href="#processargs-save" title="Permalink to this heading"></a></h3>
+<section id="save-the-new-arguments-file-for-future-use">
+<h4>Save the new arguments file for future use<a class="headerlink" href="#save-the-new-arguments-file-for-future-use" title="Permalink to this heading"></a></h4>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">new_pargs</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;ready_setups/args_</span><span class="si">{</span><span class="n">new_pargs</span><span class="o">.</span><span class="n">args_trial</span><span class="o">.</span><span class="n">trial_name</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="processargs-load">
+<h3><strong>ProcessArgs.load()</strong><a class="headerlink" href="#processargs-load" title="Permalink to this heading"></a></h3>
+<section id="load-the-new-argument-and-graph-files-into-processargs-using-load">
+<h4>Load the new argument and graph files into ProcessArgs() using load()<a class="headerlink" href="#load-the-new-argument-and-graph-files-into-processargs-using-load" title="Permalink to this heading"></a></h4>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">new_pargs_from_load</span> <span class="o">=</span> <span class="n">lgtool</span><span class="o">.</span><span class="n">ProcessArgs</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">arguments_file</span><span class="o">=</span><span class="s1">&#39;../lyra-challenge/ready_setups/args_args_trial1&#39;</span>
+                                            <span class="p">,</span><span class="n">graph_file</span><span class="o">=</span><span class="s1">&#39;../lyra-challenge/ready_setups/graph_trial1.json&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="load-graph">
+<h3><strong>load_graph()</strong><a class="headerlink" href="#load-graph" title="Permalink to this heading"></a></h3>
+<section id="loading-graph-from-filename-into-site-structures">
+<h4>Loading graph from filename into Site_Structures<a class="headerlink" href="#loading-graph-from-filename-into-site-structures" title="Permalink to this heading"></a></h4>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># code here, need to figure out how to use this</span>
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="processargs-values-to-args">
+<h3><strong>ProcessArgs.values_to_args()</strong><a class="headerlink" href="#processargs-values-to-args" title="Permalink to this heading"></a></h3>
+<section id="finally-return-the-new-arguments-into-a-list-and-compare-to-what-was-created-at-the-top-using-values-to-args">
+<h4>Finally, return the new arguments into a list and compare to what was created at the top, using values_to_args()<a class="headerlink" href="#finally-return-the-new-arguments-into-a-list-and-compare-to-what-was-created-at-the-top-using-values-to-args" title="Permalink to this heading"></a></h4>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">new_pargs_list</span> <span class="o">=</span> <span class="n">new_pargs</span><span class="o">.</span><span class="n">values_to_args</span><span class="p">()</span> 
+<span class="n">pp</span><span class="o">.</span><span class="n">pprint</span><span class="p">(</span><span class="n">new_pargs_list</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>[&#39;--trial_name&#39;,
+ &#39;trial1&#39;,
+ &#39;--max_x&#39;,
+ &#39;10&#39;,
+ &#39;--max_y&#39;,
+ &#39;10&#39;,
+ &#39;--num_verts&#39;,
+ &#39;30&#39;,
+ &#39;--graph_type&#39;,
+ &#39;grid&#39;,
+ &#39;--num_site1&#39;,
+ &#39;3&#39;,
+ &#39;--num_site2&#39;,
+ &#39;2&#39;,
+ &#39;--num_site3&#39;,
+ &#39;5&#39;,
+ &#39;--site1_acquire_time&#39;,
+ &#39;2&#39;,
+ &#39;--site2_acquire_time&#39;,
+ &#39;4&#39;,
+ &#39;--site3_acquire_time&#39;,
+ &#39;6&#39;,
+ &#39;--site1_reward&#39;,
+ &#39;100.0&#39;,
+ &#39;--site2_reward&#39;,
+ &#39;200.0&#39;,
+ &#39;--site3_reward&#39;,
+ &#39;300.0&#39;,
+ &#39;--site1_mult_time&#39;,
+ &#39;1&#39;,
+ &#39;--site2_mult_time&#39;,
+ &#39;1&#39;,
+ &#39;--site3_mult_time&#39;,
+ &#39;1&#39;,
+ &#39;--site1_mult_time_active&#39;,
+ &#39;0, 50&#39;,
+ &#39;--site2_mult_time_active&#39;,
+ &#39;0, 50&#39;,
+ &#39;--site3_mult_time_active&#39;,
+ &#39;0, 50&#39;,
+ &#39;--site1_mult_workers&#39;,
+ &#39;1, 1, 1&#39;,
+ &#39;--site2_mult_workers&#39;,
+ &#39;1, 1, 1&#39;,
+ &#39;--site3_mult_workers&#39;,
+ &#39;1, 1, 1&#39;,
+ &#39;--site1_exp_time&#39;,
+ &#39;50&#39;,
+ &#39;--site2_exp_time&#39;,
+ &#39;50&#39;,
+ &#39;--site3_exp_time&#39;,
+ &#39;50&#39;,
+ &#39;--worker1_cost&#39;,
+ &#39;200.0&#39;,
+ &#39;--worker2_cost&#39;,
+ &#39;400.0&#39;,
+ &#39;--worker3_cost&#39;,
+ &#39;600.0&#39;,
+ &#39;--budget&#39;,
+ &#39;10000.0&#39;,
+ &#39;--duration&#39;,
+ &#39;50&#39;]
+</pre></div>
+</div>
+</div>
+</div>
+<p><span class="xref myst">Back to the Top!</span></p>
+</section>
+</section>
+</section>
+<hr class="docutils" />
+<section id="parameters-object">
+<h2><strong>Parameters Object</strong><a class="headerlink" href="#parameters-object" title="Permalink to this heading"></a></h2>
+<section id="the-loaded-arguments-and-graph-can-be-wrapped-with-lgtool-parameters-class-which-can-be-further-passed-to-the-lgtool-configuration-object">
+<h3>The loaded arguments and graph can be wrapped with <code class="docutils literal notranslate"><span class="pre">lgtool.Parameters</span></code> class which can be further passed to the <code class="docutils literal notranslate"><span class="pre">lgtool.Configuration()</span></code> object.<a class="headerlink" href="#the-loaded-arguments-and-graph-can-be-wrapped-with-lgtool-parameters-class-which-can-be-further-passed-to-the-lgtool-configuration-object" title="Permalink to this heading"></a></h3>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">params</span> <span class="o">=</span> <span class="n">lgtool</span><span class="o">.</span><span class="n">Parameters</span><span class="p">(</span><span class="n">graph</span> <span class="o">=</span> <span class="n">pargs</span><span class="o">.</span><span class="n">graph</span>
+                           <span class="p">,</span><span class="n">budget</span> <span class="o">=</span> <span class="n">pargs</span><span class="o">.</span><span class="n">args_trial</span><span class="o">.</span><span class="n">budget</span>
+                           <span class="p">,</span><span class="n">duration_time</span> <span class="o">=</span> <span class="n">pargs</span><span class="o">.</span><span class="n">args_trial</span><span class="o">.</span><span class="n">duration</span>
+                           <span class="p">,</span><span class="n">cost_rate</span> <span class="o">=</span> <span class="n">pargs</span><span class="o">.</span><span class="n">worker_cost_rate</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="display">
+<h3><strong>display()</strong><a class="headerlink" href="#display" title="Permalink to this heading"></a></h3>
+<section id="use-the-display-function-to-view-the-check-the-arguments-that-were-passed-through-lgtool-parameters">
+<h4>Use the <code class="docutils literal notranslate"><span class="pre">display()</span></code> function to view the check the arguments that were passed through <code class="docutils literal notranslate"><span class="pre">lgtool.Parameters</span></code><a class="headerlink" href="#use-the-display-function-to-view-the-check-the-arguments-that-were-passed-through-lgtool-parameters" title="Permalink to this heading"></a></h4>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">params</span><span class="o">.</span><span class="n">display</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>{&#39;budget&#39;: 1000.0, &#39;duration_time&#39;: 20, &#39;graph&#39;: &lt;lyra_graphtool.graph.Graph object at 0x11842faf0&gt;, &#39;worker_cost_rate&#39;: {&lt;Worker_Type.WORKER1: 0&gt;: 100.0, &lt;Worker_Type.WORKER2: 1&gt;: 200.0, &lt;Worker_Type.WORKER3: 2&gt;: 500.0}}
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="or-call-each-individual-argument-passed-through-lgtools-parameters-object">
+<h4>Or call each individual argument passed through <code class="docutils literal notranslate"><span class="pre">lgtools.Parameters()</span></code> object<a class="headerlink" href="#or-call-each-individual-argument-passed-through-lgtools-parameters-object" title="Permalink to this heading"></a></h4>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="n">params</span><span class="o">.</span><span class="n">budget</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">params</span><span class="o">.</span><span class="n">duration_time</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">params</span><span class="o">.</span><span class="n">graph</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">params</span><span class="o">.</span><span class="n">worker_cost_rate</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>1000.0
+20
+&lt;lyra_graphtool.graph.Graph object at 0x11842faf0&gt;
+{&lt;Worker_Type.WORKER1: 0&gt;: 100.0, &lt;Worker_Type.WORKER2: 1&gt;: 200.0, &lt;Worker_Type.WORKER3: 2&gt;: 500.0}
+</pre></div>
+</div>
+</div>
+</div>
+<p><span class="xref myst">Back to the Top!</span></p>
+</section>
+</section>
+</section>
+<hr class="docutils" />
+<section id="configuration-object">
+<h2><strong>Configuration Object</strong><a class="headerlink" href="#configuration-object" title="Permalink to this heading"></a></h2>
+<section id="the-lgtool-configuration-object-contains-not-only-the-graph-to-be-optimized-but-also-problem-constraints-and-setup-like-budget-duration-and-worker-cost-rates-pass-the-arguments-run-through-the-lgtool-parameters-section-for-set-up-this-module-will-be-the-workhorse-to-solve-the-challenge-because-it-allows-users-to-add-update-and-extract-most-parameters-for-the-challenge">
+<h3>The <code class="docutils literal notranslate"><span class="pre">lgtool.Configuration()</span></code> object contains not only the graph to be optimized, but also problem constraints and setup like budget, duration, and worker cost rates. Pass the arguments run through the <code class="docutils literal notranslate"><span class="pre">lgtool.Parameters()</span></code> section for set up. This module will be the workhorse to solve the challenge because it allows users to add, update, and extract most parameters for the challenge.<a class="headerlink" href="#the-lgtool-configuration-object-contains-not-only-the-graph-to-be-optimized-but-also-problem-constraints-and-setup-like-budget-duration-and-worker-cost-rates-pass-the-arguments-run-through-the-lgtool-parameters-section-for-set-up-this-module-will-be-the-workhorse-to-solve-the-challenge-because-it-allows-users-to-add-update-and-extract-most-parameters-for-the-challenge" title="Permalink to this heading"></a></h3>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">params</span> <span class="o">=</span> <span class="n">lgtool</span><span class="o">.</span><span class="n">Parameters</span><span class="p">(</span><span class="n">pargs</span><span class="o">.</span><span class="n">graph</span><span class="p">,</span> 
+                           <span class="n">budget</span> <span class="o">=</span> <span class="n">pargs</span><span class="o">.</span><span class="n">args_trial</span><span class="o">.</span><span class="n">budget</span><span class="p">,</span> 
+                           <span class="n">duration_time</span> <span class="o">=</span> <span class="n">pargs</span><span class="o">.</span><span class="n">args_trial</span><span class="o">.</span><span class="n">duration</span><span class="p">,</span>
+                           <span class="n">cost_rate</span> <span class="o">=</span> <span class="n">pargs</span><span class="o">.</span><span class="n">worker_cost_rate</span>
+                           <span class="p">)</span>
+
+<span class="n">cfg</span> <span class="o">=</span> <span class="n">lgtool</span><span class="o">.</span><span class="n">Configuration</span><span class="p">(</span><span class="n">params</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="add-sched">
+<h3><strong>add_sched()</strong><a class="headerlink" href="#add-sched" title="Permalink to this heading"></a></h3>
+<section id="add-a-specific-schedule-for-a-worker-type-wt-and-number-of-those-worker-wn-to-access-the-configuration-dictionary-call-config-on-the-configuration-object-created-in-the-intial-setup-users-can-access-this-information-using-this-format-configuration-config-worker-type-worker-number">
+<h4>Add a specific schedule for a Worker_Type (wt) and number of those worker (wn). To access the configuration dictionary, call <code class="docutils literal notranslate"><span class="pre">.config</span></code> on the Configuration object created in the intial setup. Users can access this information using this format: <code class="docutils literal notranslate"><span class="pre">Configuration.config[Worker_Type][worker</span> <span class="pre">number]</span></code><a class="headerlink" href="#add-a-specific-schedule-for-a-worker-type-wt-and-number-of-those-worker-wn-to-access-the-configuration-dictionary-call-config-on-the-configuration-object-created-in-the-intial-setup-users-can-access-this-information-using-this-format-configuration-config-worker-type-worker-number" title="Permalink to this heading"></a></h4>
+</section>
+<section id="in-the-example-below-config-is-called-on-the-configuration-object-we-define-that-we-want-a-worker-type-worker1-and-we-want-1-of-those-workers">
+<h4>In the example below, <code class="docutils literal notranslate"><span class="pre">.config</span></code> is called on the Configuration object. We define that we want a <code class="docutils literal notranslate"><span class="pre">Worker_Type</span> <span class="pre">=</span> <span class="pre">WORKER1</span></code> and we want 1 of those workers.<a class="headerlink" href="#in-the-example-below-config-is-called-on-the-configuration-object-we-define-that-we-want-a-worker-type-worker1-and-we-want-1-of-those-workers" title="Permalink to this heading"></a></h4>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">schedule_add</span> <span class="o">=</span> <span class="n">cfg</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">schedule_add</span><span class="p">)</span>
+<span class="n">cfg</span><span class="o">.</span><span class="n">add_sched</span><span class="p">(</span><span class="n">wt</span> <span class="o">=</span> <span class="n">Worker_Type</span><span class="o">.</span><span class="n">WORKER1</span><span class="p">,</span> <span class="n">wn</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">sched</span><span class="o">=</span><span class="n">schedule_add</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>{0: &lt;lyra_graphtool.configuration.Config_Single_Time object at 0x11f3a9b40&gt;, 1: &lt;lyra_graphtool.configuration.Config_Single_Time object at 0x11f262d40&gt;, 2: &lt;lyra_graphtool.configuration.Config_Single_Time object at 0x11f262da0&gt;, 3: &lt;lyra_graphtool.configuration.Config_Single_Time object at 0x11f262e00&gt;, 4: &lt;lyra_graphtool.configuration.Config_Single_Time object at 0x11f262e60&gt;, 5: &lt;lyra_graphtool.configuration.Config_Single_Time object at 0x11f262ec0&gt;, 6: &lt;lyra_graphtool.configuration.Config_Single_Time object at 0x11f262f20&gt;, 7: &lt;lyra_graphtool.configuration.Config_Single_Time object at 0x11f262f80&gt;, 8: &lt;lyra_graphtool.configuration.Config_Single_Time object at 0x11f262fe0&gt;, 9: &lt;lyra_graphtool.configuration.Config_Single_Time object at 0x11f263040&gt;, 10: &lt;lyra_graphtool.configuration.Config_Single_Time object at 0x11f2630a0&gt;, 11: &lt;lyra_graphtool.configuration.Config_Single_Time object at 0x11f263100&gt;, 12: &lt;lyra_graphtool.configuration.Config_Single_Time object at 0x11f263160&gt;, 13: &lt;lyra_graphtool.configuration.Config_Single_Time object at 0x11f2631c0&gt;, 14: &lt;lyra_graphtool.configuration.Config_Single_Time object at 0x11f263220&gt;, 15: &lt;lyra_graphtool.configuration.Config_Single_Time object at 0x11f263280&gt;, 16: &lt;lyra_graphtool.configuration.Config_Single_Time object at 0x11f2632e0&gt;, 17: &lt;lyra_graphtool.configuration.Config_Single_Time object at 0x11f263340&gt;, 18: &lt;lyra_graphtool.configuration.Config_Single_Time object at 0x11f2633a0&gt;, 19: &lt;lyra_graphtool.configuration.Config_Single_Time object at 0x11f263400&gt;}
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="budget-feasible">
+<h3><strong>budget_feasible()</strong><a class="headerlink" href="#budget-feasible" title="Permalink to this heading"></a></h3>
+<section id="here-we-test-whether-the-entire-solution-configuration-stays-within-the-budget-contraints-set-in-the-arguments-this-can-be-called-on-the-configuration-object-with-no-input-arugments">
+<h4>Here we test whether the entire solution configuration stays within the budget contraints set in the arguments. This can be called on the <code class="docutils literal notranslate"><span class="pre">Configuration</span></code> object with no input arugments.<a class="headerlink" href="#here-we-test-whether-the-entire-solution-configuration-stays-within-the-budget-contraints-set-in-the-arguments-this-can-be-called-on-the-configuration-object-with-no-input-arugments" title="Permalink to this heading"></a></h4>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">cfg</span><span class="o">.</span><span class="n">budget_feasible</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>True
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="cost">
+<h3><strong>cost()</strong><a class="headerlink" href="#cost" title="Permalink to this heading"></a></h3>
+<section id="this-will-return-the-cost-of-the-entire-configuration-remember-profit-will-be-used-to-score-the-solution-profit-revenue-cost-so-its-important-to-not-only-increase-revenue-but-also-be-mindful-of-costs-it-can-be-called-on-the-configuration-object-with-no-input-arguments">
+<h4>This will return the cost of the entire configuration. Remember, profit will be used to score the solution(<code class="docutils literal notranslate"><span class="pre">profit</span> <span class="pre">=</span> <span class="pre">revenue</span> <span class="pre">-</span> <span class="pre">cost</span></code>), so its important to not only increase revenue, but also be mindful of costs.  It can be called on the <code class="docutils literal notranslate"><span class="pre">Configuration</span></code> object with no input arguments.<a class="headerlink" href="#this-will-return-the-cost-of-the-entire-configuration-remember-profit-will-be-used-to-score-the-solution-profit-revenue-cost-so-its-important-to-not-only-increase-revenue-but-also-be-mindful-of-costs-it-can-be-called-on-the-configuration-object-with-no-input-arguments" title="Permalink to this heading"></a></h4>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">cfg</span><span class="o">.</span><span class="n">cost</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>900.0
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="cost-sched">
+<h3><strong>cost_sched()</strong><a class="headerlink" href="#cost-sched" title="Permalink to this heading"></a></h3>
+<section id="users-can-calculate-the-cost-of-a-single-worker-schedule-by-inputting">
+<h4>Users can calculate the cost of a single-worker schedule by inputting.<a class="headerlink" href="#users-can-calculate-the-cost-of-a-single-worker-schedule-by-inputting" title="Permalink to this heading"></a></h4>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">schedule</span> <span class="o">=</span> <span class="n">cfg</span><span class="o">.</span><span class="n">config</span>
+<span class="n">cfg</span><span class="o">.</span><span class="n">cost_sched</span><span class="p">(</span><span class="n">sched</span> <span class="o">=</span> <span class="n">schedule</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">1</span><span class="p">],</span><span class="n">worker</span><span class="o">=</span><span class="n">Worker_Type</span><span class="o">.</span><span class="n">WORKER1</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>0
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="feasible">
+<h3><strong>feasible()</strong><a class="headerlink" href="#feasible" title="Permalink to this heading"></a></h3>
+<section id="method-to-determine-overall-feasibility-of-the-configuration-in-terms-of-space-buget-and-access">
+<h4>Method to determine overall feasibility of the configuration in terms of space, buget, and access<a class="headerlink" href="#method-to-determine-overall-feasibility-of-the-configuration-in-terms-of-space-buget-and-access" title="Permalink to this heading"></a></h4>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">cfg</span><span class="o">.</span><span class="n">feasible</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>True
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="get-accessed-sites">
+<h3><strong>get_accessed_sites()</strong><a class="headerlink" href="#get-accessed-sites" title="Permalink to this heading"></a></h3>
+<section id="method-to-return-the-sites-that-were-accessed-in-a-schedule">
+<h4>Method to return the sites that were accessed in a schedule<a class="headerlink" href="#method-to-return-the-sites-that-were-accessed-in-a-schedule" title="Permalink to this heading"></a></h4>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">schedule</span> <span class="o">=</span> <span class="n">cfg</span><span class="o">.</span><span class="n">config</span>
+<span class="n">cfg</span><span class="o">.</span><span class="n">get_accessed_sites</span><span class="p">(</span><span class="n">schedule</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>({(3.0, 0.0): 0,
+  (3.0, 2.0): 0,
+  (3.0, 4.0): 0,
+  (2.0, 5.0): 0,
+  (4.0, 6.0): 0,
+  (1.0, 2.0): 0,
+  (1.0, 3.0): 0,
+  (7.0, 0.0): 0,
+  (7.0, 3.0): 0,
+  (5.0, 6.0): 0},
+ &#39;Log of accesses:\n&#39;)
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="get-current-workers">
+<h3><strong>get_current_workers()</strong><a class="headerlink" href="#get-current-workers" title="Permalink to this heading"></a></h3>
+<section id="method-to-return-a-dictionary-of-the-the-workers-used-in-the-configuration-this-requires-the-full-configuration-schedule-as-an-input">
+<h4>Method to return a dictionary of the the workers used in the configuration. This requires the full configuration schedule as an input.<a class="headerlink" href="#method-to-return-a-dictionary-of-the-the-workers-used-in-the-configuration-this-requires-the-full-configuration-schedule-as-an-input" title="Permalink to this heading"></a></h4>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">cfg</span><span class="o">.</span><span class="n">get_current_workers</span><span class="p">(</span><span class="n">schedule</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>{&lt;Worker_Type.WORKER1: 0&gt;: 1,
+ &lt;Worker_Type.WORKER2: 1&gt;: 0,
+ &lt;Worker_Type.WORKER3: 2&gt;: 0}
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="get-max-revenue">
+<h3><strong>get_max_revenue()</strong><a class="headerlink" href="#get-max-revenue" title="Permalink to this heading"></a></h3>
+<section id="get-the-maximum-revenue-earned-for-a-particular-graph-configuration">
+<h4>Get the maximum revenue earned for a particular graph configuration<a class="headerlink" href="#get-the-maximum-revenue-earned-for-a-particular-graph-configuration" title="Permalink to this heading"></a></h4>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">cfg</span><span class="o">.</span><span class="n">get_max_revenue</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>2200.0
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="get-sched-path-length">
+<h3><strong>get_sched_path_length()</strong><a class="headerlink" href="#get-sched-path-length" title="Permalink to this heading"></a></h3>
+<section id="this-is-used-to-determine-the-length-of-one-worker-schedule-how-many-steps-was-the-worker-active-it-requires-a-single-schedule-as-an-input">
+<h4>This is used to determine the length of one worker schedule (how many steps was the worker active). It requires a single schedule as an input<a class="headerlink" href="#this-is-used-to-determine-the-length-of-one-worker-schedule-how-many-steps-was-the-worker-active-it-requires-a-single-schedule-as-an-input" title="Permalink to this heading"></a></h4>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">cfg</span><span class="o">.</span><span class="n">get_sched_path_length</span><span class="p">(</span><span class="n">schedule</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">9</span><span class="p">])</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>0
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="get-vertices-start">
+<h3><strong>get_vertices_start()</strong><a class="headerlink" href="#get-vertices-start" title="Permalink to this heading"></a></h3>
+<section id="returns-the-list-vertices-from-which-a-worker-s-path-must-start">
+<h4>Returns the list vertices from which a worker’s path must start<a class="headerlink" href="#returns-the-list-vertices-from-which-a-worker-s-path-must-start" title="Permalink to this heading"></a></h4>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">start</span> <span class="o">=</span> <span class="n">cfg</span><span class="o">.</span><span class="n">get_vertices_start</span><span class="p">()</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">start</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>[&lt;lyra_graphtool.vertex.Vertex object at 0x11fbee0b0&gt;]
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="get-worker">
+<h3><strong>get_worker()</strong><a class="headerlink" href="#get-worker" title="Permalink to this heading"></a></h3>
+<section id="method-to-return-a-worker-object-the-worker-object-has-rates-compliant-with-the-configuration">
+<h4>Method to return a Worker object. The worker object has rates compliant with the configuration<a class="headerlink" href="#method-to-return-a-worker-object-the-worker-object-has-rates-compliant-with-the-configuration" title="Permalink to this heading"></a></h4>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">cfg</span><span class="o">.</span><span class="n">get_worker</span><span class="p">(</span><span class="n">Worker_Type</span><span class="o">.</span><span class="n">WORKER1</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&lt;lyra_graphtool.worker.Worker at 0x12fcb9e10&gt;
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="is-empty">
+<h3><strong>is_empty()</strong><a class="headerlink" href="#is-empty" title="Permalink to this heading"></a></h3>
+<section id="determine-if-a-single-worker-schedule-is-empty">
+<h4>Determine if a single worker schedule is empty<a class="headerlink" href="#determine-if-a-single-worker-schedule-is-empty" title="Permalink to this heading"></a></h4>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">schedule</span> <span class="o">=</span> <span class="n">cfg</span><span class="o">.</span><span class="n">config</span>
+<span class="n">cfg</span><span class="o">.</span><span class="n">is_empty</span><span class="p">(</span><span class="n">schedule</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">1</span><span class="p">])</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>True
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="load-from-json">
+<h3><strong>load_from_json()</strong><a class="headerlink" href="#load-from-json" title="Permalink to this heading"></a></h3>
+<section id="loading-the-configuration-from-a-json">
+<h4>Loading the configuration from a <code class="docutils literal notranslate"><span class="pre">.json</span> </code><a class="headerlink" href="#loading-the-configuration-from-a-json" title="Permalink to this heading"></a></h4>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">cfg</span><span class="o">.</span><span class="n">load_from_json</span><span class="p">(</span><span class="n">file_name</span><span class="o">=</span><span class="s1">&#39;./solutions/solution_random.json&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="revenue">
+<h3><strong>revenue()</strong><a class="headerlink" href="#revenue" title="Permalink to this heading"></a></h3>
+<section id="this-is-a-method-to-calculate-the-revenue-for-the-entire-schedule-configuration">
+<h4>This is a method to calculate the revenue for the entire schedule configuration<a class="headerlink" href="#this-is-a-method-to-calculate-the-revenue-for-the-entire-schedule-configuration" title="Permalink to this heading"></a></h4>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">cfg</span><span class="o">.</span><span class="n">revenue</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>0
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="save">
+<h3><strong>save()</strong><a class="headerlink" href="#save" title="Permalink to this heading"></a></h3>
+<section id="save-the-configuration-solution-as-a-pickle-file">
+<h4>Save the configuration solution as a pickle file<a class="headerlink" href="#save-the-configuration-solution-as-a-pickle-file" title="Permalink to this heading"></a></h4>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">cfg</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">file_name</span><span class="o">=</span><span class="s1">&#39;./ready_setups/test_config_save&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="save-to-json">
+<h3><strong>save_to_json()</strong><a class="headerlink" href="#save-to-json" title="Permalink to this heading"></a></h3>
+<section id="save-the-configuration-solution-as-a-json-file">
+<h4>Save the configuration solution as a <code class="docutils literal notranslate"><span class="pre">.json</span></code> file<a class="headerlink" href="#save-the-configuration-solution-as-a-json-file" title="Permalink to this heading"></a></h4>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">cfg</span><span class="o">.</span><span class="n">save_to_json</span><span class="p">(</span><span class="s1">&#39;./ready_setups/test_config_save.json&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="sched-all-feasible-access-sites">
+<h3><strong>sched_all_feasible_access_sites()</strong><a class="headerlink" href="#sched-all-feasible-access-sites" title="Permalink to this heading"></a></h3>
+<section id="this-method-determines-if-a-schedules-s-access-properties-are-feasible">
+<h4>This method determines if a schedules’s access properties are feasible<a class="headerlink" href="#this-method-determines-if-a-schedules-s-access-properties-are-feasible" title="Permalink to this heading"></a></h4>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">cfg</span><span class="o">.</span><span class="n">sched_all_feasible_access_sites</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>True
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="sched-all-feasible-space">
+<h3><strong>sched_all_feasible_space()</strong><a class="headerlink" href="#sched-all-feasible-space" title="Permalink to this heading"></a></h3>
+<section id="this-is-a-method-to-determine-if-all-schedules-are-spatially-feasible">
+<h4>This is a method to determine if all schedules are spatially feasible<a class="headerlink" href="#this-is-a-method-to-determine-if-all-schedules-are-spatially-feasible" title="Permalink to this heading"></a></h4>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">cfg</span><span class="o">.</span><span class="n">sched_all_feasible_space</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>True
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="sched-feasible-access-sites">
+<h3><strong>sched_feasible_access_sites()</strong><a class="headerlink" href="#sched-feasible-access-sites" title="Permalink to this heading"></a></h3>
+<section id="this-method-determines-if-a-single-schedule-s-access-extract-properties-are-feasible-it-requires-the-input-of-a-single-schedule-and-the-worker-type-class-to-test">
+<h4>This method determines if a single schedule’s access/extract properties are feasible. It requires the input of a single schedule and the Worker_Type class to test.<a class="headerlink" href="#this-method-determines-if-a-single-schedule-s-access-extract-properties-are-feasible-it-requires-the-input-of-a-single-schedule-and-the-worker-type-class-to-test" title="Permalink to this heading"></a></h4>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">schedule</span> <span class="o">=</span> <span class="n">cfg</span><span class="o">.</span><span class="n">config</span>
+<span class="n">cfg</span><span class="o">.</span><span class="n">sched_feasible_access_sites</span><span class="p">(</span><span class="n">sched</span><span class="o">=</span> <span class="n">schedule</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">1</span><span class="p">],</span> <span class="n">worker_type</span><span class="o">=</span> <span class="n">Worker_Type</span><span class="o">.</span><span class="n">WORKER1</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>True
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="sched-feasible-space">
+<h3><strong>sched_feasible_space()</strong><a class="headerlink" href="#sched-feasible-space" title="Permalink to this heading"></a></h3>
+<section id="this-tests-whether-the-whole-configuration-is-spatially-feasible-and-requires-an-input-of-a-single-schedule">
+<h4>This tests whether the whole configuration is spatially feasible and requires an input of a single schedule.<a class="headerlink" href="#this-tests-whether-the-whole-configuration-is-spatially-feasible-and-requires-an-input-of-a-single-schedule" title="Permalink to this heading"></a></h4>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">schedule</span> <span class="o">=</span> <span class="n">cfg</span><span class="o">.</span><span class="n">config</span>
+<span class="n">cfg</span><span class="o">.</span><span class="n">sched_feasible_space</span><span class="p">(</span><span class="n">sched</span><span class="o">=</span><span class="n">schedule</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">1</span><span class="p">])</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>True
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="sched-info">
+<h3><strong>sched_info()</strong><a class="headerlink" href="#sched-info" title="Permalink to this heading"></a></h3>
+<section id="prints-information-about-specific-workers-schedule-in-the-form-timestep-x-coordinate-y-coordinate-vertex-type-accessed-not-accessed">
+<h4>Prints information about specific workers schedule in the form: <code class="docutils literal notranslate"><span class="pre">[timestep,</span> <span class="pre">(x_coordinate,</span> <span class="pre">y_coordinate),</span> <span class="pre">Vertex_Type,</span> <span class="pre">accessed/not</span> <span class="pre">accessed]</span></code><a class="headerlink" href="#prints-information-about-specific-workers-schedule-in-the-form-timestep-x-coordinate-y-coordinate-vertex-type-accessed-not-accessed" title="Permalink to this heading"></a></h4>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">schedule</span> <span class="o">=</span> <span class="n">cfg</span><span class="o">.</span><span class="n">config</span>
+<span class="n">cfg</span><span class="o">.</span><span class="n">sched_info</span><span class="p">(</span><span class="n">schedule</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">2</span><span class="p">])</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>[&#39;[t=0, (None,None), vtype=None, acc=False ]&#39;,
+ &#39;[t=1, (None,None), vtype=None, acc=False ]&#39;,
+ &#39;[t=2, (None,None), vtype=None, acc=False ]&#39;,
+ &#39;[t=3, (None,None), vtype=None, acc=False ]&#39;,
+ &#39;[t=4, (None,None), vtype=None, acc=False ]&#39;,
+ &#39;[t=5, (None,None), vtype=None, acc=False ]&#39;,
+ &#39;[t=6, (None,None), vtype=None, acc=False ]&#39;,
+ &#39;[t=7, (None,None), vtype=None, acc=False ]&#39;,
+ &#39;[t=8, (None,None), vtype=None, acc=False ]&#39;,
+ &#39;[t=9, (None,None), vtype=None, acc=False ]&#39;,
+ &#39;[t=10, (None,None), vtype=None, acc=False ]&#39;,
+ &#39;[t=11, (None,None), vtype=None, acc=False ]&#39;,
+ &#39;[t=12, (None,None), vtype=None, acc=False ]&#39;,
+ &#39;[t=13, (None,None), vtype=None, acc=False ]&#39;,
+ &#39;[t=14, (None,None), vtype=None, acc=False ]&#39;,
+ &#39;[t=15, (None,None), vtype=None, acc=False ]&#39;,
+ &#39;[t=16, (None,None), vtype=None, acc=False ]&#39;,
+ &#39;[t=17, (None,None), vtype=None, acc=False ]&#39;,
+ &#39;[t=18, (None,None), vtype=None, acc=False ]&#39;,
+ &#39;[t=19, (None,None), vtype=None, acc=False ]&#39;]
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="sched-revenue">
+<h3><strong>sched_revenue()</strong><a class="headerlink" href="#sched-revenue" title="Permalink to this heading"></a></h3>
+<section id="this-method-requires-a-single-schedule-as-an-input-and-returns-the-revenue-of-that-particular-schedule">
+<h4>This method requires a single schedule as an input and returns the revenue of that particular schedule<a class="headerlink" href="#this-method-requires-a-single-schedule-as-an-input-and-returns-the-revenue-of-that-particular-schedule" title="Permalink to this heading"></a></h4>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">cfg</span><span class="o">.</span><span class="n">sched_revenue</span><span class="p">(</span><span class="n">schedule</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">2</span><span class="p">])</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>0
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="site-accessed">
+<h3><strong>site_accessed()</strong><a class="headerlink" href="#site-accessed" title="Permalink to this heading"></a></h3>
+<section id="this-method-determines-whether-or-not-the-site-was-accessed-in-the-configuration-it-reuqired-a-vertex-object-as-an-input">
+<h4>This method determines whether or not the site was accessed in the configuration. It reuqired a Vertex object as an input.<a class="headerlink" href="#this-method-determines-whether-or-not-the-site-was-accessed-in-the-configuration-it-reuqired-a-vertex-object-as-an-input" title="Permalink to this heading"></a></h4>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">v_orig</span> <span class="o">=</span> <span class="n">cfg</span><span class="o">.</span><span class="n">graph</span><span class="o">.</span><span class="n">get_vertices_type</span><span class="p">(</span><span class="n">lgtool</span><span class="o">.</span><span class="n">Vertex_Type</span><span class="o">.</span><span class="n">ORIGIN</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+<span class="n">cfg</span><span class="o">.</span><span class="n">site_accessed</span><span class="p">(</span><span class="n">v</span><span class="o">=</span><span class="n">v_orig</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>False
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="site-accessed-at-time">
+<h3><strong>site_accessed_at_time()</strong><a class="headerlink" href="#site-accessed-at-time" title="Permalink to this heading"></a></h3>
+<section id="this-method-requires-a-vertex-as-an-input-and-returns-whether-of-not-that-site-was-accessed-at-a-given-time-this-example-uses-timestep-5-you-can-see-that-this-site-was-not-accessed-at-timestep-5">
+<h4>This method requires a Vertex as an input and returns whether of not that site was accessed at a given time. This example uses timestep=5. You can see that this site was not accessed at timestep=5.<a class="headerlink" href="#this-method-requires-a-vertex-as-an-input-and-returns-whether-of-not-that-site-was-accessed-at-a-given-time-this-example-uses-timestep-5-you-can-see-that-this-site-was-not-accessed-at-timestep-5" title="Permalink to this heading"></a></h4>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">v_orig</span> <span class="o">=</span> <span class="n">cfg</span><span class="o">.</span><span class="n">graph</span><span class="o">.</span><span class="n">get_vertices_type</span><span class="p">(</span><span class="n">lgtool</span><span class="o">.</span><span class="n">Vertex_Type</span><span class="o">.</span><span class="n">SITE1</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+<span class="n">cfg</span><span class="o">.</span><span class="n">site_accessed_at_time</span><span class="p">(</span><span class="n">v</span><span class="o">=</span><span class="n">v_orig</span><span class="p">,</span> <span class="n">t</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>False
+</pre></div>
+</div>
+</div>
+</div>
+<p><span class="xref myst">Back to the Top!</span></p>
+</section>
+</section>
+</section>
+<hr class="docutils" />
+<section id="edge-object">
+<h2><strong>Edge Object</strong><a class="headerlink" href="#edge-object" title="Permalink to this heading"></a></h2>
+<section id="edge-info">
+<h3><strong>Edge.info()</strong><a class="headerlink" href="#edge-info" title="Permalink to this heading"></a></h3>
+<section id="edge-info-returns-the-edge-information-about-a-given-edge-object">
+<h4><code class="docutils literal notranslate"><span class="pre">Edge.info()</span></code> returns the edge information about a given Edge object<a class="headerlink" href="#edge-info-returns-the-edge-information-about-a-given-edge-object" title="Permalink to this heading"></a></h4>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">verts</span> <span class="o">=</span> <span class="n">pargs</span><span class="o">.</span><span class="n">graph</span><span class="o">.</span><span class="n">vertices</span>
+<span class="n">v1</span> <span class="o">=</span> <span class="n">verts</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+<span class="n">v2</span> <span class="o">=</span> <span class="n">verts</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+
+<span class="n">edge_obj</span> <span class="o">=</span> <span class="n">lgtool</span><span class="o">.</span><span class="n">Edge</span><span class="p">(</span><span class="n">v1</span><span class="o">=</span><span class="n">v1</span><span class="p">,</span><span class="n">v2</span><span class="o">=</span><span class="n">v2</span><span class="p">)</span>
+<span class="n">edge_obj</span><span class="o">.</span><span class="n">info</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>[(3.0, 0.0), (5.0, 0.0)]
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="in-graph">
+<h3><strong>in_graph()</strong><a class="headerlink" href="#in-graph" title="Permalink to this heading"></a></h3>
+<section id="this-method-determines-if-the-edge-is-allowed-to-travel-in-1-timestep">
+<h4>This method determines if the edge is allowed to travel in 1 timestep<a class="headerlink" href="#this-method-determines-if-the-edge-is-allowed-to-travel-in-1-timestep" title="Permalink to this heading"></a></h4>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">verts</span> <span class="o">=</span> <span class="n">pargs</span><span class="o">.</span><span class="n">graph</span><span class="o">.</span><span class="n">vertices</span>
+<span class="n">v1</span> <span class="o">=</span> <span class="n">verts</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+<span class="n">v2</span> <span class="o">=</span> <span class="n">verts</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+
+<span class="n">edge_obj</span> <span class="o">=</span> <span class="n">lgtool</span><span class="o">.</span><span class="n">Edge</span><span class="p">(</span><span class="n">v1</span><span class="o">=</span><span class="n">v1</span><span class="p">,</span><span class="n">v2</span><span class="o">=</span><span class="n">v2</span><span class="p">)</span>
+<span class="n">edge_obj</span><span class="o">.</span><span class="n">in_graph</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>False
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="nearest-neighbor">
+<h3><strong>nearest_neighbor()</strong><a class="headerlink" href="#nearest-neighbor" title="Permalink to this heading"></a></h3>
+<section id="this-method-requires-an-input-of-two-vertices-on-the-graph-and-determines-if-they-are-near-each-other">
+<h4>This method requires an input of two vertices on the graph and determines if they are near each other.<a class="headerlink" href="#this-method-requires-an-input-of-two-vertices-on-the-graph-and-determines-if-they-are-near-each-other" title="Permalink to this heading"></a></h4>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">verts</span> <span class="o">=</span> <span class="n">pargs</span><span class="o">.</span><span class="n">graph</span><span class="o">.</span><span class="n">vertices</span>
+<span class="n">v1</span> <span class="o">=</span> <span class="n">verts</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+<span class="n">v2</span> <span class="o">=</span> <span class="n">verts</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+
+<span class="n">edge_obj</span> <span class="o">=</span> <span class="n">lgtool</span><span class="o">.</span><span class="n">Edge</span><span class="p">(</span><span class="n">v1</span><span class="o">=</span><span class="n">v1</span><span class="p">,</span><span class="n">v2</span><span class="o">=</span><span class="n">v2</span><span class="p">)</span>
+<span class="n">edge_obj</span><span class="o">.</span><span class="n">nearest_neighbor</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>False
+</pre></div>
+</div>
+</div>
+</div>
+<p><span class="xref myst">Back to the Top!</span></p>
+</section>
+</section>
+</section>
+<hr class="docutils" />
+<section id="graph-object">
+<h2><strong>Graph Object</strong><a class="headerlink" href="#graph-object" title="Permalink to this heading"></a></h2>
+<section id="add-vertex">
+<h3><strong>add_vertex()</strong><a class="headerlink" href="#add-vertex" title="Permalink to this heading"></a></h3>
+<section id="add-vertex-allows-users-to-manually-add-a-vertex-to-the-graph-configuration">
+<h4><code class="docutils literal notranslate"><span class="pre">add_vertex()</span></code> allows users to manually add a vertex to the graph configuration<a class="headerlink" href="#add-vertex-allows-users-to-manually-add-a-vertex-to-the-graph-configuration" title="Permalink to this heading"></a></h4>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">verts</span> <span class="o">=</span> <span class="n">lgtool</span><span class="o">.</span><span class="n">Vertex</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">Vertex_Type</span><span class="o">.</span><span class="n">SITE3</span><span class="p">,</span> <span class="n">reward</span><span class="o">=</span><span class="mi">1000</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="n">verts</span><span class="p">)</span>
+<span class="n">cfg</span><span class="o">.</span><span class="n">graph</span><span class="o">.</span><span class="n">add_vertex</span><span class="p">(</span><span class="n">v</span><span class="o">=</span><span class="n">verts</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&lt;lyra_graphtool.vertex.Vertex object at 0x1285a21d0&gt;
+after translations in x and y, no reduction in components
+components:
+{(9, 7): (&lt;Vertex_Type.SITE3: 4&gt;, 1)}
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="adjacent-vertices">
+<h3><strong>adjacent_vertices()</strong><a class="headerlink" href="#adjacent-vertices" title="Permalink to this heading"></a></h3>
+<section id="this-method-returns-which-vertices-are-adjacent-to-a-given-vertex">
+<h4>This method returns which vertices are adjacent to a given vertex<a class="headerlink" href="#this-method-returns-which-vertices-are-adjacent-to-a-given-vertex" title="Permalink to this heading"></a></h4>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">cfg</span><span class="o">.</span><span class="n">graph</span><span class="o">.</span><span class="n">adjacent_vertices</span><span class="p">(</span><span class="n">v</span><span class="o">=</span><span class="n">verts</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>[&lt;lyra_graphtool.vertex.Vertex at 0x10b57b670&gt;,
+ &lt;lyra_graphtool.vertex.Vertex at 0x10b57b610&gt;,
+ &lt;lyra_graphtool.vertex.Vertex at 0x10bc1c400&gt;,
+ &lt;lyra_graphtool.vertex.Vertex at 0x10bc1c520&gt;,
+ &lt;lyra_graphtool.vertex.Vertex at 0x10bc1c5e0&gt;]
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="closest-vertices">
+<h3><strong>closest_vertices()</strong><a class="headerlink" href="#closest-vertices" title="Permalink to this heading"></a></h3>
+<section id="closest-vertices-returns-a-list-the-closet-vertices-to-a-given-vertex">
+<h4><code class="docutils literal notranslate"><span class="pre">closest_vertices()</span></code> returns a list the closet vertices to a given vertex<a class="headerlink" href="#closest-vertices-returns-a-list-the-closet-vertices-to-a-given-vertex" title="Permalink to this heading"></a></h4>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">closest_verts_list</span> <span class="o">=</span> <span class="n">cfg</span><span class="o">.</span><span class="n">graph</span><span class="o">.</span><span class="n">closest_vertices</span><span class="p">(</span><span class="n">v</span><span class="o">=</span><span class="n">verts</span><span class="p">)</span>
+<span class="n">pp</span><span class="o">.</span><span class="n">pprint</span><span class="p">(</span><span class="n">closest_verts_list</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>[&lt;lyra_graphtool.vertex.Vertex object at 0x11f7efd60&gt;,
+ &lt;lyra_graphtool.vertex.Vertex object at 0x11f7efdf0&gt;,
+ &lt;lyra_graphtool.vertex.Vertex object at 0x11f7eea40&gt;,
+ &lt;lyra_graphtool.vertex.Vertex object at 0x11f7ee950&gt;]
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="connected-components">
+<h3><strong>connected_components()</strong><a class="headerlink" href="#connected-components" title="Permalink to this heading"></a></h3>
+<section id="connected-components-returns-a-list-of-vertices-that-are-connected">
+<h4><code class="docutils literal notranslate"><span class="pre">connected_components()</span></code> returns a list of vertices that are connected<a class="headerlink" href="#connected-components-returns-a-list-of-vertices-that-are-connected" title="Permalink to this heading"></a></h4>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">cfg</span><span class="o">.</span><span class="n">graph</span><span class="o">.</span><span class="n">connected_components</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>[[&lt;lyra_graphtool.vertex.Vertex at 0x10b57b670&gt;,
+  &lt;lyra_graphtool.vertex.Vertex at 0x10bc1c400&gt;,
+  &lt;lyra_graphtool.vertex.Vertex at 0x10bc1c430&gt;,
+  &lt;lyra_graphtool.vertex.Vertex at 0x10b57b610&gt;,
+  &lt;lyra_graphtool.vertex.Vertex at 0x10bc1c3d0&gt;,
+  &lt;lyra_graphtool.vertex.Vertex at 0x10bc1c370&gt;,
+  &lt;lyra_graphtool.vertex.Vertex at 0x10bc1c490&gt;,
+  &lt;lyra_graphtool.vertex.Vertex at 0x10b57bc40&gt;,
+  &lt;lyra_graphtool.vertex.Vertex at 0x10bc1c3a0&gt;,
+  &lt;lyra_graphtool.vertex.Vertex at 0x10bc1c460&gt;,
+  &lt;lyra_graphtool.vertex.Vertex at 0x10bc1c5b0&gt;,
+  &lt;lyra_graphtool.vertex.Vertex at 0x10bc1c610&gt;,
+  &lt;lyra_graphtool.vertex.Vertex at 0x10bc1c640&gt;,
+  &lt;lyra_graphtool.vertex.Vertex at 0x10bc1c670&gt;,
+  &lt;lyra_graphtool.vertex.Vertex at 0x10bc1c550&gt;,
+  &lt;lyra_graphtool.vertex.Vertex at 0x10bd45e10&gt;,
+  &lt;lyra_graphtool.vertex.Vertex at 0x10bc1c4f0&gt;,
+  &lt;lyra_graphtool.vertex.Vertex at 0x10bc1c7f0&gt;,
+  &lt;lyra_graphtool.vertex.Vertex at 0x10bc1c820&gt;,
+  &lt;lyra_graphtool.vertex.Vertex at 0x10bc1c520&gt;,
+  &lt;lyra_graphtool.vertex.Vertex at 0x10bc1c580&gt;,
+  &lt;lyra_graphtool.vertex.Vertex at 0x10bc1c4c0&gt;,
+  &lt;lyra_graphtool.vertex.Vertex at 0x10bc1c7c0&gt;,
+  &lt;lyra_graphtool.vertex.Vertex at 0x10bc1c760&gt;,
+  &lt;lyra_graphtool.vertex.Vertex at 0x10bc1c6a0&gt;,
+  &lt;lyra_graphtool.vertex.Vertex at 0x10bc1c700&gt;,
+  &lt;lyra_graphtool.vertex.Vertex at 0x10bc1c790&gt;,
+  &lt;lyra_graphtool.vertex.Vertex at 0x10bc1c850&gt;,
+  &lt;lyra_graphtool.vertex.Vertex at 0x10bc1c730&gt;,
+  &lt;lyra_graphtool.vertex.Vertex at 0x10bc1c6d0&gt;,
+  &lt;lyra_graphtool.vertex.Vertex at 0x10bc1c5e0&gt;]]
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="depth-first-search">
+<h3><strong>depth_first_search()</strong><a class="headerlink" href="#depth-first-search" title="Permalink to this heading"></a></h3>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># unclear what this function returns?</span>
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="distance">
+<h3><strong>distance()</strong><a class="headerlink" href="#distance" title="Permalink to this heading"></a></h3>
+</section>
+<section id="get-edges-at-vertex">
+<h3><strong>get_edges_at_vertex()</strong><a class="headerlink" href="#get-edges-at-vertex" title="Permalink to this heading"></a></h3>
+<section id="the-get-edges-at-vertex-method-will-return-a-list-of-edges-at-a-given-vertex-here-we-define-our-vertex-using-get-vertex-xy-with-coordinates-x-2-y-3">
+<h4>The <code class="docutils literal notranslate"><span class="pre">get_edges_at_vertex()</span></code> method will return a list of edges at a given vertex. Here we define our vertex using <span class="xref myst">get_vertex_xy()</span> with coordinates (x=2,y=3)<a class="headerlink" href="#the-get-edges-at-vertex-method-will-return-a-list-of-edges-at-a-given-vertex-here-we-define-our-vertex-using-get-vertex-xy-with-coordinates-x-2-y-3" title="Permalink to this heading"></a></h4>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">verts</span> <span class="o">=</span> <span class="n">cfg</span><span class="o">.</span><span class="n">graph</span><span class="o">.</span><span class="n">get_vertex_xy</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span><span class="n">y</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
+<span class="n">vert_edges</span> <span class="o">=</span> <span class="n">cfg</span><span class="o">.</span><span class="n">graph</span><span class="o">.</span><span class="n">get_edges_at_vertex</span><span class="p">(</span><span class="n">v</span><span class="o">=</span><span class="n">verts</span><span class="p">)</span>
+<span class="n">pp</span><span class="o">.</span><span class="n">pprint</span><span class="p">(</span><span class="n">vert_edges</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>[&lt;lyra_graphtool.edge.Edge object at 0x11771aa70&gt;,
+ &lt;lyra_graphtool.edge.Edge object at 0x11771ad10&gt;,
+ &lt;lyra_graphtool.edge.Edge object at 0x11771ae30&gt;,
+ &lt;lyra_graphtool.edge.Edge object at 0x11771aef0&gt;]
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="edges-info">
+<h3><strong>edges_info()</strong><a class="headerlink" href="#edges-info" title="Permalink to this heading"></a></h3>
+<section id="this-method-will-return-the-edges-for-the-entire-graph">
+<h4>This method will return the edges for the entire graph<a class="headerlink" href="#this-method-will-return-the-edges-for-the-entire-graph" title="Permalink to this heading"></a></h4>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">edge_list</span> <span class="o">=</span> <span class="n">cfg</span><span class="o">.</span><span class="n">graph</span><span class="o">.</span><span class="n">edges_info</span><span class="p">()</span>
+<span class="n">pp</span><span class="o">.</span><span class="n">pprint</span><span class="p">(</span><span class="n">edge_list</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>{((0.0, 7.0), (0.0, 6.0)): 1,
+ ((0.0, 8.0), (0.0, 7.0)): 1,
+ ((1.0, 2.0), (1.0, 3.0)): 1,
+ ((1.0, 5.0), (0.0, 6.0)): 1,
+ ((1.0, 7.0), (0.0, 6.0)): 1,
+ ((1.0, 7.0), (0.0, 7.0)): 1,
+ ((1.0, 7.0), (0.0, 8.0)): 1,
+ ((2.0, 0.0), (1.0, 0.0)): 1,
+ ((2.0, 0.0), (2.0, 1.0)): 1,
+ ((2.0, 1.0), (1.0, 0.0)): 1,
+ ((2.0, 1.0), (1.0, 2.0)): 1,
+ ((2.0, 3.0), (1.0, 2.0)): 1,
+ ((2.0, 3.0), (1.0, 3.0)): 1,
+ ((2.0, 5.0), (1.0, 5.0)): 1,
+ ((2.0, 8.0), (1.0, 7.0)): 1,
+ ((3.0, 0.0), (2.0, 0.0)): 1,
+ ((3.0, 0.0), (2.0, 1.0)): 1,
+ ((3.0, 0.0), (4.0, 1.0)): 1,
+ ((3.0, 2.0), (2.0, 1.0)): 1,
+ ((3.0, 2.0), (2.0, 3.0)): 1,
+ ((3.0, 2.0), (4.0, 1.0)): 1,
+ ((3.0, 4.0), (2.0, 3.0)): 1,
+ ((3.0, 4.0), (2.0, 5.0)): 1,
+ ((3.0, 6.0), (2.0, 5.0)): 1,
+ ((3.0, 6.0), (3.0, 7.0)): 1,
+ ((3.0, 6.0), (4.0, 6.0)): 1,
+ ((3.0, 7.0), (2.0, 8.0)): 1,
+ ((3.0, 7.0), (4.0, 6.0)): 1,
+ ((4.0, 1.0), (5.0, 0.0)): 1,
+ ((4.0, 1.0), (5.0, 2.0)): 1,
+ ((4.0, 6.0), (5.0, 6.0)): 1,
+ ((4.0, 6.0), (5.0, 7.0)): 1,
+ ((5.0, 6.0), (5.0, 7.0)): 1,
+ ((6.0, 0.0), (5.0, 0.0)): 1,
+ ((6.0, 2.0), (5.0, 2.0)): 1,
+ ((7.0, 0.0), (6.0, 0.0)): 1,
+ ((7.0, 1.0), (6.0, 0.0)): 1,
+ ((7.0, 1.0), (6.0, 2.0)): 1,
+ ((7.0, 1.0), (7.0, 0.0)): 1,
+ ((7.0, 3.0), (6.0, 2.0)): 1,
+ ((7.0, 4.0), (7.0, 3.0)): 1}
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="get-vertex-xy">
+<h3><strong>get_vertex_xy()</strong><a class="headerlink" href="#get-vertex-xy" title="Permalink to this heading"></a></h3>
+<section id="this-method-returns-the-vertex-object-at-given-x-y-coordinates">
+<h4>This method returns the vertex object at given (x,y) coordinates<a class="headerlink" href="#this-method-returns-the-vertex-object-at-given-x-y-coordinates" title="Permalink to this heading"></a></h4>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">specified_verts</span> <span class="o">=</span> <span class="n">cfg</span><span class="o">.</span><span class="n">graph</span><span class="o">.</span><span class="n">get_vertex_xy</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span><span class="n">y</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">specified_verts</span><span class="o">.</span><span class="n">info</span><span class="p">())</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>[(3.0, 4.0), &lt;Vertex_Type.SITE1: 2&gt;]
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="get-vertices-type">
+<h3><strong>get_vertices_type()</strong><a class="headerlink" href="#get-vertices-type" title="Permalink to this heading"></a></h3>
+<section id="we-can-use-this-method-to-extract-vertices-of-a-specific-vertex-type">
+<h4>We can use this method to extract vertices of a specific Vertex_Type<a class="headerlink" href="#we-can-use-this-method-to-extract-vertices-of-a-specific-vertex-type" title="Permalink to this heading"></a></h4>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">site1_vert_list</span> <span class="o">=</span> <span class="n">cfg</span><span class="o">.</span><span class="n">graph</span><span class="o">.</span><span class="n">get_vertices_type</span><span class="p">(</span><span class="n">v_type</span><span class="o">=</span><span class="n">Vertex_Type</span><span class="o">.</span><span class="n">SITE1</span><span class="p">)</span>
+<span class="n">pp</span><span class="o">.</span><span class="n">pprint</span><span class="p">(</span><span class="n">site1_vert_list</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>[&lt;lyra_graphtool.vertex.Vertex object at 0x10bc1c370&gt;,
+ &lt;lyra_graphtool.vertex.Vertex object at 0x10bc1c580&gt;,
+ &lt;lyra_graphtool.vertex.Vertex object at 0x10bc1c700&gt;]
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="isolated-vertices">
+<h3><strong>isolated_vertices()</strong><a class="headerlink" href="#isolated-vertices" title="Permalink to this heading"></a></h3>
+<section id="using-isolated-vertices-users-can-determine-if-any-of-the-vertices-in-the-graph-are-isolated-from-other-vertices-in-the-graph-configuration">
+<h4>Using <code class="docutils literal notranslate"><span class="pre">isolated_vertices()</span></code>, users can determine if any of the vertices in the graph are isolated from other vertices in the graph configuration.<a class="headerlink" href="#using-isolated-vertices-users-can-determine-if-any-of-the-vertices-in-the-graph-are-isolated-from-other-vertices-in-the-graph-configuration" title="Permalink to this heading"></a></h4>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">isolated_verts_list</span> <span class="o">=</span> <span class="n">cfg</span><span class="o">.</span><span class="n">graph</span><span class="o">.</span><span class="n">isolated_vertices</span><span class="p">()</span>
+<span class="n">pp</span><span class="o">.</span><span class="n">pprint</span><span class="p">(</span><span class="n">isolated_verts_list</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>[&lt;lyra_graphtool.vertex.Vertex object at 0x11f7ee800&gt;]
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="id1">
+<h3><strong>load_from_json()</strong><a class="headerlink" href="#id1" title="Permalink to this heading"></a></h3>
+<section id="load-json-graph-files-into-the-configuration-object">
+<h4>Load <code class="docutils literal notranslate"><span class="pre">.json</span></code> graph files into the Configuration object<a class="headerlink" href="#load-json-graph-files-into-the-configuration-object" title="Permalink to this heading"></a></h4>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">cfg</span><span class="o">.</span><span class="n">graph</span><span class="o">.</span><span class="n">load_from_json</span><span class="p">(</span><span class="n">file_name</span><span class="o">=</span><span class="s1">&#39;./ready_setups/graph_sample.json&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="make-graph-connected">
+<h3><strong>make_graph_connected()</strong><a class="headerlink" href="#make-graph-connected" title="Permalink to this heading"></a></h3>
+</section>
+<section id="paths">
+<h3><strong>paths()</strong><a class="headerlink" href="#paths" title="Permalink to this heading"></a></h3>
+<section id="another-import-method-for-the-challenge-is-paths-when-provided-with-two-vertices-this-method-will-return-ever-possible-path-that-can-connect-the-two-points">
+<h4>Another import method for the challenge is <code class="docutils literal notranslate"><span class="pre">paths()</span></code>, When provided with two vertices, this method will return ever possible path that can connect the two points.<a class="headerlink" href="#another-import-method-for-the-challenge-is-paths-when-provided-with-two-vertices-this-method-will-return-ever-possible-path-that-can-connect-the-two-points" title="Permalink to this heading"></a></h4>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># get two verts and then get paths between them</span>
+<span class="n">verts</span> <span class="o">=</span> <span class="n">pargs</span><span class="o">.</span><span class="n">graph</span><span class="o">.</span><span class="n">vertices</span>
+
+<span class="c1"># pick first and last vertex in the list</span>
+<span class="n">v1</span> <span class="o">=</span> <span class="n">verts</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+<span class="n">v2</span> <span class="o">=</span> <span class="n">verts</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="n">v1</span><span class="o">.</span><span class="n">info</span><span class="p">(),</span><span class="n">v2</span><span class="o">.</span><span class="n">info</span><span class="p">())</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+<span class="n">paths12</span> <span class="o">=</span> <span class="n">pargs</span><span class="o">.</span><span class="n">graph</span><span class="o">.</span><span class="n">paths</span><span class="p">(</span><span class="n">v1</span><span class="p">,</span><span class="n">v2</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">paths12</span><span class="p">:</span>
+    <span class="n">path</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">p</span><span class="p">:</span>
+        <span class="n">path</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">v</span><span class="o">.</span><span class="n">x</span><span class="p">,</span><span class="n">v</span><span class="o">.</span><span class="n">y</span><span class="p">))</span>
+        
+    <span class="n">display</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+    <span class="c1"># print_graph() method when provided with a list of vertices, highlights them in orange</span>
+    <span class="n">pargs</span><span class="o">.</span><span class="n">graph</span><span class="o">.</span><span class="n">print_graph</span><span class="p">(</span><span class="n">p</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="print-graph">
+<h3><strong>print_graph()</strong><a class="headerlink" href="#print-graph" title="Permalink to this heading"></a></h3>
+<section id="the-print-graph-method-will-be-one-of-the-most-important-used-during-the-challenge-because-it-will-allow-you-to-visualize-your-the-solution-that-your-algorithm-has-created">
+<h4>The <code class="docutils literal notranslate"><span class="pre">print_graph()</span></code> method will be one of the most important used during the challenge, because it will allow you to visualize your the solution that your algorithm has created.<a class="headerlink" href="#the-print-graph-method-will-be-one-of-the-most-important-used-during-the-challenge-because-it-will-allow-you-to-visualize-your-the-solution-that-your-algorithm-has-created" title="Permalink to this heading"></a></h4>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">pargs</span><span class="o">.</span><span class="n">graph</span><span class="o">.</span><span class="n">print_graph</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../_images/4c4e789c11f91de66d2d6ed51073e54f5cb0b64dff1be88ceb323c0abfec0955.png" src="../_images/4c4e789c11f91de66d2d6ed51073e54f5cb0b64dff1be88ceb323c0abfec0955.png" />
+</div>
+</div>
+</section>
+</section>
+<section id="graph-save">
+<h3><strong>Graph.save()</strong><a class="headerlink" href="#graph-save" title="Permalink to this heading"></a></h3>
+<section id="save-the-graph-to-a-pickle-file-for-future-use">
+<h4>Save the graph to a pickle file for future use<a class="headerlink" href="#save-the-graph-to-a-pickle-file-for-future-use" title="Permalink to this heading"></a></h4>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">pargs</span><span class="o">.</span><span class="n">graph</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">file_name</span><span class="o">=</span> <span class="s1">&#39;./ready_setups/test_graph_save&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="graph-save-to-json">
+<h3><strong>Graph.save_to_json()</strong><a class="headerlink" href="#graph-save-to-json" title="Permalink to this heading"></a></h3>
+<section id="save-the-new-graph-to-a-json-file-for-later-use">
+<h4>Save the new graph to a <code class="docutils literal notranslate"><span class="pre">.json</span></code> file for later use<a class="headerlink" href="#save-the-new-graph-to-a-json-file-for-later-use" title="Permalink to this heading"></a></h4>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">new_pargs</span><span class="o">.</span><span class="n">graph</span><span class="o">.</span><span class="n">save_to_json</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;ready_setups/graph_</span><span class="si">{</span><span class="n">new_pargs</span><span class="o">.</span><span class="n">args_trial</span><span class="o">.</span><span class="n">trial_name</span><span class="si">}</span><span class="s1">.json&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="set-edges">
+<h3><strong>set_edges()</strong><a class="headerlink" href="#set-edges" title="Permalink to this heading"></a></h3>
+<section id="unclear-what-this-does">
+<h4>unclear what this does?<a class="headerlink" href="#unclear-what-this-does" title="Permalink to this heading"></a></h4>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">cfg</span><span class="o">.</span><span class="n">graph</span><span class="o">.</span><span class="n">set_edges</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>[&lt;lyra_graphtool.edge.Edge at 0x11771a950&gt;,
+ &lt;lyra_graphtool.edge.Edge at 0x11771a9b0&gt;,
+ &lt;lyra_graphtool.edge.Edge at 0x11771aa10&gt;,
+ &lt;lyra_graphtool.edge.Edge at 0x11771aa70&gt;,
+ &lt;lyra_graphtool.edge.Edge at 0x11771ab30&gt;,
+ &lt;lyra_graphtool.edge.Edge at 0x11771aad0&gt;,
+ &lt;lyra_graphtool.edge.Edge at 0x11771abf0&gt;,
+ &lt;lyra_graphtool.edge.Edge at 0x11771ab90&gt;,
+ &lt;lyra_graphtool.edge.Edge at 0x11771acb0&gt;,
+ &lt;lyra_graphtool.edge.Edge at 0x11771ad10&gt;,
+ &lt;lyra_graphtool.edge.Edge at 0x11771ad70&gt;,
+ &lt;lyra_graphtool.edge.Edge at 0x11771ac50&gt;,
+ &lt;lyra_graphtool.edge.Edge at 0x11771add0&gt;,
+ &lt;lyra_graphtool.edge.Edge at 0x11771ae30&gt;,
+ &lt;lyra_graphtool.edge.Edge at 0x11771aef0&gt;,
+ &lt;lyra_graphtool.edge.Edge at 0x11771ae90&gt;,
+ &lt;lyra_graphtool.edge.Edge at 0x11771af50&gt;,
+ &lt;lyra_graphtool.edge.Edge at 0x11771b010&gt;,
+ &lt;lyra_graphtool.edge.Edge at 0x11771b070&gt;,
+ &lt;lyra_graphtool.edge.Edge at 0x11771afb0&gt;,
+ &lt;lyra_graphtool.edge.Edge at 0x11771b130&gt;,
+ &lt;lyra_graphtool.edge.Edge at 0x11771b0d0&gt;,
+ &lt;lyra_graphtool.edge.Edge at 0x11771b190&gt;,
+ &lt;lyra_graphtool.edge.Edge at 0x11771b250&gt;,
+ &lt;lyra_graphtool.edge.Edge at 0x11771b1f0&gt;,
+ &lt;lyra_graphtool.edge.Edge at 0x11771b310&gt;,
+ &lt;lyra_graphtool.edge.Edge at 0x11771b2b0&gt;,
+ &lt;lyra_graphtool.edge.Edge at 0x11771b3d0&gt;,
+ &lt;lyra_graphtool.edge.Edge at 0x11771b370&gt;,
+ &lt;lyra_graphtool.edge.Edge at 0x11771b430&gt;,
+ &lt;lyra_graphtool.edge.Edge at 0x11771b490&gt;,
+ &lt;lyra_graphtool.edge.Edge at 0x11771b4f0&gt;,
+ &lt;lyra_graphtool.edge.Edge at 0x11771b550&gt;,
+ &lt;lyra_graphtool.edge.Edge at 0x11771b610&gt;,
+ &lt;lyra_graphtool.edge.Edge at 0x11771b5b0&gt;,
+ &lt;lyra_graphtool.edge.Edge at 0x11771b6d0&gt;,
+ &lt;lyra_graphtool.edge.Edge at 0x11771b730&gt;,
+ &lt;lyra_graphtool.edge.Edge at 0x11771b670&gt;,
+ &lt;lyra_graphtool.edge.Edge at 0x11771b7f0&gt;,
+ &lt;lyra_graphtool.edge.Edge at 0x11771b790&gt;,
+ &lt;lyra_graphtool.edge.Edge at 0x117833a00&gt;]
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="set-random-sites-origin">
+<h3><strong>set_random_sites_origin()</strong><a class="headerlink" href="#set-random-sites-origin" title="Permalink to this heading"></a></h3>
+<section id="id2">
+<h4>unclear what this does?<a class="headerlink" href="#id2" title="Permalink to this heading"></a></h4>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">cfg</span><span class="o">.</span><span class="n">graph</span><span class="o">.</span><span class="n">set_random_sites_origin</span><span class="p">(</span><span class="n">n_site1</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span><span class="n">n_site2</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span><span class="n">n_site3</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="set-vertex-type">
+<h3><strong>set_vertex_type()</strong><a class="headerlink" href="#set-vertex-type" title="Permalink to this heading"></a></h3>
+<section id="we-can-use-the-set-vertex-type-method-to-manually-set-a-particular-vertex-object-by-defining-the-vertex-type-and-x-y-coordinates">
+<h4>We can use the <code class="docutils literal notranslate"><span class="pre">set_vertex_type()</span></code> method to manually set a particular Vertex object, by defining the <code class="docutils literal notranslate"><span class="pre">Vertex_Type</span></code> and (x,y) coordinates<a class="headerlink" href="#we-can-use-the-set-vertex-type-method-to-manually-set-a-particular-vertex-object-by-defining-the-vertex-type-and-x-y-coordinates" title="Permalink to this heading"></a></h4>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">set_verts</span> <span class="o">=</span> <span class="n">cfg</span><span class="o">.</span><span class="n">graph</span><span class="o">.</span><span class="n">set_vertex_type</span><span class="p">(</span><span class="n">v_type</span><span class="o">=</span> <span class="n">Vertex_Type</span><span class="o">.</span><span class="n">SITE2</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="mi">6</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">set_verts</span><span class="o">.</span><span class="n">info</span><span class="p">())</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>[(5.0, 6.0), &lt;Vertex_Type.SITE2: 3&gt;]
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="set-vertex-coords">
+<h3><strong>set_vertex_coords()</strong><a class="headerlink" href="#set-vertex-coords" title="Permalink to this heading"></a></h3>
+<section id="similar-to-set-vertex-type-set-vertex-coords-will-set-a-defined-vertex-type-to-specificed-x-y-coordinates">
+<h4>Similar to <code class="docutils literal notranslate"><span class="pre">set_vertex_type()</span></code>, <code class="docutils literal notranslate"><span class="pre">set_vertex_coords()</span></code> will set a defined Vertex_Type to specificed (x,y) coordinates<a class="headerlink" href="#similar-to-set-vertex-type-set-vertex-coords-will-set-a-defined-vertex-type-to-specificed-x-y-coordinates" title="Permalink to this heading"></a></h4>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">input_vertex</span> <span class="o">=</span> <span class="n">lgtool</span><span class="o">.</span><span class="n">Vertex</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span><span class="n">y</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span><span class="n">v_type</span><span class="o">=</span><span class="n">Vertex_Type</span><span class="o">.</span><span class="n">BASIC</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Coordinates of Input Vertex:</span><span class="si">{</span><span class="n">input_vertex</span><span class="o">.</span><span class="n">info</span><span class="p">()</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+<span class="n">new_vertex</span> <span class="o">=</span> <span class="n">cfg</span><span class="o">.</span><span class="n">graph</span><span class="o">.</span><span class="n">set_vertex_coords</span><span class="p">(</span><span class="n">v</span><span class="o">=</span><span class="n">input_vertex</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="mi">9</span><span class="p">,</span><span class="n">y</span><span class="o">=</span><span class="mi">7</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Coordinates of New Vertex:</span><span class="si">{</span><span class="n">new_vertex</span><span class="o">.</span><span class="n">info</span><span class="p">()</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Coordinates of Input Vertex:[(1, 2), &lt;Vertex_Type.BASIC: 0&gt;]
+Coordinates of New Vertex:[(9, 7), &lt;Vertex_Type.SITE3: 4&gt;]
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="vertices-array">
+<h3><strong>vertices_array()</strong><a class="headerlink" href="#vertices-array" title="Permalink to this heading"></a></h3>
+<section id="we-can-use-the-vertices-array-method-to-extract-a-numpy-array-of-vertices-in-the-graph">
+<h4>We can use the <code class="docutils literal notranslate"><span class="pre">vertices_array()</span></code> method to extract a Numpy array of vertices in the graph<a class="headerlink" href="#we-can-use-the-vertices-array-method-to-extract-a-numpy-array-of-vertices-in-the-graph" title="Permalink to this heading"></a></h4>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">vert_array</span> <span class="o">=</span> <span class="n">cfg</span><span class="o">.</span><span class="n">graph</span><span class="o">.</span><span class="n">vertices_array</span><span class="p">()</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">vert_array</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>[[3. 0.]
+ [3. 2.]
+ [3. 6.]
+ [3. 4.]
+ [3. 7.]
+ [2. 3.]
+ [2. 0.]
+ [2. 1.]
+ [2. 8.]
+ [2. 5.]
+ [4. 1.]
+ [4. 6.]
+ [1. 2.]
+ [1. 5.]
+ [1. 3.]
+ [1. 7.]
+ [1. 0.]
+ [0. 8.]
+ [0. 7.]
+ [0. 6.]
+ [7. 1.]
+ [7. 4.]
+ [7. 0.]
+ [7. 3.]
+ [6. 2.]
+ [6. 0.]
+ [5. 2.]
+ [5. 6.]
+ [5. 7.]
+ [5. 0.]
+ [0. 9.]
+ [2. 1.]
+ [2. 1.]]
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="vertices-info">
+<h3><strong>vertices_info()</strong><a class="headerlink" href="#vertices-info" title="Permalink to this heading"></a></h3>
+<section id="by-calling-vertices-info-the-user-can-either-define-a-list-of-vertices-to-recieve-info-about-here-we-will-use-the-get-vertices-type-method-to-extract-a-list-of-site3-vertex-types-and-use-the-list-to-get-vertices-information">
+<h4>By calling <code class="docutils literal notranslate"><span class="pre">.vertices_info()</span></code> the user can either define a list of vertices to recieve info about. Here we will use the <span class="xref myst">get_vertices_type()</span> method to extract a list of SITE3 Vertex_Types and use the list to get vertices information.<a class="headerlink" href="#by-calling-vertices-info-the-user-can-either-define-a-list-of-vertices-to-recieve-info-about-here-we-will-use-the-get-vertices-type-method-to-extract-a-list-of-site3-vertex-types-and-use-the-list-to-get-vertices-information" title="Permalink to this heading"></a></h4>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">defined_verts_list</span> <span class="o">=</span> <span class="n">cfg</span><span class="o">.</span><span class="n">graph</span><span class="o">.</span><span class="n">vertices_info</span><span class="p">(</span><span class="n">vert_list</span><span class="o">=</span><span class="n">cfg</span><span class="o">.</span><span class="n">graph</span><span class="o">.</span><span class="n">get_vertices_type</span><span class="p">(</span><span class="n">v_type</span><span class="o">=</span><span class="n">Vertex_Type</span><span class="o">.</span><span class="n">SITE3</span><span class="p">))</span>
+<span class="n">pp</span><span class="o">.</span><span class="n">pprint</span><span class="p">(</span><span class="n">defined_verts_list</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>{(0.0, 9.0): (&lt;Vertex_Type.SITE3: 4&gt;, 1),
+ (1.0, 2.0): (&lt;Vertex_Type.SITE3: 4&gt;, 1),
+ (2.0, 1.0): (&lt;Vertex_Type.SITE3: 4&gt;, 2),
+ (2.0, 5.0): (&lt;Vertex_Type.SITE3: 4&gt;, 1),
+ (4.0, 6.0): (&lt;Vertex_Type.SITE3: 4&gt;, 1),
+ (5.0, 6.0): (&lt;Vertex_Type.SITE3: 4&gt;, 1),
+ (7.0, 3.0): (&lt;Vertex_Type.SITE3: 4&gt;, 1)}
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="we-can-also-provide-no-vertices-list-and-recieve-all-vertices-in-the-graph">
+<h4>We can also provide no vertices list and recieve all vertices in the graph<a class="headerlink" href="#we-can-also-provide-no-vertices-list-and-recieve-all-vertices-in-the-graph" title="Permalink to this heading"></a></h4>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">all_verts_list</span> <span class="o">=</span> <span class="n">cfg</span><span class="o">.</span><span class="n">graph</span><span class="o">.</span><span class="n">vertices_info</span><span class="p">()</span>
+<span class="n">pp</span><span class="o">.</span><span class="n">pprint</span><span class="p">(</span><span class="n">all_verts_list</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>{(0.0, 6.0): (&lt;Vertex_Type.BASIC: 0&gt;, 1),
+ (0.0, 7.0): (&lt;Vertex_Type.ORIGIN: 1&gt;, 1),
+ (0.0, 8.0): (&lt;Vertex_Type.BASIC: 0&gt;, 1),
+ (0.0, 9.0): (&lt;Vertex_Type.SITE3: 4&gt;, 1),
+ (1.0, 0.0): (&lt;Vertex_Type.BASIC: 0&gt;, 1),
+ (1.0, 2.0): (&lt;Vertex_Type.SITE3: 4&gt;, 1),
+ (1.0, 3.0): (&lt;Vertex_Type.SITE1: 2&gt;, 1),
+ (1.0, 5.0): (&lt;Vertex_Type.BASIC: 0&gt;, 1),
+ (1.0, 7.0): (&lt;Vertex_Type.BASIC: 0&gt;, 1),
+ (2.0, 0.0): (&lt;Vertex_Type.BASIC: 0&gt;, 1),
+ (2.0, 1.0): (&lt;Vertex_Type.SITE3: 4&gt;, 3),
+ (2.0, 3.0): (&lt;Vertex_Type.BASIC: 0&gt;, 1),
+ (2.0, 5.0): (&lt;Vertex_Type.SITE3: 4&gt;, 1),
+ (2.0, 8.0): (&lt;Vertex_Type.BASIC: 0&gt;, 1),
+ (3.0, 0.0): (&lt;Vertex_Type.SITE2: 3&gt;, 1),
+ (3.0, 2.0): (&lt;Vertex_Type.SITE2: 3&gt;, 1),
+ (3.0, 4.0): (&lt;Vertex_Type.SITE1: 2&gt;, 1),
+ (3.0, 6.0): (&lt;Vertex_Type.BASIC: 0&gt;, 1),
+ (3.0, 7.0): (&lt;Vertex_Type.BASIC: 0&gt;, 1),
+ (4.0, 1.0): (&lt;Vertex_Type.BASIC: 0&gt;, 1),
+ (4.0, 6.0): (&lt;Vertex_Type.SITE3: 4&gt;, 1),
+ (5.0, 0.0): (&lt;Vertex_Type.BASIC: 0&gt;, 1),
+ (5.0, 2.0): (&lt;Vertex_Type.BASIC: 0&gt;, 1),
+ (5.0, 6.0): (&lt;Vertex_Type.SITE3: 4&gt;, 1),
+ (5.0, 7.0): (&lt;Vertex_Type.BASIC: 0&gt;, 1),
+ (6.0, 0.0): (&lt;Vertex_Type.BASIC: 0&gt;, 1),
+ (6.0, 2.0): (&lt;Vertex_Type.BASIC: 0&gt;, 1),
+ (7.0, 0.0): (&lt;Vertex_Type.SITE1: 2&gt;, 1),
+ (7.0, 1.0): (&lt;Vertex_Type.BASIC: 0&gt;, 1),
+ (7.0, 3.0): (&lt;Vertex_Type.SITE3: 4&gt;, 1),
+ (7.0, 4.0): (&lt;Vertex_Type.BASIC: 0&gt;, 1)}
+</pre></div>
+</div>
+</div>
+</div>
+<p><span class="xref myst">Back to the Top!</span></p>
+</section>
+</section>
+</section>
+<hr class="docutils" />
+<section id="vertex-type-object">
+<h2><strong>Vertex_Type Object</strong><a class="headerlink" href="#vertex-type-object" title="Permalink to this heading"></a></h2>
+<section id="vertex-type-is-used-to-store-and-define-each-location-type-on-the-graph-these-variables-will-contain-spatial-location-information-as-well-as-reward-amount-and-time-to-extract-sites-1-2-and-3-can-contain-varying-reward-amounts">
+<h3>Vertex_Type is used to store and define each location type on the graph. These variables will contain spatial location information, as well as reward amount and time to extract. SITEs 1,2 and 3 can contain varying reward amounts.<a class="headerlink" href="#vertex-type-is-used-to-store-and-define-each-location-type-on-the-graph-these-variables-will-contain-spatial-location-information-as-well-as-reward-amount-and-time-to-extract-sites-1-2-and-3-can-contain-varying-reward-amounts" title="Permalink to this heading"></a></h3>
+</section>
+<section id="vertex-type-basic-basic-is-a-location-in-space-neither-a-site-nor-the-origin-regular-point-on-the-graph">
+<h3><code class="docutils literal notranslate"><span class="pre">Vertex_Type.BASIC</span></code> - BASIC is a location in space, neither a SITE nor the ORIGIN (regular point on the graph)<a class="headerlink" href="#vertex-type-basic-basic-is-a-location-in-space-neither-a-site-nor-the-origin-regular-point-on-the-graph" title="Permalink to this heading"></a></h3>
+</section>
+<section id="vertex-type-origin-starting-point-for-workers">
+<h3><code class="docutils literal notranslate"><span class="pre">Vertex_Type.ORIGIN</span></code> - starting point for workers<a class="headerlink" href="#vertex-type-origin-starting-point-for-workers" title="Permalink to this heading"></a></h3>
+</section>
+<section id="vertex-type-other">
+<h3><code class="docutils literal notranslate"><span class="pre">Vertex_Type.OTHER</span></code><a class="headerlink" href="#vertex-type-other" title="Permalink to this heading"></a></h3>
+</section>
+<section id="vertex-type-other2">
+<h3><code class="docutils literal notranslate"><span class="pre">Vertex_Type.OTHER2</span></code><a class="headerlink" href="#vertex-type-other2" title="Permalink to this heading"></a></h3>
+</section>
+<section id="vertex-type-site1-point-on-graph-with-reward">
+<h3><code class="docutils literal notranslate"><span class="pre">Vertex_Type.SITE1</span></code> - point on graph with reward<a class="headerlink" href="#vertex-type-site1-point-on-graph-with-reward" title="Permalink to this heading"></a></h3>
+</section>
+<section id="vertex-type-site2-point-on-graph-with-reward">
+<h3><code class="docutils literal notranslate"><span class="pre">Vertex_Type.SITE2</span></code> - point on graph with reward<a class="headerlink" href="#vertex-type-site2-point-on-graph-with-reward" title="Permalink to this heading"></a></h3>
+</section>
+<section id="id3">
+<h3><code class="docutils literal notranslate"><span class="pre">Vertex_Type.SITE2</span></code> - point on graph with reward<a class="headerlink" href="#id3" title="Permalink to this heading"></a></h3>
+<p><span class="xref myst">Back to the Top!</span></p>
+</section>
+</section>
+<hr class="docutils" />
+<section id="vertex-object">
+<h2><strong>Vertex Object</strong><a class="headerlink" href="#vertex-object" title="Permalink to this heading"></a></h2>
+<section id="the-vertex-object-allows-users-to-create-vertices-for-that-graph-by-defining-characteristics-such-as-coordinates-x-y-vertex-type-rewards-available-at-given-site-site-expiration-time-and-time-to-aquire-below-we-create-a-vertex-object-and-assign-attributes">
+<h3>The <code class="docutils literal notranslate"><span class="pre">Vertex</span></code> object allows users to create vertices for that graph by defining characteristics such as coordinates (x,y), Vertex_Type, rewards available at given site, site expiration time, and time to aquire. Below we create a vertex object and assign attributes.<a class="headerlink" href="#the-vertex-object-allows-users-to-create-vertices-for-that-graph-by-defining-characteristics-such-as-coordinates-x-y-vertex-type-rewards-available-at-given-site-site-expiration-time-and-time-to-aquire-below-we-create-a-vertex-object-and-assign-attributes" title="Permalink to this heading"></a></h3>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">verts</span> <span class="o">=</span> <span class="n">lgtool</span><span class="o">.</span><span class="n">Vertex</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span><span class="n">y</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">v_type</span><span class="o">=</span><span class="n">Vertex_Type</span><span class="o">.</span><span class="n">SITE1</span><span class="p">,</span> <span class="n">reward</span><span class="o">=</span><span class="mi">200</span><span class="p">)</span>
+<span class="n">verts</span><span class="o">.</span><span class="n">info</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>[(4, 5), &lt;Vertex_Type.SITE1: 2&gt;]
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="vertex-info">
+<h3><strong>Vertex.info()</strong><a class="headerlink" href="#vertex-info" title="Permalink to this heading"></a></h3>
+<section id="using-info-we-can-view-the-vertex-object-we-just-created-along-with-it-s-defining-characteristics">
+<h4>Using <code class="docutils literal notranslate"><span class="pre">.info()</span></code> we can view the <code class="docutils literal notranslate"><span class="pre">Vertex</span></code> object we just created, along with it’s defining characteristics<a class="headerlink" href="#using-info-we-can-view-the-vertex-object-we-just-created-along-with-it-s-defining-characteristics" title="Permalink to this heading"></a></h4>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">verts</span><span class="o">.</span><span class="n">info</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>[(4, 5), &lt;Vertex_Type.SITE1: 2&gt;]
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="accessible-types">
+<h3><strong>accessible_types()</strong><a class="headerlink" href="#accessible-types" title="Permalink to this heading"></a></h3>
+<section id="we-can-also-use-accessible-types-to-determine-which-vertex-types-are-accessible">
+<h4>We can also use <code class="docutils literal notranslate"><span class="pre">.accessible_types()</span></code> to determine which <code class="docutils literal notranslate"><span class="pre">Vertex_Types</span></code> are accessible<a class="headerlink" href="#we-can-also-use-accessible-types-to-determine-which-vertex-types-are-accessible" title="Permalink to this heading"></a></h4>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">verts</span><span class="o">.</span><span class="n">accessible_types</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>[&lt;Vertex_Type.SITE1: 2&gt;, &lt;Vertex_Type.SITE2: 3&gt;, &lt;Vertex_Type.SITE3: 4&gt;]
+</pre></div>
+</div>
+</div>
+</div>
+<p><span class="xref myst">Back to the Top!</span></p>
+</section>
+</section>
+</section>
+<hr class="docutils" />
+<section id="worker-type-object">
+<h2><strong>Worker_Type Object</strong><a class="headerlink" href="#worker-type-object" title="Permalink to this heading"></a></h2>
+<section id="worker-type-holds-the-variable-information-the-three-types-of-workers-worker1-worker2-and-worker3-each-worker-is-assigned-an-order-and-this-can-be-viewed-by-calling-worker-types-on-the-configuration-ocject-created-in-the-initial-setup">
+<h3><code class="docutils literal notranslate"><span class="pre">Worker_Type</span></code> holds the variable information the three types of workers: WORKER1, WORKER2, and WORKER3. Each worker is assigned an order, and this can be viewed by calling <code class="docutils literal notranslate"><span class="pre">.worker_types</span></code> on the configuration ocject created in the initial setup.<a class="headerlink" href="#worker-type-holds-the-variable-information-the-three-types-of-workers-worker1-worker2-and-worker3-each-worker-is-assigned-an-order-and-this-can-be-viewed-by-calling-worker-types-on-the-configuration-ocject-created-in-the-initial-setup" title="Permalink to this heading"></a></h3>
+</section>
+<section id="in-the-configuration-object-section-above-you-can-see-how-to-get-the-cost-rate-assigned-to-each-worker-for-the-configuration">
+<h3>In the <span class="xref myst">Configuration-Object</span> section above you can see how to get the <span class="xref myst">cost rate</span> assigned to each worker for the configuration.<a class="headerlink" href="#in-the-configuration-object-section-above-you-can-see-how-to-get-the-cost-rate-assigned-to-each-worker-for-the-configuration" title="Permalink to this heading"></a></h3>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">cfg</span><span class="o">.</span><span class="n">worker_types</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>[&lt;Worker_Type.WORKER1: 0&gt;, &lt;Worker_Type.WORKER2: 1&gt;, &lt;Worker_Type.WORKER3: 2&gt;]
+</pre></div>
+</div>
+</div>
+</div>
+<p><span class="xref myst">Back to the Top!</span></p>
+</section>
+</section>
+<hr class="docutils" />
+<section id="worker-object">
+<h2><strong>Worker Object</strong><a class="headerlink" href="#worker-object" title="Permalink to this heading"></a></h2>
+<section id="the-worker-object-contains-the-information-about-worker-type-and-associated-cost-rate">
+<h3>The Worker object contains the information about worker type and associated cost rate.<a class="headerlink" href="#the-worker-object-contains-the-information-about-worker-type-and-associated-cost-rate" title="Permalink to this heading"></a></h3>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># need to come back and figure out how to use this one</span>
+<span class="n">wrker_obj</span> <span class="o">=</span> <span class="n">lgtool</span><span class="o">.</span><span class="n">Worker</span><span class="p">(</span><span class="n">w_type</span><span class="o">=</span><span class="n">Worker_Type</span><span class="o">.</span><span class="n">WORKER2</span><span class="p">,</span> <span class="n">rates</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output traceback highlight-ipythontb notranslate"><div class="highlight"><pre><span></span><span class="gt">---------------------------------------------------------------------------</span>
+<span class="ne">TypeError</span><span class="g g-Whitespace">                                 </span>Traceback (most recent call last)
+<span class="n">Cell</span> <span class="n">In</span><span class="p">[</span><span class="mi">33</span><span class="p">],</span> <span class="n">line</span> <span class="mi">2</span>
+<span class="g g-Whitespace">      </span><span class="mi">1</span> <span class="c1"># need to come back and figure out how to use this one</span>
+<span class="ne">----&gt; </span><span class="mi">2</span> <span class="n">wrker_obj</span> <span class="o">=</span> <span class="n">lgtool</span><span class="o">.</span><span class="n">Worker</span><span class="p">(</span><span class="n">w_type</span><span class="o">=</span><span class="n">Worker_Type</span><span class="o">.</span><span class="n">WORKER2</span><span class="p">,</span> <span class="n">rates</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span>
+
+<span class="nn">File ~/python_projects/lyra-challenge/lyra_graphtool/worker.py:32,</span> in <span class="ni">Worker.__init__</span><span class="nt">(self, w_type, rates)</span>
+<span class="g g-Whitespace">     </span><span class="mi">27</span><span class="w"> </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="g g-Whitespace">     </span><span class="mi">28</span><span class="sd"> ## Object to set and extract worker type and cost</span>
+<span class="g g-Whitespace">     </span><span class="mi">29</span><span class="sd"> &#39;&#39;&#39;</span>
+<span class="g g-Whitespace">     </span><span class="mi">31</span> <span class="bp">self</span><span class="o">.</span><span class="n">worker_type</span> <span class="o">=</span> <span class="n">w_type</span>
+<span class="ne">---&gt; </span><span class="mi">32</span> <span class="bp">self</span><span class="o">.</span><span class="n">worker_cost_rate</span> <span class="o">=</span> <span class="n">rates</span><span class="p">[</span><span class="n">w_type</span><span class="p">]</span> <span class="ow">or</span> <span class="n">WORKER_COST_RATE</span><span class="p">[</span><span class="n">w_type</span><span class="p">]</span>
+
+<span class="ne">TypeError</span>: &#39;int&#39; object is not subscriptable
+</pre></div>
+</div>
+</div>
+</div>
+<p><span class="xref myst">Back to the Top!</span></p>
+<hr class="docutils" />
+</section>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="../tutorial.html" class="btn btn-neutral float-left" title="Tutorial" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, Studio X.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

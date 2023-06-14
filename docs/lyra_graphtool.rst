@@ -1,5 +1,5 @@
-API Documentation
-=======================
+lyra_graphtool
+==============
 
 
 lyra\_graphtool.configuration module

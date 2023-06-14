@@ -1,4 +1,7 @@
 Tutorial
 ========
 
-this will house the tutorial notebook
+.. toctree::
+   :maxdepth: 2
+   
+   examples/00_lyra_graphtool_tutorial

@@ -1,5 +1,5 @@
-lyra_graphtool
-==============
+API Documentation
+=================
 
 .. toctree::
    :maxdepth: 2
