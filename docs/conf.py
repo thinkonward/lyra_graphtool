@@ -11,6 +11,7 @@ import sys
 sys.path.insert(0, os.path.abspath('..'))
 sys.path.insert(0, os.path.abspath('../src'))
 
+
 project = 'Lyra Graphtool'
 copyright = '2023, Studio X'
 author = 'Studio X'
@@ -23,7 +24,8 @@ extensions = [
     'sphinx.ext.autodoc',
     'sphinx.ext.viewcode',
     'sphinx.ext.napoleon',
-    'nbsphinx'
+    'nbsphinx',
+    'myst_nb'
 ]
 
 templates_path = ['_templates']
