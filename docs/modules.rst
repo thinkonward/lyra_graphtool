@@ -2,6 +2,6 @@ API Documentation
 =================
 
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 4
 
    lyra_graphtool
