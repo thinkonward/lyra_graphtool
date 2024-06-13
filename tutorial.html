@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Lyra Graphtool Tutorial &mdash; Lyra Graphtool 0.0.1 documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=fa44fd50" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=19f00094" />
+      <link rel="stylesheet" type="text/css" href="_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="_static/jquery.js?v=5d32c60e"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="_static/documentation_options.js?v=d45e8c67"></script>
+        <script src="_static/doctools.js?v=9a2dae69"></script>
+        <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+        <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Introduction" href="examples/00_lyra_graphtool_tutorial.html" />
+    <link rel="prev" title="lyra_graphtool" href="lyra_graphtool.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            Lyra Graphtool
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="install.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="depend.html">Package Dependencies</a></li>
+<li class="toctree-l1"><a class="reference internal" href="modules.html">API Documentation</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Lyra Graphtool Tutorial</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="examples/00_lyra_graphtool_tutorial.html"><strong>Introduction</strong></a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples/00_lyra_graphtool_tutorial.html#initial-setup"><strong>Initial Setup</strong></a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples/00_lyra_graphtool_tutorial.html#processargs-object"><strong>ProcessArgs Object</strong></a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples/00_lyra_graphtool_tutorial.html#parameters-object"><strong>Parameters Object</strong></a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples/00_lyra_graphtool_tutorial.html#configuration-object"><strong>Configuration Object</strong></a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples/00_lyra_graphtool_tutorial.html#edge-object"><strong>Edge Object</strong></a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples/00_lyra_graphtool_tutorial.html#graph-object"><strong>Graph Object</strong></a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples/00_lyra_graphtool_tutorial.html#vertex-type-object"><strong>Vertex_Type Object</strong></a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples/00_lyra_graphtool_tutorial.html#vertex-object"><strong>Vertex Object</strong></a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples/00_lyra_graphtool_tutorial.html#worker-type-object"><strong>Worker_Type Object</strong></a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples/00_lyra_graphtool_tutorial.html#worker-object"><strong>Worker Object</strong></a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">Lyra Graphtool</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Lyra Graphtool Tutorial</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/tutorial.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="lyra-graphtool-tutorial">
+<h1>Lyra Graphtool Tutorial<a class="headerlink" href="#lyra-graphtool-tutorial" title="Link to this heading"></a></h1>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="examples/00_lyra_graphtool_tutorial.html"><strong>Introduction</strong></a><ul>
+<li class="toctree-l2"><a class="reference internal" href="examples/00_lyra_graphtool_tutorial.html#welcome-to-the-off-the-beaten-path-xeek-challenge">Welcome to the Off the Beaten Path Xeek Challenge!</a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples/00_lyra_graphtool_tutorial.html#this-is-a-fun-and-unique-variation-of-the-traditional-travelling-salesman-problem">This is a fun and unique variation of the traditional travelling salesman problem.</a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples/00_lyra_graphtool_tutorial.html#in-the-traditional-travelling-salesman-problem-the-goal-is-to-optimize-the-route-that-the-salesman-has-to-walk-this-challenge-introduces-additional-constraints-and-additional-degrees-of-freedom-variables-to-the-problem-not-only-will-you-be-considering-the-distance-to-travel-but-additional-factors-like-simulation-duration-budget-amount-of-rewards-extracted-from-a-particular-site-and-the-cost-of-a-worker-the-solution-to-the-challenge-is-not-only-the-plan-but-also-an-algorithm-that-will-be-tested-on-other-problem-setups-different-graphs-to-explore-different-values-of-constraints-therefore-you-have-to-keep-in-mind-that-you-are-developing-a-universal-tool-for-finding-a-solution">In the traditional travelling salesman problem, the goal is to optimize the route that the “salesman” has to walk. This challenge introduces additional constraints and additional degrees of freedom (variables) to the problem. Not only will you be considering the distance to travel, but additional factors like simulation duration, budget, amount of rewards extracted from a particular site, and the cost of a worker. The solution to the challenge is not only the plan, but also an algorithm that will be tested on other problem setups (different graphs to explore, different values of constraints), therefore you have to keep in mind, that you are developing a universal tool for finding a solution.</a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples/00_lyra_graphtool_tutorial.html#the-xeek-team-has-built-a-unique-and-powerful-tool-called-lyra-graphtool-to-help-you-skip-the-graph-setup-part-of-the-challenge-and-get-to-the-important-part-generating-an-algorithm-to-optimize-the-problem-this-notebook-as-well-as-a-random-walk-exmaple-solution-and-api-documentation-will-serve-as-your-documenation-and-learning-resources-for-the-challenge">The Xeek team has built a unique and powerful tool, called <code class="docutils literal notranslate"><span class="pre">lyra_graphtool</span></code>, to help you skip the graph setup part of the challenge and get to the important part; generating an algorithm to optimize the problem! This notebook, as well as a random walk exmaple solution and API Documentation will serve as your documenation and learning resources for the challenge.</a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples/00_lyra_graphtool_tutorial.html#please-use-the-links-below-if-you-would-like-to-jump-to-a-specific-object-in-this-notebook-as-well-as-a-starter-notebook-with-an-example-solution">Please use the links below if you would like to jump to a specific Object in this notebook, as well as a starter notebook with an example solution!</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="examples/00_lyra_graphtool_tutorial.html#initial-setup"><strong>Initial Setup</strong></a><ul>
+<li class="toctree-l2"><a class="reference internal" href="examples/00_lyra_graphtool_tutorial.html#upon-starting-this-challenge-competitors-will-need-to-download-the-required-matrials-from-the-off-the-beaten-path-challenge-page">Upon starting this challenge, competitors will need to download the required matrials from the Off the Beaten Path challenge page.</a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples/00_lyra_graphtool_tutorial.html#the-xeek-team-will-provide">The Xeek team will provide:</a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples/00_lyra_graphtool_tutorial.html#note-ensure-that-the-lyra-graphtool-folder-is-saved-in-your-project-folder-to-avoid-import-issues">Note: Ensure that the <code class="docutils literal notranslate"><span class="pre">lyra_graphtool</span></code> folder is saved in your project folder to avoid import issues</a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples/00_lyra_graphtool_tutorial.html#now-let-s-get-started"><strong>Now let’s get started!</strong></a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples/00_lyra_graphtool_tutorial.html#run-the-next-3-code-cells-in-order-to-setup-graphs-budgets-worker-costs-rewards-and-duration-double-check-to-make-sure-the-file-paths-for-the-lgtool-processargs-load-are-correct">Run the next 3 code cells in order to setup graphs, budgets, worker costs, rewards, and duration. Double check to make sure the file paths for the <code class="docutils literal notranslate"><span class="pre">lgtool.ProcessArgs.load()</span></code> are correct.</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="examples/00_lyra_graphtool_tutorial.html#processargs-object"><strong>ProcessArgs Object</strong></a><ul>
+<li class="toctree-l2"><a class="reference internal" href="examples/00_lyra_graphtool_tutorial.html#the-processargs-object-will-be-used-in-the-intial-setup-of-the-problem-xeek-will-provide-the-setup-parameters-for-the-graph-and-arguments-file-for-the-challenge-challengers-do-however-have-the-tools-to-create-their-own-argument-files-remember-the-final-scoring-will-occur-on-a-different-argument-file-than-what-is-provided-so-it-is-to-your-advantage-to-create-your-own-argument-file-s-and-test-your-algorithm-to-see-if-it-is-effiecient-for-all-scenarios-below-will-explore-the-functionality-of-the-proceesargs-object-by-building-a-test-arguments-graph-file">The ProcessArgs object will be used in the intial setup of the problem. Xeek will provide the setup parameters for the graph and arguments file for the challenge. Challengers do, however, have the tools to create their own argument files. Remember, the final scoring will occur on a different argument file than what is provided, so it is to your advantage to create your own argument file(s) and test your algorithm to see if it is effiecient for all scenarios. Below will explore the functionality of the ProceesArgs object, by building a test arguments/graph file.</a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples/00_lyra_graphtool_tutorial.html#create-a-processargs-object-and-pass-the-new-argument-file-through-it">Create a <code class="docutils literal notranslate"><span class="pre">ProcessArgs</span></code> object and pass the new argument file through it</a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples/00_lyra_graphtool_tutorial.html#processargs-save"><strong>ProcessArgs.save()</strong></a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples/00_lyra_graphtool_tutorial.html#processargs-load"><strong>ProcessArgs.load()</strong></a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples/00_lyra_graphtool_tutorial.html#load-graph"><strong>load_graph()</strong></a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples/00_lyra_graphtool_tutorial.html#processargs-values-to-args"><strong>ProcessArgs.values_to_args()</strong></a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="examples/00_lyra_graphtool_tutorial.html#parameters-object"><strong>Parameters Object</strong></a><ul>
+<li class="toctree-l2"><a class="reference internal" href="examples/00_lyra_graphtool_tutorial.html#the-loaded-arguments-and-graph-can-be-wrapped-with-lgtool-parameters-class-which-can-be-further-passed-to-the-lgtool-configuration-object">The loaded arguments and graph can be wrapped with <code class="docutils literal notranslate"><span class="pre">lgtool.Parameters</span></code> class which can be further passed to the <code class="docutils literal notranslate"><span class="pre">lgtool.Configuration()</span></code> object.</a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples/00_lyra_graphtool_tutorial.html#display"><strong>display()</strong></a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="examples/00_lyra_graphtool_tutorial.html#configuration-object"><strong>Configuration Object</strong></a><ul>
+<li class="toctree-l2"><a class="reference internal" href="examples/00_lyra_graphtool_tutorial.html#the-lgtool-configuration-object-contains-not-only-the-graph-to-be-optimized-but-also-problem-constraints-and-setup-like-budget-duration-and-worker-cost-rates-pass-the-arguments-run-through-the-lgtool-parameters-section-for-set-up-this-module-will-be-the-workhorse-to-solve-the-challenge-because-it-allows-users-to-add-update-and-extract-most-parameters-for-the-challenge">The <code class="docutils literal notranslate"><span class="pre">lgtool.Configuration()</span></code> object contains not only the graph to be optimized, but also problem constraints and setup like budget, duration, and worker cost rates. Pass the arguments run through the <code class="docutils literal notranslate"><span class="pre">lgtool.Parameters()</span></code> section for set up. This module will be the workhorse to solve the challenge because it allows users to add, update, and extract most parameters for the challenge.</a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples/00_lyra_graphtool_tutorial.html#add-sched"><strong>add_sched()</strong></a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples/00_lyra_graphtool_tutorial.html#budget-feasible"><strong>budget_feasible()</strong></a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples/00_lyra_graphtool_tutorial.html#cost"><strong>cost()</strong></a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples/00_lyra_graphtool_tutorial.html#cost-sched"><strong>cost_sched()</strong></a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples/00_lyra_graphtool_tutorial.html#feasible"><strong>feasible()</strong></a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples/00_lyra_graphtool_tutorial.html#get-accessed-sites"><strong>get_accessed_sites()</strong></a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples/00_lyra_graphtool_tutorial.html#get-current-workers"><strong>get_current_workers()</strong></a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples/00_lyra_graphtool_tutorial.html#get-max-revenue"><strong>get_max_revenue()</strong></a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples/00_lyra_graphtool_tutorial.html#get-sched-path-length"><strong>get_sched_path_length()</strong></a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples/00_lyra_graphtool_tutorial.html#get-vertices-start"><strong>get_vertices_start()</strong></a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples/00_lyra_graphtool_tutorial.html#get-worker"><strong>get_worker()</strong></a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples/00_lyra_graphtool_tutorial.html#is-empty"><strong>is_empty()</strong></a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples/00_lyra_graphtool_tutorial.html#load-from-json"><strong>load_from_json()</strong></a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples/00_lyra_graphtool_tutorial.html#revenue"><strong>revenue()</strong></a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples/00_lyra_graphtool_tutorial.html#save"><strong>save()</strong></a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples/00_lyra_graphtool_tutorial.html#save-to-json"><strong>save_to_json()</strong></a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples/00_lyra_graphtool_tutorial.html#sched-all-feasible-access-sites"><strong>sched_all_feasible_access_sites()</strong></a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples/00_lyra_graphtool_tutorial.html#sched-all-feasible-space"><strong>sched_all_feasible_space()</strong></a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples/00_lyra_graphtool_tutorial.html#sched-feasible-access-sites"><strong>sched_feasible_access_sites()</strong></a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples/00_lyra_graphtool_tutorial.html#sched-feasible-space"><strong>sched_feasible_space()</strong></a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples/00_lyra_graphtool_tutorial.html#sched-info"><strong>sched_info()</strong></a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples/00_lyra_graphtool_tutorial.html#sched-revenue"><strong>sched_revenue()</strong></a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples/00_lyra_graphtool_tutorial.html#site-accessed"><strong>site_accessed()</strong></a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples/00_lyra_graphtool_tutorial.html#site-accessed-at-time"><strong>site_accessed_at_time()</strong></a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="examples/00_lyra_graphtool_tutorial.html#edge-object"><strong>Edge Object</strong></a><ul>
+<li class="toctree-l2"><a class="reference internal" href="examples/00_lyra_graphtool_tutorial.html#edge-info"><strong>Edge.info()</strong></a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples/00_lyra_graphtool_tutorial.html#in-graph"><strong>in_graph()</strong></a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples/00_lyra_graphtool_tutorial.html#nearest-neighbor"><strong>nearest_neighbor()</strong></a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="examples/00_lyra_graphtool_tutorial.html#graph-object"><strong>Graph Object</strong></a><ul>
+<li class="toctree-l2"><a class="reference internal" href="examples/00_lyra_graphtool_tutorial.html#add-vertex"><strong>add_vertex()</strong></a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples/00_lyra_graphtool_tutorial.html#adjacent-vertices"><strong>adjacent_vertices()</strong></a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples/00_lyra_graphtool_tutorial.html#closest-vertices"><strong>closest_vertices()</strong></a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples/00_lyra_graphtool_tutorial.html#connected-components"><strong>connected_components()</strong></a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples/00_lyra_graphtool_tutorial.html#depth-first-search"><strong>depth_first_search()</strong></a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples/00_lyra_graphtool_tutorial.html#distance"><strong>distance()</strong></a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples/00_lyra_graphtool_tutorial.html#get-edges-at-vertex"><strong>get_edges_at_vertex()</strong></a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples/00_lyra_graphtool_tutorial.html#edges-info"><strong>edges_info()</strong></a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples/00_lyra_graphtool_tutorial.html#get-vertex-xy"><strong>get_vertex_xy()</strong></a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples/00_lyra_graphtool_tutorial.html#get-vertices-type"><strong>get_vertices_type()</strong></a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples/00_lyra_graphtool_tutorial.html#isolated-vertices"><strong>isolated_vertices()</strong></a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples/00_lyra_graphtool_tutorial.html#id1"><strong>load_from_json()</strong></a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples/00_lyra_graphtool_tutorial.html#make-graph-connected"><strong>make_graph_connected()</strong></a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples/00_lyra_graphtool_tutorial.html#paths"><strong>paths()</strong></a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples/00_lyra_graphtool_tutorial.html#print-graph"><strong>print_graph()</strong></a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples/00_lyra_graphtool_tutorial.html#graph-save"><strong>Graph.save()</strong></a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples/00_lyra_graphtool_tutorial.html#graph-save-to-json"><strong>Graph.save_to_json()</strong></a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples/00_lyra_graphtool_tutorial.html#set-edges"><strong>set_edges()</strong></a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples/00_lyra_graphtool_tutorial.html#set-random-sites-origin"><strong>set_random_sites_origin()</strong></a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples/00_lyra_graphtool_tutorial.html#set-vertex-type"><strong>set_vertex_type()</strong></a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples/00_lyra_graphtool_tutorial.html#set-vertex-coords"><strong>set_vertex_coords()</strong></a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples/00_lyra_graphtool_tutorial.html#vertices-array"><strong>vertices_array()</strong></a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples/00_lyra_graphtool_tutorial.html#vertices-info"><strong>vertices_info()</strong></a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="examples/00_lyra_graphtool_tutorial.html#vertex-type-object"><strong>Vertex_Type Object</strong></a><ul>
+<li class="toctree-l2"><a class="reference internal" href="examples/00_lyra_graphtool_tutorial.html#vertex-type-is-used-to-store-and-define-each-location-type-on-the-graph-these-variables-will-contain-spatial-location-information-as-well-as-reward-amount-and-time-to-extract-sites-1-2-and-3-can-contain-varying-reward-amounts">Vertex_Type is used to store and define each location type on the graph. These variables will contain spatial location information, as well as reward amount and time to extract. SITEs 1,2 and 3 can contain varying reward amounts.</a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples/00_lyra_graphtool_tutorial.html#vertex-type-basic-basic-is-a-location-in-space-neither-a-site-nor-the-origin-regular-point-on-the-graph"><code class="docutils literal notranslate"><span class="pre">Vertex_Type.BASIC</span></code> - BASIC is a location in space, neither a SITE nor the ORIGIN (regular point on the graph)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples/00_lyra_graphtool_tutorial.html#vertex-type-origin-starting-point-for-workers"><code class="docutils literal notranslate"><span class="pre">Vertex_Type.ORIGIN</span></code> - starting point for workers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples/00_lyra_graphtool_tutorial.html#vertex-type-other"><code class="docutils literal notranslate"><span class="pre">Vertex_Type.OTHER</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples/00_lyra_graphtool_tutorial.html#vertex-type-other2"><code class="docutils literal notranslate"><span class="pre">Vertex_Type.OTHER2</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples/00_lyra_graphtool_tutorial.html#vertex-type-site1-point-on-graph-with-reward"><code class="docutils literal notranslate"><span class="pre">Vertex_Type.SITE1</span></code> - point on graph with reward</a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples/00_lyra_graphtool_tutorial.html#vertex-type-site2-point-on-graph-with-reward"><code class="docutils literal notranslate"><span class="pre">Vertex_Type.SITE2</span></code> - point on graph with reward</a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples/00_lyra_graphtool_tutorial.html#id3"><code class="docutils literal notranslate"><span class="pre">Vertex_Type.SITE2</span></code> - point on graph with reward</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="examples/00_lyra_graphtool_tutorial.html#vertex-object"><strong>Vertex Object</strong></a><ul>
+<li class="toctree-l2"><a class="reference internal" href="examples/00_lyra_graphtool_tutorial.html#the-vertex-object-allows-users-to-create-vertices-for-that-graph-by-defining-characteristics-such-as-coordinates-x-y-vertex-type-rewards-available-at-given-site-site-expiration-time-and-time-to-aquire-below-we-create-a-vertex-object-and-assign-attributes">The <code class="docutils literal notranslate"><span class="pre">Vertex</span></code> object allows users to create vertices for that graph by defining characteristics such as coordinates (x,y), Vertex_Type, rewards available at given site, site expiration time, and time to aquire. Below we create a vertex object and assign attributes.</a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples/00_lyra_graphtool_tutorial.html#vertex-info"><strong>Vertex.info()</strong></a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples/00_lyra_graphtool_tutorial.html#accessible-types"><strong>accessible_types()</strong></a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="examples/00_lyra_graphtool_tutorial.html#worker-type-object"><strong>Worker_Type Object</strong></a><ul>
+<li class="toctree-l2"><a class="reference internal" href="examples/00_lyra_graphtool_tutorial.html#worker-type-holds-the-variable-information-the-three-types-of-workers-worker1-worker2-and-worker3-each-worker-is-assigned-an-order-and-this-can-be-viewed-by-calling-worker-types-on-the-configuration-ocject-created-in-the-initial-setup"><code class="docutils literal notranslate"><span class="pre">Worker_Type</span></code> holds the variable information the three types of workers: WORKER1, WORKER2, and WORKER3. Each worker is assigned an order, and this can be viewed by calling <code class="docutils literal notranslate"><span class="pre">.worker_types</span></code> on the configuration ocject created in the initial setup.</a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples/00_lyra_graphtool_tutorial.html#in-the-configuration-object-section-above-you-can-see-how-to-get-the-cost-rate-assigned-to-each-worker-for-the-configuration">In the Configuration-Object section above you can see how to get the cost rate assigned to each worker for the configuration.</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="examples/00_lyra_graphtool_tutorial.html#worker-object"><strong>Worker Object</strong></a><ul>
+<li class="toctree-l2"><a class="reference internal" href="examples/00_lyra_graphtool_tutorial.html#the-worker-object-contains-the-information-about-worker-type-and-associated-cost-rate">The Worker object contains the information about worker type and associated cost rate.</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="lyra_graphtool.html" class="btn btn-neutral float-left" title="lyra_graphtool" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="examples/00_lyra_graphtool_tutorial.html" class="btn btn-neutral float-right" title="Introduction" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, Studio X.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

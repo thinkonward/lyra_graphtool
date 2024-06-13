@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>lyra_graphtool.vertex &mdash; Lyra Graphtool 0.0.1 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=fa44fd50" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=19f00094" />
+      <link rel="stylesheet" type="text/css" href="../../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../_static/documentation_options.js?v=d45e8c67"></script>
+        <script src="../../_static/doctools.js?v=9a2dae69"></script>
+        <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+        <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            Lyra Graphtool
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../install.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../depend.html">Package Dependencies</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../modules.html">API Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../tutorial.html">Lyra Graphtool Tutorial</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">Lyra Graphtool</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">lyra_graphtool.vertex</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for lyra_graphtool.vertex</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">enum</span> <span class="kn">import</span> <span class="n">IntEnum</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">List</span><span class="p">,</span> <span class="n">TypeVar</span><span class="p">,</span> <span class="n">Generic</span>
+
+<span class="kn">import</span> <span class="nn">lyra_graphtool.utils</span> <span class="k">as</span> <span class="nn">utils</span>
+
+<span class="n">Vertex</span> <span class="o">=</span> <span class="n">TypeVar</span><span class="p">(</span><span class="s1">&#39;Vertex&#39;</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="Vertex_Type">
+<a class="viewcode-back" href="../../lyra_graphtool.html#lyra_graphtool.vertex.Vertex_Type">[docs]</a>
+<span class="k">class</span> <span class="nc">Vertex_Type</span><span class="p">(</span><span class="n">IntEnum</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    Used to define type of location.</span>
+<span class="sd">        Note: BASIC is a location in space, neither a SITE nor ORIGIN</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="n">BASIC</span> <span class="o">=</span> <span class="mi">0</span>   <span class="c1"># location in space; neither a site nor origin</span>
+    <span class="n">ORIGIN</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="n">SITE1</span> <span class="o">=</span> <span class="mi">2</span>
+    <span class="n">SITE2</span> <span class="o">=</span> <span class="mi">3</span>
+    <span class="n">SITE3</span> <span class="o">=</span> <span class="mi">4</span>
+    <span class="n">OTHER</span> <span class="o">=</span> <span class="mi">5</span>
+    <span class="n">OTHER2</span> <span class="o">=</span> <span class="mi">6</span></div>
+
+
+
+<span class="c1"># create and return a vertex object</span>
+<div class="viewcode-block" id="Vertex">
+<a class="viewcode-back" href="../../lyra_graphtool.html#lyra_graphtool.vertex.Vertex">[docs]</a>
+<span class="k">class</span> <span class="nc">Vertex</span><span class="p">(</span><span class="n">Generic</span><span class="p">[</span><span class="n">Vertex</span><span class="p">]):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span>
+                 <span class="n">v_type</span><span class="o">=</span><span class="n">Vertex_Type</span><span class="o">.</span><span class="n">BASIC</span><span class="p">,</span>
+                 <span class="n">reward</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>  <span class="c1"># reward given</span>
+                 <span class="n">mult_time</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>  <span class="c1"># multiplied by cost</span>
+                 <span class="n">mult_time_active</span><span class="o">=</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">),</span>  <span class="c1"># mult_time applies t1 &lt;= time &lt;= t2 (t1,t2)</span>
+                 <span class="n">mult_worker</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>  <span class="c1"># multiplied by cost for this type, eg {Worker_Type.WORKER1: 1.5}</span>
+                 <span class="n">expiration_time</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>  <span class="c1"># reward = 0 after this time (in days)</span>
+                 <span class="n">time_to_acquire</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>  <span class="c1"># site must be accessed for this many time steps</span>
+                 <span class="p">):</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Used to create and return a vertex object</span>
+
+<span class="sd">            Arguments:</span>
+
+<span class="sd">                v_type: Vertex_Type.BASIC</span>
+
+<span class="sd">                reward: int, default = 0</span>
+<span class="sd">                    reward given</span>
+
+<span class="sd">                mult_time: int, default = 1</span>
+<span class="sd">                    multiplied by cost</span>
+
+<span class="sd">                mult_time_active: int pair, default = (None, None)</span>
+<span class="sd">                    mult_time applies t1 &lt;= time &lt;= t2 (t1,t2)</span>
+
+<span class="sd">                mult_worker: int, default = None</span>
+<span class="sd">                    multiplied by cost for this type, eg {Worker_Type.WORKER1: 1.5}</span>
+
+<span class="sd">                expiration_time: int, default = None</span>
+<span class="sd">                    reward = 0 after this time (in days)</span>
+
+<span class="sd">                time_to_acquire: int, default = 0</span>
+<span class="sd">                    site must be accessed for this many time steps</span>
+
+<span class="sd">            Return:</span>
+<span class="sd">                None</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">if</span> <span class="n">mult_worker</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">mult_worker</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">x</span> <span class="o">=</span> <span class="n">x</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">y</span> <span class="o">=</span> <span class="n">y</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">vertex_type</span> <span class="o">=</span> <span class="n">v_type</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">reward</span> <span class="o">=</span> <span class="n">reward</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mult_time</span> <span class="o">=</span> <span class="n">mult_time</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mult_time_active</span> <span class="o">=</span> <span class="n">mult_time_active</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mult_worker</span> <span class="o">=</span> <span class="n">mult_worker</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">expiration_time</span> <span class="o">=</span> <span class="n">expiration_time</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">time_to_acquire</span> <span class="o">=</span> <span class="n">time_to_acquire</span>
+
+    <span class="k">def</span> <span class="fm">__eq__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">v</span><span class="p">:</span> <span class="n">Vertex</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+        <span class="n">eq</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">x</span> <span class="o">==</span> <span class="n">v</span><span class="o">.</span><span class="n">x</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">y</span> <span class="o">==</span> <span class="n">v</span><span class="o">.</span><span class="n">y</span>
+        <span class="k">return</span> <span class="n">eq</span>
+
+    <span class="c1"># display info about vertex</span>
+<div class="viewcode-block" id="Vertex.info">
+<a class="viewcode-back" href="../../lyra_graphtool.html#lyra_graphtool.vertex.Vertex.info">[docs]</a>
+    <span class="k">def</span> <span class="nf">info</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Get information about vertex</span>
+
+<span class="sd">            Arguments:</span>
+<span class="sd">                verbose: bool, default=False</span>
+
+<span class="sd">            Return:</span>
+<span class="sd">                list, vertices information list</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="n">x</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">y</span>
+        <span class="n">v_type</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">vertex_type</span>
+        <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;[ (</span><span class="si">{</span><span class="n">x</span><span class="si">}</span><span class="s1">,</span><span class="si">{</span><span class="n">y</span><span class="si">}</span><span class="s1">), </span><span class="si">{</span><span class="n">v_type</span><span class="si">}</span><span class="s1"> ]&#39;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="p">[(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">),</span> <span class="n">v_type</span><span class="p">]</span></div>
+
+
+<div class="viewcode-block" id="Vertex.accessible_types">
+<a class="viewcode-back" href="../../lyra_graphtool.html#lyra_graphtool.vertex.Vertex.accessible_types">[docs]</a>
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">accessible_types</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">:</span>
+        <span class="k">return</span> <span class="p">[</span><span class="n">Vertex_Type</span><span class="o">.</span><span class="n">SITE1</span><span class="p">,</span> <span class="n">Vertex_Type</span><span class="o">.</span><span class="n">SITE2</span><span class="p">,</span> <span class="n">Vertex_Type</span><span class="o">.</span><span class="n">SITE3</span><span class="p">]</span></div>
+</div>
+
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, Studio X.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

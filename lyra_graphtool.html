@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>lyra_graphtool &mdash; Lyra Graphtool 0.0.1 documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=fa44fd50" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=19f00094" />
+      <link rel="stylesheet" type="text/css" href="_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="_static/jquery.js?v=5d32c60e"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="_static/documentation_options.js?v=d45e8c67"></script>
+        <script src="_static/doctools.js?v=9a2dae69"></script>
+        <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+        <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Lyra Graphtool Tutorial" href="tutorial.html" />
+    <link rel="prev" title="API Documentation" href="modules.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            Lyra Graphtool
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="install.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="depend.html">Package Dependencies</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="modules.html">API Documentation</a><ul class="current">
+<li class="toctree-l2 current"><a class="current reference internal" href="#">lyra_graphtool</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#lyra-graphtool-configuration-module">lyra_graphtool.configuration module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#module-lyra_graphtool.edge">lyra_graphtool.edge module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#lyra_graphtool.edge.Edge"><code class="docutils literal notranslate"><span class="pre">Edge</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#lyra-graphtool-graph-module">lyra_graphtool.graph module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#lyra-graphtool-parameters-module">lyra_graphtool.parameters module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#module-lyra_graphtool.utils">lyra_graphtool.utils module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#lyra_graphtool.utils.bostr"><code class="docutils literal notranslate"><span class="pre">bostr()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#lyra_graphtool.utils.checkd3"><code class="docutils literal notranslate"><span class="pre">checkd3()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#lyra_graphtool.utils.checkf"><code class="docutils literal notranslate"><span class="pre">checkf()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#lyra_graphtool.utils.checki"><code class="docutils literal notranslate"><span class="pre">checki()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#lyra_graphtool.utils.checkp2"><code class="docutils literal notranslate"><span class="pre">checkp2()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#lyra_graphtool.utils.comma_separated_float_3"><code class="docutils literal notranslate"><span class="pre">comma_separated_float_3()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#lyra_graphtool.utils.comma_separated_int_2"><code class="docutils literal notranslate"><span class="pre">comma_separated_int_2()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#lyra_graphtool.utils.grstr"><code class="docutils literal notranslate"><span class="pre">grstr()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#lyra_graphtool.utils.nnfloat"><code class="docutils literal notranslate"><span class="pre">nnfloat()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#lyra_graphtool.utils.nnint"><code class="docutils literal notranslate"><span class="pre">nnint()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#lyra_graphtool.utils.ostr"><code class="docutils literal notranslate"><span class="pre">ostr()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#lyra_graphtool.utils.pint"><code class="docutils literal notranslate"><span class="pre">pint()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#lyra_graphtool.utils.sstr"><code class="docutils literal notranslate"><span class="pre">sstr()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#lyra_graphtool.utils.vertices_array"><code class="docutils literal notranslate"><span class="pre">vertices_array()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#module-lyra_graphtool.vertex">lyra_graphtool.vertex module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#lyra_graphtool.vertex.Vertex"><code class="docutils literal notranslate"><span class="pre">Vertex</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#lyra_graphtool.vertex.Vertex_Type"><code class="docutils literal notranslate"><span class="pre">Vertex_Type</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#lyra-graphtool-worker-module">lyra_graphtool.worker module</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="tutorial.html">Lyra Graphtool Tutorial</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">Lyra Graphtool</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="modules.html">API Documentation</a></li>
+      <li class="breadcrumb-item active">lyra_graphtool</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/lyra_graphtool.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="lyra-graphtool">
+<h1>lyra_graphtool<a class="headerlink" href="#lyra-graphtool" title="Link to this heading"></a></h1>
+<section id="lyra-graphtool-configuration-module">
+<h2>lyra_graphtool.configuration module<a class="headerlink" href="#lyra-graphtool-configuration-module" title="Link to this heading"></a></h2>
+</section>
+<section id="module-lyra_graphtool.edge">
+<span id="lyra-graphtool-edge-module"></span><h2>lyra_graphtool.edge module<a class="headerlink" href="#module-lyra_graphtool.edge" title="Link to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="lyra_graphtool.edge.Edge">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">lyra_graphtool.edge.</span></span><span class="sig-name descname"><span class="pre">Edge</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">v1</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#lyra_graphtool.vertex.Vertex" title="lyra_graphtool.vertex.Vertex"><span class="pre">Vertex</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">v2</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#lyra_graphtool.vertex.Vertex" title="lyra_graphtool.vertex.Vertex"><span class="pre">Vertex</span></a></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/lyra_graphtool/edge.html#Edge"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lyra_graphtool.edge.Edge" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Generic</span></code>[<a class="reference internal" href="#lyra_graphtool.edge.Edge" title="lyra_graphtool.edge.Edge"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Edge</span></code></a>]</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="lyra_graphtool.edge.Edge.in_graph">
+<span class="sig-name descname"><span class="pre">in_graph</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="reference internal" href="_modules/lyra_graphtool/edge.html#Edge.in_graph"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lyra_graphtool.edge.Edge.in_graph" title="Link to this definition"></a></dt>
+<dd><p>This determines if edge is allowed to travel in 1 timestep</p>
+<blockquote>
+<div><dl class="simple">
+<dt>Arguments:</dt><dd><p>None</p>
+</dd>
+<dt>Return:</dt><dd><dl class="simple">
+<dt>bool</dt><dd><p>True - edge is allowed for travel in 1 timestep: add to graph
+False - cannot travel across edge in 1 timestep: do not add to graph</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</div></blockquote>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="lyra_graphtool.edge.Edge.info">
+<span class="sig-name descname"><span class="pre">info</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">List</span></span></span><a class="reference internal" href="_modules/lyra_graphtool/edge.html#Edge.info"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lyra_graphtool.edge.Edge.info" title="Link to this definition"></a></dt>
+<dd><p>Displays list of information about the object</p>
+<blockquote>
+<div><dl class="simple">
+<dt>Arguments:</dt><dd><p>verbose : bool, default False</p>
+</dd>
+<dt>Return:</dt><dd><p>list</p>
+</dd>
+</dl>
+</div></blockquote>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="lyra_graphtool.edge.Edge.nearest_neighbor">
+<span class="sig-name descname"><span class="pre">nearest_neighbor</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="reference internal" href="_modules/lyra_graphtool/edge.html#Edge.nearest_neighbor"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lyra_graphtool.edge.Edge.nearest_neighbor" title="Link to this definition"></a></dt>
+<dd><p>Defines “nearest neighbor”</p>
+<blockquote>
+<div><dl class="simple">
+<dt>Arguments:</dt><dd><p>None</p>
+</dd>
+<dt>Return:</dt><dd><dl class="simple">
+<dt>bool</dt><dd><p>True if edge consists of “nearest neighbors”, False otherwise</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</div></blockquote>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="lyra-graphtool-graph-module">
+<h2>lyra_graphtool.graph module<a class="headerlink" href="#lyra-graphtool-graph-module" title="Link to this heading"></a></h2>
+</section>
+<section id="lyra-graphtool-parameters-module">
+<h2>lyra_graphtool.parameters module<a class="headerlink" href="#lyra-graphtool-parameters-module" title="Link to this heading"></a></h2>
+</section>
+<section id="module-lyra_graphtool.utils">
+<span id="lyra-graphtool-utils-module"></span><h2>lyra_graphtool.utils module<a class="headerlink" href="#module-lyra_graphtool.utils" title="Link to this heading"></a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="lyra_graphtool.utils.bostr">
+<span class="sig-prename descclassname"><span class="pre">lyra_graphtool.utils.</span></span><span class="sig-name descname"><span class="pre">bostr</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">arg</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/lyra_graphtool/utils.html#bostr"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lyra_graphtool.utils.bostr" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="lyra_graphtool.utils.checkd3">
+<span class="sig-prename descclassname"><span class="pre">lyra_graphtool.utils.</span></span><span class="sig-name descname"><span class="pre">checkd3</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">type_list</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">arg_list</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">default</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_arg_default</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/lyra_graphtool/utils.html#checkd3"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lyra_graphtool.utils.checkd3" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="lyra_graphtool.utils.checkf">
+<span class="sig-prename descclassname"><span class="pre">lyra_graphtool.utils.</span></span><span class="sig-name descname"><span class="pre">checkf</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">arg</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">default</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">-99.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_arg_default</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/lyra_graphtool/utils.html#checkf"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lyra_graphtool.utils.checkf" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="lyra_graphtool.utils.checki">
+<span class="sig-prename descclassname"><span class="pre">lyra_graphtool.utils.</span></span><span class="sig-name descname"><span class="pre">checki</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">arg</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">default</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">-99</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_arg_default</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/lyra_graphtool/utils.html#checki"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lyra_graphtool.utils.checki" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="lyra_graphtool.utils.checkp2">
+<span class="sig-prename descclassname"><span class="pre">lyra_graphtool.utils.</span></span><span class="sig-name descname"><span class="pre">checkp2</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">arg</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">default</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Tuple</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_arg_default</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/lyra_graphtool/utils.html#checkp2"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lyra_graphtool.utils.checkp2" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="lyra_graphtool.utils.comma_separated_float_3">
+<span class="sig-prename descclassname"><span class="pre">lyra_graphtool.utils.</span></span><span class="sig-name descname"><span class="pre">comma_separated_float_3</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">arg</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/lyra_graphtool/utils.html#comma_separated_float_3"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lyra_graphtool.utils.comma_separated_float_3" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="lyra_graphtool.utils.comma_separated_int_2">
+<span class="sig-prename descclassname"><span class="pre">lyra_graphtool.utils.</span></span><span class="sig-name descname"><span class="pre">comma_separated_int_2</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">arg</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/lyra_graphtool/utils.html#comma_separated_int_2"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lyra_graphtool.utils.comma_separated_int_2" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="lyra_graphtool.utils.grstr">
+<span class="sig-prename descclassname"><span class="pre">lyra_graphtool.utils.</span></span><span class="sig-name descname"><span class="pre">grstr</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">arg</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/lyra_graphtool/utils.html#grstr"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lyra_graphtool.utils.grstr" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="lyra_graphtool.utils.nnfloat">
+<span class="sig-prename descclassname"><span class="pre">lyra_graphtool.utils.</span></span><span class="sig-name descname"><span class="pre">nnfloat</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">arg</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/lyra_graphtool/utils.html#nnfloat"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lyra_graphtool.utils.nnfloat" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="lyra_graphtool.utils.nnint">
+<span class="sig-prename descclassname"><span class="pre">lyra_graphtool.utils.</span></span><span class="sig-name descname"><span class="pre">nnint</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">arg</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/lyra_graphtool/utils.html#nnint"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lyra_graphtool.utils.nnint" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="lyra_graphtool.utils.ostr">
+<span class="sig-prename descclassname"><span class="pre">lyra_graphtool.utils.</span></span><span class="sig-name descname"><span class="pre">ostr</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">arg</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/lyra_graphtool/utils.html#ostr"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lyra_graphtool.utils.ostr" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="lyra_graphtool.utils.pint">
+<span class="sig-prename descclassname"><span class="pre">lyra_graphtool.utils.</span></span><span class="sig-name descname"><span class="pre">pint</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">arg</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/lyra_graphtool/utils.html#pint"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lyra_graphtool.utils.pint" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="lyra_graphtool.utils.sstr">
+<span class="sig-prename descclassname"><span class="pre">lyra_graphtool.utils.</span></span><span class="sig-name descname"><span class="pre">sstr</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">arg</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/lyra_graphtool/utils.html#sstr"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lyra_graphtool.utils.sstr" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="lyra_graphtool.utils.vertices_array">
+<span class="sig-prename descclassname"><span class="pre">lyra_graphtool.utils.</span></span><span class="sig-name descname"><span class="pre">vertices_array</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">vert_list</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">ndarray</span></span></span><a class="reference internal" href="_modules/lyra_graphtool/utils.html#vertices_array"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lyra_graphtool.utils.vertices_array" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</section>
+<section id="module-lyra_graphtool.vertex">
+<span id="lyra-graphtool-vertex-module"></span><h2>lyra_graphtool.vertex module<a class="headerlink" href="#module-lyra_graphtool.vertex" title="Link to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="lyra_graphtool.vertex.Vertex">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">lyra_graphtool.vertex.</span></span><span class="sig-name descname"><span class="pre">Vertex</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">v_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">Vertex_Type.BASIC</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reward</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mult_time</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mult_time_active</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">(None,</span> <span class="pre">None)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mult_worker</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">expiration_time</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">time_to_acquire</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/lyra_graphtool/vertex.html#Vertex"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lyra_graphtool.vertex.Vertex" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Generic</span></code>[<a class="reference internal" href="#lyra_graphtool.vertex.Vertex" title="lyra_graphtool.vertex.Vertex"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Vertex</span></code></a>]</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="lyra_graphtool.vertex.Vertex.accessible_types">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">accessible_types</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">List</span></span></span><a class="reference internal" href="_modules/lyra_graphtool/vertex.html#Vertex.accessible_types"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lyra_graphtool.vertex.Vertex.accessible_types" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="lyra_graphtool.vertex.Vertex.info">
+<span class="sig-name descname"><span class="pre">info</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">List</span></span></span><a class="reference internal" href="_modules/lyra_graphtool/vertex.html#Vertex.info"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lyra_graphtool.vertex.Vertex.info" title="Link to this definition"></a></dt>
+<dd><p>Get information about vertex</p>
+<blockquote>
+<div><dl class="simple">
+<dt>Arguments:</dt><dd><p>verbose: bool, default=False</p>
+</dd>
+<dt>Return:</dt><dd><p>list, vertices information list</p>
+</dd>
+</dl>
+</div></blockquote>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="lyra_graphtool.vertex.Vertex_Type">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">lyra_graphtool.vertex.</span></span><span class="sig-name descname"><span class="pre">Vertex_Type</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">names=&lt;not</span> <span class="pre">given&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">*values</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">module=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">qualname=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">type=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start=1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">boundary=None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/lyra_graphtool/vertex.html#Vertex_Type"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lyra_graphtool.vertex.Vertex_Type" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">IntEnum</span></code></p>
+<dl class="simple">
+<dt>Used to define type of location.</dt><dd><p>Note: BASIC is a location in space, neither a SITE nor ORIGIN</p>
+</dd>
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="lyra_graphtool.vertex.Vertex_Type.BASIC">
+<span class="sig-name descname"><span class="pre">BASIC</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0</span></em><a class="headerlink" href="#lyra_graphtool.vertex.Vertex_Type.BASIC" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="lyra_graphtool.vertex.Vertex_Type.ORIGIN">
+<span class="sig-name descname"><span class="pre">ORIGIN</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">1</span></em><a class="headerlink" href="#lyra_graphtool.vertex.Vertex_Type.ORIGIN" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="lyra_graphtool.vertex.Vertex_Type.OTHER">
+<span class="sig-name descname"><span class="pre">OTHER</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">5</span></em><a class="headerlink" href="#lyra_graphtool.vertex.Vertex_Type.OTHER" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="lyra_graphtool.vertex.Vertex_Type.OTHER2">
+<span class="sig-name descname"><span class="pre">OTHER2</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">6</span></em><a class="headerlink" href="#lyra_graphtool.vertex.Vertex_Type.OTHER2" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="lyra_graphtool.vertex.Vertex_Type.SITE1">
+<span class="sig-name descname"><span class="pre">SITE1</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">2</span></em><a class="headerlink" href="#lyra_graphtool.vertex.Vertex_Type.SITE1" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="lyra_graphtool.vertex.Vertex_Type.SITE2">
+<span class="sig-name descname"><span class="pre">SITE2</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">3</span></em><a class="headerlink" href="#lyra_graphtool.vertex.Vertex_Type.SITE2" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="lyra_graphtool.vertex.Vertex_Type.SITE3">
+<span class="sig-name descname"><span class="pre">SITE3</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">4</span></em><a class="headerlink" href="#lyra_graphtool.vertex.Vertex_Type.SITE3" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="lyra-graphtool-worker-module">
+<h2>lyra_graphtool.worker module<a class="headerlink" href="#lyra-graphtool-worker-module" title="Link to this heading"></a></h2>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="modules.html" class="btn btn-neutral float-left" title="API Documentation" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="tutorial.html" class="btn btn-neutral float-right" title="Lyra Graphtool Tutorial" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, Studio X.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

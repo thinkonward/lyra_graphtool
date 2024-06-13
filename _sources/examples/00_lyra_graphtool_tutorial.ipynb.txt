@@ -1,0 +1,2718 @@
+{
+ "cells": [
+  {
+   "attachments": {},
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "## **Introduction**"
+   ]
+  },
+  {
+   "attachments": {},
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "##### Welcome to the Off the Beaten Path Xeek Challenge!\n",
+    "\n",
+    "##### This is a fun and unique variation of the traditional [travelling salesman](https://en.wikipedia.org/wiki/Travelling_salesman_problem) problem. \n",
+    "\n",
+    "##### In the traditional travelling salesman problem, the goal is to optimize the route that the \"salesman\" has to walk. This challenge introduces additional constraints and additional degrees of freedom (variables) to the problem. Not only will you be considering the distance to travel, but additional factors like simulation duration, budget, amount of rewards extracted from a particular site, and the cost of a worker. The solution to the challenge is not only the plan, but also an algorithm that will be tested on other problem setups (different graphs to explore, different values of constraints), therefore you have to keep in mind, that you are developing a universal tool for finding a solution.\n",
+    "\n",
+    " ##### The Xeek team has built a unique and powerful tool, called `lyra_graphtool`, to help you skip the graph setup part of the challenge and get to the important part; generating an algorithm to optimize the problem! This notebook, as well as a random walk exmaple solution and API Documentation will serve as your documenation and learning resources for the challenge.\n",
+    "\n",
+    "##### Please use the links below if you would like to jump to a specific Object in this notebook, as well as a starter notebook with an example solution!"
+   ]
+  },
+  {
+   "attachments": {},
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "## **Initial Setup**"
+   ]
+  },
+  {
+   "attachments": {},
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "##### Upon starting this challenge, competitors will need to download the required matrials from the [Off the Beaten Path](https://xeek.ai/challenges/off-the-beaten-path) challenge page. \n",
+    "##### The Xeek team will provide:\n",
+    "* An arguments file that will contain information to set up the problem. All participants will recieve the same arguments file. This file will contain information like **total budget**, **site rewards**, and **duration** of the simulation.\n",
+    "* A graph JSON file. All participants will recieve the same `graph.json` file. This will be loaded into the `lyra_graphtool.Graph` object to set up the graph vertices and site information.\n",
+    "* A starter notebook, similar to the [example solution](Lyra-starter-v0.ipynb), but without the example solution. This notebook will be your playground to write an algorithm to solve the Off the Beaten Path Challenge!\n",
+    "##### Note: Ensure that the `lyra_graphtool` folder is saved in your project folder to avoid import issues\n"
+   ]
+  },
+  {
+   "attachments": {},
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "##### **Now let's get started!**\n",
+    "##### Run the next 3 code cells in order to setup graphs, budgets, worker costs, rewards, and duration. Double check to make sure the file paths for the `lgtool.ProcessArgs.load()` are correct."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "import random\n",
+    "from copy import deepcopy\n",
+    "from random import randint\n",
+    "import pprint as pp\n",
+    "\n",
+    "import lyra_graphtool as lgtool\n",
+    "from lyra_graphtool import Configuration, Config_Single_Time, Edge, Graph, Graph_Type, Parameters, Vertex, Worker_Type, Vertex_Type"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "pargs = lgtool.ProcessArgs.load(arguments_file='../lyra-challenge/ready_setups/args_random', graph_file='../lyra-challenge/ready_setups/graph_random.json')"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "params = lgtool.Parameters(pargs.graph, \n",
+    "                           budget = pargs.args_trial.budget, \n",
+    "                           duration_time = pargs.args_trial.duration,\n",
+    "                           cost_rate = pargs.worker_cost_rate\n",
+    "                           )\n",
+    "\n",
+    "cfg = lgtool.Configuration(params)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 8,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "cfg.load_from_json('./solutions/solution_random.json')"
+   ]
+  },
+  {
+   "attachments": {},
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "## **ProcessArgs Object**"
+   ]
+  },
+  {
+   "attachments": {},
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "##### The ProcessArgs object will be used in the intial setup of the problem. Xeek will provide the setup parameters for the graph and arguments file for the challenge. Challengers do, however, have the tools to create their own argument files. Remember, the final scoring will occur on a different argument file than what is provided, so it is to your advantage to create your own argument file(s) and test your algorithm to see if it is effiecient for all scenarios. Below will explore the functionality of the ProceesArgs object, by building a test arguments/graph file."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 53,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "duration = 50 # amount of timesteps in problem\n",
+    "duration = str(int(duration))\n",
+    "arg_list_new = [\n",
+    "    '--trial_name', 'trial1',    # name of trial\n",
+    "    '--budget', '10000',          # budget that will be used by hiring workers of different types\n",
+    "    '--duration', duration,      # amount of timesteps in problem\n",
+    "    '--worker1_cost', '200',     # Worker_Type.WORKER1 cost/timestep which reduces our budget\n",
+    "    '--worker2_cost', '400',     # Worker_Type.WORKER2 cost/timestep which reduces our budget\n",
+    "    '--worker3_cost', '600',     # Worker_Type.WORKER3 cost/timestep which reduces our budget\n",
+    "    ################## BELOW GRAPH ARGUMENTS ####################\n",
+    "    '--filename_graph', '',      # if loading graph, max_x, max_y, num_verts, graph_type, num_site[k] (k=1,2,3) ignored\n",
+    "    '--max_x', '10',             # max x coordinate during random or grid graph creation\n",
+    "    '--max_y', '10',             # max y coordinate during random or grid graph creation\n",
+    "    '--num_verts', '30',         # amount of vertices (travel points) that the graph will have\n",
+    "    '--graph_type', 'grid',    # type of graph, either 'random' or 'grid' the difference between these is shown further in notebook\n",
+    "    '--num_site1', '3',          # amount of Vertex_Type.SITE1 on the graph mind that amount of all sites cannot be greater than 'num_verts-1'\n",
+    "    '--num_site2', '2',          # amount of Vertex_Type.SITE2 on the graph mind that amount of all sites cannot be greater than 'num_verts-1'\n",
+    "    '--num_site3', '5',          # amount of Vertex_Type.SITE3 on the graph mind that amount of all sites cannot be greater than 'num_verts-1'\n",
+    "    '--site1_acquire_time', '2',    # if args starting with 'site' are specified, they are imposed on loaded graph\n",
+    "    '--site2_acquire_time', '4',    # timesteps needed to extract Vertex_Type.SITE2 reward\n",
+    "    '--site3_acquire_time', '6',    # timesteps needed to extract Vertex_Type.SITE3 reward\n",
+    "    '--site1_reward', '100',     # reward from extracting Vertex_Type.SITE1\n",
+    "    '--site2_reward', '200',     # reward from extracting Vertex_Type.SITE2\n",
+    "    '--site3_reward', '300',     # reward from extracting Vertex_Type.SITE3\n",
+    "]"
+   ]
+  },
+  {
+   "attachments": {},
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "##### Create a `ProcessArgs` object and pass the new argument file through it"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 54,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "new_pargs = lgtool.ProcessArgs(arg_list_new)"
+   ]
+  },
+  {
+   "attachments": {},
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "### **ProcessArgs.save()**"
+   ]
+  },
+  {
+   "attachments": {},
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "##### Save the new arguments file for future use"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 55,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "new_pargs.save(f'ready_setups/args_{new_pargs.args_trial.trial_name}')"
+   ]
+  },
+  {
+   "attachments": {},
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "### **ProcessArgs.load()**"
+   ]
+  },
+  {
+   "attachments": {},
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "#### Load the new argument and graph files into ProcessArgs() using load()"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "new_pargs_from_load = lgtool.ProcessArgs.load(arguments_file='../lyra-challenge/ready_setups/args_args_trial1'\n",
+    "                                            ,graph_file='../lyra-challenge/ready_setups/graph_trial1.json')"
+   ]
+  },
+  {
+   "attachments": {},
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "### **load_graph()**"
+   ]
+  },
+  {
+   "attachments": {},
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "##### Loading graph from filename into Site_Structures"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 69,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "# code here, need to figure out how to use this"
+   ]
+  },
+  {
+   "attachments": {},
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "### **ProcessArgs.values_to_args()**"
+   ]
+  },
+  {
+   "attachments": {},
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "#### Finally, return the new arguments into a list and compare to what was created at the top, using values_to_args()"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 68,
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "['--trial_name',\n",
+      " 'trial1',\n",
+      " '--max_x',\n",
+      " '10',\n",
+      " '--max_y',\n",
+      " '10',\n",
+      " '--num_verts',\n",
+      " '30',\n",
+      " '--graph_type',\n",
+      " 'grid',\n",
+      " '--num_site1',\n",
+      " '3',\n",
+      " '--num_site2',\n",
+      " '2',\n",
+      " '--num_site3',\n",
+      " '5',\n",
+      " '--site1_acquire_time',\n",
+      " '2',\n",
+      " '--site2_acquire_time',\n",
+      " '4',\n",
+      " '--site3_acquire_time',\n",
+      " '6',\n",
+      " '--site1_reward',\n",
+      " '100.0',\n",
+      " '--site2_reward',\n",
+      " '200.0',\n",
+      " '--site3_reward',\n",
+      " '300.0',\n",
+      " '--site1_mult_time',\n",
+      " '1',\n",
+      " '--site2_mult_time',\n",
+      " '1',\n",
+      " '--site3_mult_time',\n",
+      " '1',\n",
+      " '--site1_mult_time_active',\n",
+      " '0, 50',\n",
+      " '--site2_mult_time_active',\n",
+      " '0, 50',\n",
+      " '--site3_mult_time_active',\n",
+      " '0, 50',\n",
+      " '--site1_mult_workers',\n",
+      " '1, 1, 1',\n",
+      " '--site2_mult_workers',\n",
+      " '1, 1, 1',\n",
+      " '--site3_mult_workers',\n",
+      " '1, 1, 1',\n",
+      " '--site1_exp_time',\n",
+      " '50',\n",
+      " '--site2_exp_time',\n",
+      " '50',\n",
+      " '--site3_exp_time',\n",
+      " '50',\n",
+      " '--worker1_cost',\n",
+      " '200.0',\n",
+      " '--worker2_cost',\n",
+      " '400.0',\n",
+      " '--worker3_cost',\n",
+      " '600.0',\n",
+      " '--budget',\n",
+      " '10000.0',\n",
+      " '--duration',\n",
+      " '50']\n"
+     ]
+    }
+   ],
+   "source": [
+    "new_pargs_list = new_pargs.values_to_args() \n",
+    "pp.pprint(new_pargs_list)"
+   ]
+  },
+  {
+   "attachments": {},
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "-----------------------"
+   ]
+  },
+  {
+   "attachments": {},
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "## **Parameters Object**"
+   ]
+  },
+  {
+   "attachments": {},
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "##### The loaded arguments and graph can be wrapped with `lgtool.Parameters` class which can be further passed to the `lgtool.Configuration()` object."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 38,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "params = lgtool.Parameters(graph = pargs.graph\n",
+    "                           ,budget = pargs.args_trial.budget\n",
+    "                           ,duration_time = pargs.args_trial.duration\n",
+    "                           ,cost_rate = pargs.worker_cost_rate)"
+   ]
+  },
+  {
+   "attachments": {},
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "### **display()**"
+   ]
+  },
+  {
+   "attachments": {},
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "##### Use the `display()` function to view the check the arguments that were passed through `lgtool.Parameters`"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 42,
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "{'budget': 1000.0, 'duration_time': 20, 'graph': <lyra_graphtool.graph.Graph object at 0x11842faf0>, 'worker_cost_rate': {<Worker_Type.WORKER1: 0>: 100.0, <Worker_Type.WORKER2: 1>: 200.0, <Worker_Type.WORKER3: 2>: 500.0}}\n"
+     ]
+    }
+   ],
+   "source": [
+    "params.display()"
+   ]
+  },
+  {
+   "attachments": {},
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "##### Or call each individual argument passed through `lgtools.Parameters()` object"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 45,
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "1000.0\n",
+      "20\n",
+      "<lyra_graphtool.graph.Graph object at 0x11842faf0>\n",
+      "{<Worker_Type.WORKER1: 0>: 100.0, <Worker_Type.WORKER2: 1>: 200.0, <Worker_Type.WORKER3: 2>: 500.0}\n"
+     ]
+    }
+   ],
+   "source": [
+    "print(params.budget)\n",
+    "print(params.duration_time)\n",
+    "print(params.graph)\n",
+    "print(params.worker_cost_rate)"
+   ]
+  },
+  {
+   "attachments": {},
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "-----------------------"
+   ]
+  },
+  {
+   "attachments": {},
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "## **Configuration Object**"
+   ]
+  },
+  {
+   "attachments": {},
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "##### The `lgtool.Configuration()` object contains not only the graph to be optimized, but also problem constraints and setup like budget, duration, and worker cost rates. Pass the arguments run through the `lgtool.Parameters()` section for set up. This module will be the workhorse to solve the challenge because it allows users to add, update, and extract most parameters for the challenge."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "params = lgtool.Parameters(pargs.graph, \n",
+    "                           budget = pargs.args_trial.budget, \n",
+    "                           duration_time = pargs.args_trial.duration,\n",
+    "                           cost_rate = pargs.worker_cost_rate\n",
+    "                           )\n",
+    "\n",
+    "cfg = lgtool.Configuration(params)"
+   ]
+  },
+  {
+   "attachments": {},
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "### **add_sched()**"
+   ]
+  },
+  {
+   "attachments": {},
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "##### Add a specific schedule for a Worker_Type (wt) and number of those worker (wn). To access the configuration dictionary, call `.config` on the Configuration object created in the intial setup. Users can access this information using this format: `Configuration.config[Worker_Type][worker number]`\n",
+    "\n",
+    "##### In the example below, `.config` is called on the Configuration object. We define that we want a `Worker_Type = WORKER1` and we want 1 of those workers."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 125,
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "{0: <lyra_graphtool.configuration.Config_Single_Time object at 0x11f3a9b40>, 1: <lyra_graphtool.configuration.Config_Single_Time object at 0x11f262d40>, 2: <lyra_graphtool.configuration.Config_Single_Time object at 0x11f262da0>, 3: <lyra_graphtool.configuration.Config_Single_Time object at 0x11f262e00>, 4: <lyra_graphtool.configuration.Config_Single_Time object at 0x11f262e60>, 5: <lyra_graphtool.configuration.Config_Single_Time object at 0x11f262ec0>, 6: <lyra_graphtool.configuration.Config_Single_Time object at 0x11f262f20>, 7: <lyra_graphtool.configuration.Config_Single_Time object at 0x11f262f80>, 8: <lyra_graphtool.configuration.Config_Single_Time object at 0x11f262fe0>, 9: <lyra_graphtool.configuration.Config_Single_Time object at 0x11f263040>, 10: <lyra_graphtool.configuration.Config_Single_Time object at 0x11f2630a0>, 11: <lyra_graphtool.configuration.Config_Single_Time object at 0x11f263100>, 12: <lyra_graphtool.configuration.Config_Single_Time object at 0x11f263160>, 13: <lyra_graphtool.configuration.Config_Single_Time object at 0x11f2631c0>, 14: <lyra_graphtool.configuration.Config_Single_Time object at 0x11f263220>, 15: <lyra_graphtool.configuration.Config_Single_Time object at 0x11f263280>, 16: <lyra_graphtool.configuration.Config_Single_Time object at 0x11f2632e0>, 17: <lyra_graphtool.configuration.Config_Single_Time object at 0x11f263340>, 18: <lyra_graphtool.configuration.Config_Single_Time object at 0x11f2633a0>, 19: <lyra_graphtool.configuration.Config_Single_Time object at 0x11f263400>}\n"
+     ]
+    }
+   ],
+   "source": [
+    "schedule_add = cfg.config[0][1]\n",
+    "print(schedule_add)\n",
+    "cfg.add_sched(wt = Worker_Type.WORKER1, wn=2, sched=schedule_add)"
+   ]
+  },
+  {
+   "attachments": {},
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "### **budget_feasible()**"
+   ]
+  },
+  {
+   "attachments": {},
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "##### Here we test whether the entire solution configuration stays within the budget contraints set in the arguments. This can be called on the `Configuration` object with no input arugments."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 126,
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/plain": [
+       "True"
+      ]
+     },
+     "execution_count": 126,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "cfg.budget_feasible()"
+   ]
+  },
+  {
+   "attachments": {},
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "### **cost()**"
+   ]
+  },
+  {
+   "attachments": {},
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "##### This will return the cost of the entire configuration. Remember, profit will be used to score the solution(`profit = revenue - cost`), so its important to not only increase revenue, but also be mindful of costs.  It can be called on the `Configuration` object with no input arguments."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 127,
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/plain": [
+       "900.0"
+      ]
+     },
+     "execution_count": 127,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "cfg.cost()"
+   ]
+  },
+  {
+   "attachments": {},
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "### **cost_sched()**"
+   ]
+  },
+  {
+   "attachments": {},
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "##### Users can calculate the cost of a single-worker schedule by inputting. "
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 256,
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/plain": [
+       "0"
+      ]
+     },
+     "execution_count": 256,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "schedule = cfg.config\n",
+    "cfg.cost_sched(sched = schedule[0][1],worker=Worker_Type.WORKER1)"
+   ]
+  },
+  {
+   "attachments": {},
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "### **feasible()**"
+   ]
+  },
+  {
+   "attachments": {},
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "##### Method to determine overall feasibility of the configuration in terms of space, buget, and access"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 212,
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/plain": [
+       "True"
+      ]
+     },
+     "execution_count": 212,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "cfg.feasible()"
+   ]
+  },
+  {
+   "attachments": {},
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "### **get_accessed_sites()**"
+   ]
+  },
+  {
+   "attachments": {},
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "##### Method to return the sites that were accessed in a schedule"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 213,
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/plain": [
+       "({(3.0, 0.0): 0,\n",
+       "  (3.0, 2.0): 0,\n",
+       "  (3.0, 4.0): 0,\n",
+       "  (2.0, 5.0): 0,\n",
+       "  (4.0, 6.0): 0,\n",
+       "  (1.0, 2.0): 0,\n",
+       "  (1.0, 3.0): 0,\n",
+       "  (7.0, 0.0): 0,\n",
+       "  (7.0, 3.0): 0,\n",
+       "  (5.0, 6.0): 0},\n",
+       " 'Log of accesses:\\n')"
+      ]
+     },
+     "execution_count": 213,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "schedule = cfg.config\n",
+    "cfg.get_accessed_sites(schedule)"
+   ]
+  },
+  {
+   "attachments": {},
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "### **get_current_workers()**"
+   ]
+  },
+  {
+   "attachments": {},
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "##### Method to return a dictionary of the the workers used in the configuration. This requires the full configuration schedule as an input."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 214,
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/plain": [
+       "{<Worker_Type.WORKER1: 0>: 1,\n",
+       " <Worker_Type.WORKER2: 1>: 0,\n",
+       " <Worker_Type.WORKER3: 2>: 0}"
+      ]
+     },
+     "execution_count": 214,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "cfg.get_current_workers(schedule)"
+   ]
+  },
+  {
+   "attachments": {},
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "### **get_max_revenue()**"
+   ]
+  },
+  {
+   "attachments": {},
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "##### Get the maximum revenue earned for a particular graph configuration"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 165,
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/plain": [
+       "2200.0"
+      ]
+     },
+     "execution_count": 165,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "cfg.get_max_revenue()"
+   ]
+  },
+  {
+   "attachments": {},
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "### **get_sched_path_length()**"
+   ]
+  },
+  {
+   "attachments": {},
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "##### This is used to determine the length of one worker schedule (how many steps was the worker active). It requires a single schedule as an input"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 30,
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/plain": [
+       "0"
+      ]
+     },
+     "execution_count": 30,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "cfg.get_sched_path_length(schedule[0][9])"
+   ]
+  },
+  {
+   "attachments": {},
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "### **get_vertices_start()**"
+   ]
+  },
+  {
+   "attachments": {},
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "##### Returns the list vertices from which a worker's path must start"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 216,
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "[<lyra_graphtool.vertex.Vertex object at 0x11fbee0b0>]\n"
+     ]
+    }
+   ],
+   "source": [
+    "start = cfg.get_vertices_start()\n",
+    "print(start)"
+   ]
+  },
+  {
+   "attachments": {},
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "### **get_worker()**"
+   ]
+  },
+  {
+   "attachments": {},
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "##### Method to return a Worker object. The worker object has rates compliant with the configuration"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 28,
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/plain": [
+       "<lyra_graphtool.worker.Worker at 0x12fcb9e10>"
+      ]
+     },
+     "execution_count": 28,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "cfg.get_worker(Worker_Type.WORKER1)\n"
+   ]
+  },
+  {
+   "attachments": {},
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "### **is_empty()**"
+   ]
+  },
+  {
+   "attachments": {},
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "##### Determine if a single worker schedule is empty"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 235,
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/plain": [
+       "True"
+      ]
+     },
+     "execution_count": 235,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "schedule = cfg.config\n",
+    "cfg.is_empty(schedule[0][1])"
+   ]
+  },
+  {
+   "attachments": {},
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "### **load_from_json()**"
+   ]
+  },
+  {
+   "attachments": {},
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "##### Loading the configuration from a `.json `"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 245,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "cfg.load_from_json(file_name='./solutions/solution_random.json')"
+   ]
+  },
+  {
+   "attachments": {},
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "### **revenue()**"
+   ]
+  },
+  {
+   "attachments": {},
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "##### This is a method to calculate the revenue for the entire schedule configuration"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 247,
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/plain": [
+       "0"
+      ]
+     },
+     "execution_count": 247,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "cfg.revenue()"
+   ]
+  },
+  {
+   "attachments": {},
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "### **save()**"
+   ]
+  },
+  {
+   "attachments": {},
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "##### Save the configuration solution as a pickle file"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 249,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "cfg.save(file_name='./ready_setups/test_config_save')"
+   ]
+  },
+  {
+   "attachments": {},
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "### **save_to_json()**"
+   ]
+  },
+  {
+   "attachments": {},
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "##### Save the configuration solution as a `.json` file"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 250,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "cfg.save_to_json('./ready_setups/test_config_save.json')"
+   ]
+  },
+  {
+   "attachments": {},
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "### **sched_all_feasible_access_sites()**"
+   ]
+  },
+  {
+   "attachments": {},
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "##### This method determines if a schedules's access properties are feasible"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 251,
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/plain": [
+       "True"
+      ]
+     },
+     "execution_count": 251,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "cfg.sched_all_feasible_access_sites()"
+   ]
+  },
+  {
+   "attachments": {},
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "### **sched_all_feasible_space()**"
+   ]
+  },
+  {
+   "attachments": {},
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "##### This is a method to determine if all schedules are spatially feasible"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 253,
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/plain": [
+       "True"
+      ]
+     },
+     "execution_count": 253,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "cfg.sched_all_feasible_space()"
+   ]
+  },
+  {
+   "attachments": {},
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "### **sched_feasible_access_sites()**"
+   ]
+  },
+  {
+   "attachments": {},
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "##### This method determines if a single schedule's access/extract properties are feasible. It requires the input of a single schedule and the Worker_Type class to test."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 255,
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/plain": [
+       "True"
+      ]
+     },
+     "execution_count": 255,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "schedule = cfg.config\n",
+    "cfg.sched_feasible_access_sites(sched= schedule[0][1], worker_type= Worker_Type.WORKER1)"
+   ]
+  },
+  {
+   "attachments": {},
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "### **sched_feasible_space()**"
+   ]
+  },
+  {
+   "attachments": {},
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "##### This tests whether the whole configuration is spatially feasible and requires an input of a single schedule."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 25,
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/plain": [
+       "True"
+      ]
+     },
+     "execution_count": 25,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "schedule = cfg.config\n",
+    "cfg.sched_feasible_space(sched=schedule[0][1])"
+   ]
+  },
+  {
+   "attachments": {},
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "### **sched_info()**"
+   ]
+  },
+  {
+   "attachments": {},
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "##### Prints information about specific workers schedule in the form: `[timestep, (x_coordinate, y_coordinate), Vertex_Type, accessed/not accessed]`"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 232,
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/plain": [
+       "['[t=0, (None,None), vtype=None, acc=False ]',\n",
+       " '[t=1, (None,None), vtype=None, acc=False ]',\n",
+       " '[t=2, (None,None), vtype=None, acc=False ]',\n",
+       " '[t=3, (None,None), vtype=None, acc=False ]',\n",
+       " '[t=4, (None,None), vtype=None, acc=False ]',\n",
+       " '[t=5, (None,None), vtype=None, acc=False ]',\n",
+       " '[t=6, (None,None), vtype=None, acc=False ]',\n",
+       " '[t=7, (None,None), vtype=None, acc=False ]',\n",
+       " '[t=8, (None,None), vtype=None, acc=False ]',\n",
+       " '[t=9, (None,None), vtype=None, acc=False ]',\n",
+       " '[t=10, (None,None), vtype=None, acc=False ]',\n",
+       " '[t=11, (None,None), vtype=None, acc=False ]',\n",
+       " '[t=12, (None,None), vtype=None, acc=False ]',\n",
+       " '[t=13, (None,None), vtype=None, acc=False ]',\n",
+       " '[t=14, (None,None), vtype=None, acc=False ]',\n",
+       " '[t=15, (None,None), vtype=None, acc=False ]',\n",
+       " '[t=16, (None,None), vtype=None, acc=False ]',\n",
+       " '[t=17, (None,None), vtype=None, acc=False ]',\n",
+       " '[t=18, (None,None), vtype=None, acc=False ]',\n",
+       " '[t=19, (None,None), vtype=None, acc=False ]']"
+      ]
+     },
+     "execution_count": 232,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "schedule = cfg.config\n",
+    "cfg.sched_info(schedule[0][2])"
+   ]
+  },
+  {
+   "attachments": {},
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "### **sched_revenue()**"
+   ]
+  },
+  {
+   "attachments": {},
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "##### This method requires a single schedule as an input and returns the revenue of that particular schedule"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 234,
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/plain": [
+       "0"
+      ]
+     },
+     "execution_count": 234,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "cfg.sched_revenue(schedule[0][2])"
+   ]
+  },
+  {
+   "attachments": {},
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "### **site_accessed()**"
+   ]
+  },
+  {
+   "attachments": {},
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "##### This method determines whether or not the site was accessed in the configuration. It reuqired a Vertex object as an input."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 187,
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/plain": [
+       "False"
+      ]
+     },
+     "execution_count": 187,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "v_orig = cfg.graph.get_vertices_type(lgtool.Vertex_Type.ORIGIN)[0]\n",
+    "cfg.site_accessed(v=v_orig)"
+   ]
+  },
+  {
+   "attachments": {},
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "### **site_accessed_at_time()**"
+   ]
+  },
+  {
+   "attachments": {},
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "##### This method requires a Vertex as an input and returns whether of not that site was accessed at a given time. This example uses timestep=5. You can see that this site was not accessed at timestep=5."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 188,
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/plain": [
+       "False"
+      ]
+     },
+     "execution_count": 188,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "v_orig = cfg.graph.get_vertices_type(lgtool.Vertex_Type.SITE1)[0]\n",
+    "cfg.site_accessed_at_time(v=v_orig, t=5)"
+   ]
+  },
+  {
+   "attachments": {},
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "-----------------------"
+   ]
+  },
+  {
+   "attachments": {},
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "## **Edge Object**"
+   ]
+  },
+  {
+   "attachments": {},
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "### **Edge.info()**"
+   ]
+  },
+  {
+   "attachments": {},
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "##### `Edge.info()` returns the edge information about a given Edge object"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 17,
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/plain": [
+       "[(3.0, 0.0), (5.0, 0.0)]"
+      ]
+     },
+     "execution_count": 17,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "verts = pargs.graph.vertices\n",
+    "v1 = verts[0]\n",
+    "v2 = verts[-1]\n",
+    "\n",
+    "edge_obj = lgtool.Edge(v1=v1,v2=v2)\n",
+    "edge_obj.info()"
+   ]
+  },
+  {
+   "attachments": {},
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "### **in_graph()**"
+   ]
+  },
+  {
+   "attachments": {},
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "##### This method determines if the edge is allowed to travel in 1 timestep"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 13,
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/plain": [
+       "False"
+      ]
+     },
+     "execution_count": 13,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "verts = pargs.graph.vertices\n",
+    "v1 = verts[0]\n",
+    "v2 = verts[-1]\n",
+    "\n",
+    "edge_obj = lgtool.Edge(v1=v1,v2=v2)\n",
+    "edge_obj.in_graph()"
+   ]
+  },
+  {
+   "attachments": {},
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "### **nearest_neighbor()**"
+   ]
+  },
+  {
+   "attachments": {},
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "##### This method requires an input of two vertices on the graph and determines if they are near each other."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 16,
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/plain": [
+       "False"
+      ]
+     },
+     "execution_count": 16,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "verts = pargs.graph.vertices\n",
+    "v1 = verts[0]\n",
+    "v2 = verts[-1]\n",
+    "\n",
+    "edge_obj = lgtool.Edge(v1=v1,v2=v2)\n",
+    "edge_obj.nearest_neighbor()"
+   ]
+  },
+  {
+   "attachments": {},
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "-----------------------"
+   ]
+  },
+  {
+   "attachments": {},
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "## **Graph Object**"
+   ]
+  },
+  {
+   "attachments": {},
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "### **add_vertex()**"
+   ]
+  },
+  {
+   "attachments": {},
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "##### `add_vertex()` allows users to manually add a vertex to the graph configuration"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 22,
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "<lyra_graphtool.vertex.Vertex object at 0x1285a21d0>\n",
+      "after translations in x and y, no reduction in components\n",
+      "components:\n",
+      "{(9, 7): (<Vertex_Type.SITE3: 4>, 1)}\n"
+     ]
+    }
+   ],
+   "source": [
+    "verts = lgtool.Vertex(1, 1, Vertex_Type.SITE3, reward=1000)\n",
+    "\n",
+    "print(verts)\n",
+    "cfg.graph.add_vertex(v=verts)"
+   ]
+  },
+  {
+   "attachments": {},
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "### **adjacent_vertices()**"
+   ]
+  },
+  {
+   "attachments": {},
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "##### This method returns which vertices are adjacent to a given vertex"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 39,
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/plain": [
+       "[<lyra_graphtool.vertex.Vertex at 0x10b57b670>,\n",
+       " <lyra_graphtool.vertex.Vertex at 0x10b57b610>,\n",
+       " <lyra_graphtool.vertex.Vertex at 0x10bc1c400>,\n",
+       " <lyra_graphtool.vertex.Vertex at 0x10bc1c520>,\n",
+       " <lyra_graphtool.vertex.Vertex at 0x10bc1c5e0>]"
+      ]
+     },
+     "execution_count": 39,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "cfg.graph.adjacent_vertices(v=verts)"
+   ]
+  },
+  {
+   "attachments": {},
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "### **closest_vertices()**"
+   ]
+  },
+  {
+   "attachments": {},
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "##### `closest_vertices()` returns a list the closet vertices to a given vertex"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 24,
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "[<lyra_graphtool.vertex.Vertex object at 0x11f7efd60>,\n",
+      " <lyra_graphtool.vertex.Vertex object at 0x11f7efdf0>,\n",
+      " <lyra_graphtool.vertex.Vertex object at 0x11f7eea40>,\n",
+      " <lyra_graphtool.vertex.Vertex object at 0x11f7ee950>]\n"
+     ]
+    }
+   ],
+   "source": [
+    "closest_verts_list = cfg.graph.closest_vertices(v=verts)\n",
+    "pp.pprint(closest_verts_list)"
+   ]
+  },
+  {
+   "attachments": {},
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "### **connected_components()**"
+   ]
+  },
+  {
+   "attachments": {},
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "##### `connected_components()` returns a list of vertices that are connected"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 41,
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/plain": [
+       "[[<lyra_graphtool.vertex.Vertex at 0x10b57b670>,\n",
+       "  <lyra_graphtool.vertex.Vertex at 0x10bc1c400>,\n",
+       "  <lyra_graphtool.vertex.Vertex at 0x10bc1c430>,\n",
+       "  <lyra_graphtool.vertex.Vertex at 0x10b57b610>,\n",
+       "  <lyra_graphtool.vertex.Vertex at 0x10bc1c3d0>,\n",
+       "  <lyra_graphtool.vertex.Vertex at 0x10bc1c370>,\n",
+       "  <lyra_graphtool.vertex.Vertex at 0x10bc1c490>,\n",
+       "  <lyra_graphtool.vertex.Vertex at 0x10b57bc40>,\n",
+       "  <lyra_graphtool.vertex.Vertex at 0x10bc1c3a0>,\n",
+       "  <lyra_graphtool.vertex.Vertex at 0x10bc1c460>,\n",
+       "  <lyra_graphtool.vertex.Vertex at 0x10bc1c5b0>,\n",
+       "  <lyra_graphtool.vertex.Vertex at 0x10bc1c610>,\n",
+       "  <lyra_graphtool.vertex.Vertex at 0x10bc1c640>,\n",
+       "  <lyra_graphtool.vertex.Vertex at 0x10bc1c670>,\n",
+       "  <lyra_graphtool.vertex.Vertex at 0x10bc1c550>,\n",
+       "  <lyra_graphtool.vertex.Vertex at 0x10bd45e10>,\n",
+       "  <lyra_graphtool.vertex.Vertex at 0x10bc1c4f0>,\n",
+       "  <lyra_graphtool.vertex.Vertex at 0x10bc1c7f0>,\n",
+       "  <lyra_graphtool.vertex.Vertex at 0x10bc1c820>,\n",
+       "  <lyra_graphtool.vertex.Vertex at 0x10bc1c520>,\n",
+       "  <lyra_graphtool.vertex.Vertex at 0x10bc1c580>,\n",
+       "  <lyra_graphtool.vertex.Vertex at 0x10bc1c4c0>,\n",
+       "  <lyra_graphtool.vertex.Vertex at 0x10bc1c7c0>,\n",
+       "  <lyra_graphtool.vertex.Vertex at 0x10bc1c760>,\n",
+       "  <lyra_graphtool.vertex.Vertex at 0x10bc1c6a0>,\n",
+       "  <lyra_graphtool.vertex.Vertex at 0x10bc1c700>,\n",
+       "  <lyra_graphtool.vertex.Vertex at 0x10bc1c790>,\n",
+       "  <lyra_graphtool.vertex.Vertex at 0x10bc1c850>,\n",
+       "  <lyra_graphtool.vertex.Vertex at 0x10bc1c730>,\n",
+       "  <lyra_graphtool.vertex.Vertex at 0x10bc1c6d0>,\n",
+       "  <lyra_graphtool.vertex.Vertex at 0x10bc1c5e0>]]"
+      ]
+     },
+     "execution_count": 41,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "cfg.graph.connected_components()"
+   ]
+  },
+  {
+   "attachments": {},
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "### **depth_first_search()**"
+   ]
+  },
+  {
+   "attachments": {},
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "##### This is a general, useful tool to consturct spanning trees and other things in graphs. This method will get connected components to a graph. "
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 9,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "# updating"
+   ]
+  },
+  {
+   "attachments": {},
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "### **distance()**"
+   ]
+  },
+  {
+   "attachments": {},
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "##### This method takes two sets of vertices and returns the edge of minimum distance between the two vertices"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 10,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "#updating"
+   ]
+  },
+  {
+   "attachments": {},
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "### **get_edges_at_vertex()**"
+   ]
+  },
+  {
+   "attachments": {},
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "##### The `get_edges_at_vertex()` method will return a list of edges at a given vertex. Here we define our vertex using [get_vertex_xy()](#get_vertex_xy) with coordinates (x=2,y=3)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 18,
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "[<lyra_graphtool.edge.Edge object at 0x11771aa70>,\n",
+      " <lyra_graphtool.edge.Edge object at 0x11771ad10>,\n",
+      " <lyra_graphtool.edge.Edge object at 0x11771ae30>,\n",
+      " <lyra_graphtool.edge.Edge object at 0x11771aef0>]\n"
+     ]
+    }
+   ],
+   "source": [
+    "verts = cfg.graph.get_vertex_xy(x=2,y=3)\n",
+    "vert_edges = cfg.graph.get_edges_at_vertex(v=verts)\n",
+    "pp.pprint(vert_edges)"
+   ]
+  },
+  {
+   "attachments": {},
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "### **edges_info()**"
+   ]
+  },
+  {
+   "attachments": {},
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "##### This method will return the edges for the entire graph"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 22,
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "{((0.0, 7.0), (0.0, 6.0)): 1,\n",
+      " ((0.0, 8.0), (0.0, 7.0)): 1,\n",
+      " ((1.0, 2.0), (1.0, 3.0)): 1,\n",
+      " ((1.0, 5.0), (0.0, 6.0)): 1,\n",
+      " ((1.0, 7.0), (0.0, 6.0)): 1,\n",
+      " ((1.0, 7.0), (0.0, 7.0)): 1,\n",
+      " ((1.0, 7.0), (0.0, 8.0)): 1,\n",
+      " ((2.0, 0.0), (1.0, 0.0)): 1,\n",
+      " ((2.0, 0.0), (2.0, 1.0)): 1,\n",
+      " ((2.0, 1.0), (1.0, 0.0)): 1,\n",
+      " ((2.0, 1.0), (1.0, 2.0)): 1,\n",
+      " ((2.0, 3.0), (1.0, 2.0)): 1,\n",
+      " ((2.0, 3.0), (1.0, 3.0)): 1,\n",
+      " ((2.0, 5.0), (1.0, 5.0)): 1,\n",
+      " ((2.0, 8.0), (1.0, 7.0)): 1,\n",
+      " ((3.0, 0.0), (2.0, 0.0)): 1,\n",
+      " ((3.0, 0.0), (2.0, 1.0)): 1,\n",
+      " ((3.0, 0.0), (4.0, 1.0)): 1,\n",
+      " ((3.0, 2.0), (2.0, 1.0)): 1,\n",
+      " ((3.0, 2.0), (2.0, 3.0)): 1,\n",
+      " ((3.0, 2.0), (4.0, 1.0)): 1,\n",
+      " ((3.0, 4.0), (2.0, 3.0)): 1,\n",
+      " ((3.0, 4.0), (2.0, 5.0)): 1,\n",
+      " ((3.0, 6.0), (2.0, 5.0)): 1,\n",
+      " ((3.0, 6.0), (3.0, 7.0)): 1,\n",
+      " ((3.0, 6.0), (4.0, 6.0)): 1,\n",
+      " ((3.0, 7.0), (2.0, 8.0)): 1,\n",
+      " ((3.0, 7.0), (4.0, 6.0)): 1,\n",
+      " ((4.0, 1.0), (5.0, 0.0)): 1,\n",
+      " ((4.0, 1.0), (5.0, 2.0)): 1,\n",
+      " ((4.0, 6.0), (5.0, 6.0)): 1,\n",
+      " ((4.0, 6.0), (5.0, 7.0)): 1,\n",
+      " ((5.0, 6.0), (5.0, 7.0)): 1,\n",
+      " ((6.0, 0.0), (5.0, 0.0)): 1,\n",
+      " ((6.0, 2.0), (5.0, 2.0)): 1,\n",
+      " ((7.0, 0.0), (6.0, 0.0)): 1,\n",
+      " ((7.0, 1.0), (6.0, 0.0)): 1,\n",
+      " ((7.0, 1.0), (6.0, 2.0)): 1,\n",
+      " ((7.0, 1.0), (7.0, 0.0)): 1,\n",
+      " ((7.0, 3.0), (6.0, 2.0)): 1,\n",
+      " ((7.0, 4.0), (7.0, 3.0)): 1}\n"
+     ]
+    }
+   ],
+   "source": [
+    "edge_list = cfg.graph.edges_info()\n",
+    "pp.pprint(edge_list)"
+   ]
+  },
+  {
+   "attachments": {},
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "### **get_vertex_xy()**"
+   ]
+  },
+  {
+   "attachments": {},
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "##### This method returns the vertex object at given (x,y) coordinates"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 16,
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "[(3.0, 4.0), <Vertex_Type.SITE1: 2>]\n"
+     ]
+    }
+   ],
+   "source": [
+    "specified_verts = cfg.graph.get_vertex_xy(x=3,y=4)\n",
+    "print(specified_verts.info())"
+   ]
+  },
+  {
+   "attachments": {},
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "### **get_vertices_type()**"
+   ]
+  },
+  {
+   "attachments": {},
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "##### We can use this method to extract vertices of a specific Vertex_Type"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 46,
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "[<lyra_graphtool.vertex.Vertex object at 0x10bc1c370>,\n",
+      " <lyra_graphtool.vertex.Vertex object at 0x10bc1c580>,\n",
+      " <lyra_graphtool.vertex.Vertex object at 0x10bc1c700>]\n"
+     ]
+    }
+   ],
+   "source": [
+    "site1_vert_list = cfg.graph.get_vertices_type(v_type=Vertex_Type.SITE1)\n",
+    "pp.pprint(site1_vert_list)"
+   ]
+  },
+  {
+   "attachments": {},
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "### **isolated_vertices()**\n"
+   ]
+  },
+  {
+   "attachments": {},
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "##### Using `isolated_vertices()`, users can determine if any of the vertices in the graph are isolated from other vertices in the graph configuration."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 12,
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "[<lyra_graphtool.vertex.Vertex object at 0x11f7ee800>]\n"
+     ]
+    }
+   ],
+   "source": [
+    "isolated_verts_list = cfg.graph.isolated_vertices()\n",
+    "pp.pprint(isolated_verts_list)"
+   ]
+  },
+  {
+   "attachments": {},
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "### **load_from_json()**\n"
+   ]
+  },
+  {
+   "attachments": {},
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "##### Load `.json` graph files into the Configuration object"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 24,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "cfg.graph.load_from_json(file_name='./ready_setups/graph_sample.json')"
+   ]
+  },
+  {
+   "attachments": {},
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "### **make_graph_connected()**\n"
+   ]
+  },
+  {
+   "attachments": {},
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "##### Using the output from depth_first_search(), users can bring together the connected components into a single component. Without this, we would have multiple origins, which would significantly increase the complexity."
+   ]
+  },
+  {
+   "attachments": {},
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "### **paths()**\n"
+   ]
+  },
+  {
+   "attachments": {},
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "##### Another import method for the challenge is `paths()`, When provided with two vertices, this method will return ever possible path that can connect the two points."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "# get two verts and then get paths between them\n",
+    "verts = pargs.graph.vertices\n",
+    "\n",
+    "# pick first and last vertex in the list\n",
+    "v1 = verts[0]\n",
+    "v2 = verts[-1]\n",
+    "\n",
+    "print(v1.info(),v2.info())\n",
+    "print('\\n')\n",
+    "paths12 = pargs.graph.paths(v1,v2)\n",
+    "\n",
+    "print('\\n')\n",
+    "for p in paths12:\n",
+    "    path = []\n",
+    "    for v in p:\n",
+    "        path.append((v.x,v.y))\n",
+    "        \n",
+    "    display(path)\n",
+    "    # print_graph() method when provided with a list of vertices, highlights them in orange\n",
+    "    pargs.graph.print_graph(p)"
+   ]
+  },
+  {
+   "attachments": {},
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "### **print_graph()**\n"
+   ]
+  },
+  {
+   "attachments": {},
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "##### The `print_graph()` method will be one of the most important used during the challenge, because it will allow you to visualize your the solution that your algorithm has created."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 12,
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "image/png": "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",
+      "text/plain": [
+       "<Figure size 640x480 with 1 Axes>"
+      ]
+     },
+     "metadata": {},
+     "output_type": "display_data"
+    }
+   ],
+   "source": [
+    "pargs.graph.print_graph()"
+   ]
+  },
+  {
+   "attachments": {},
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "### **Graph.save()**\n"
+   ]
+  },
+  {
+   "attachments": {},
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "##### Save the graph to a pickle file for future use"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 11,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "pargs.graph.save(file_name= './ready_setups/test_graph_save')"
+   ]
+  },
+  {
+   "attachments": {},
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "### **Graph.save_to_json()**\n"
+   ]
+  },
+  {
+   "attachments": {},
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "##### Save the new graph to a `.json` file for later use"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 70,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "new_pargs.graph.save_to_json(f'ready_setups/graph_{new_pargs.args_trial.trial_name}.json')"
+   ]
+  },
+  {
+   "attachments": {},
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "### **set_edges()**\n"
+   ]
+  },
+  {
+   "attachments": {},
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "##### unclear what this does?"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 9,
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/plain": [
+       "[<lyra_graphtool.edge.Edge at 0x11771a950>,\n",
+       " <lyra_graphtool.edge.Edge at 0x11771a9b0>,\n",
+       " <lyra_graphtool.edge.Edge at 0x11771aa10>,\n",
+       " <lyra_graphtool.edge.Edge at 0x11771aa70>,\n",
+       " <lyra_graphtool.edge.Edge at 0x11771ab30>,\n",
+       " <lyra_graphtool.edge.Edge at 0x11771aad0>,\n",
+       " <lyra_graphtool.edge.Edge at 0x11771abf0>,\n",
+       " <lyra_graphtool.edge.Edge at 0x11771ab90>,\n",
+       " <lyra_graphtool.edge.Edge at 0x11771acb0>,\n",
+       " <lyra_graphtool.edge.Edge at 0x11771ad10>,\n",
+       " <lyra_graphtool.edge.Edge at 0x11771ad70>,\n",
+       " <lyra_graphtool.edge.Edge at 0x11771ac50>,\n",
+       " <lyra_graphtool.edge.Edge at 0x11771add0>,\n",
+       " <lyra_graphtool.edge.Edge at 0x11771ae30>,\n",
+       " <lyra_graphtool.edge.Edge at 0x11771aef0>,\n",
+       " <lyra_graphtool.edge.Edge at 0x11771ae90>,\n",
+       " <lyra_graphtool.edge.Edge at 0x11771af50>,\n",
+       " <lyra_graphtool.edge.Edge at 0x11771b010>,\n",
+       " <lyra_graphtool.edge.Edge at 0x11771b070>,\n",
+       " <lyra_graphtool.edge.Edge at 0x11771afb0>,\n",
+       " <lyra_graphtool.edge.Edge at 0x11771b130>,\n",
+       " <lyra_graphtool.edge.Edge at 0x11771b0d0>,\n",
+       " <lyra_graphtool.edge.Edge at 0x11771b190>,\n",
+       " <lyra_graphtool.edge.Edge at 0x11771b250>,\n",
+       " <lyra_graphtool.edge.Edge at 0x11771b1f0>,\n",
+       " <lyra_graphtool.edge.Edge at 0x11771b310>,\n",
+       " <lyra_graphtool.edge.Edge at 0x11771b2b0>,\n",
+       " <lyra_graphtool.edge.Edge at 0x11771b3d0>,\n",
+       " <lyra_graphtool.edge.Edge at 0x11771b370>,\n",
+       " <lyra_graphtool.edge.Edge at 0x11771b430>,\n",
+       " <lyra_graphtool.edge.Edge at 0x11771b490>,\n",
+       " <lyra_graphtool.edge.Edge at 0x11771b4f0>,\n",
+       " <lyra_graphtool.edge.Edge at 0x11771b550>,\n",
+       " <lyra_graphtool.edge.Edge at 0x11771b610>,\n",
+       " <lyra_graphtool.edge.Edge at 0x11771b5b0>,\n",
+       " <lyra_graphtool.edge.Edge at 0x11771b6d0>,\n",
+       " <lyra_graphtool.edge.Edge at 0x11771b730>,\n",
+       " <lyra_graphtool.edge.Edge at 0x11771b670>,\n",
+       " <lyra_graphtool.edge.Edge at 0x11771b7f0>,\n",
+       " <lyra_graphtool.edge.Edge at 0x11771b790>,\n",
+       " <lyra_graphtool.edge.Edge at 0x117833a00>]"
+      ]
+     },
+     "execution_count": 9,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "cfg.graph.set_edges()"
+   ]
+  },
+  {
+   "attachments": {},
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "### **set_random_sites_origin()**"
+   ]
+  },
+  {
+   "attachments": {},
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "##### unclear what this does?"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 6,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "cfg.graph.set_random_sites_origin(n_site1=3,n_site2=4,n_site3=5)"
+   ]
+  },
+  {
+   "attachments": {},
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "### **set_vertex_type()**"
+   ]
+  },
+  {
+   "attachments": {},
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "##### We can use the `set_vertex_type()` method to manually set a particular Vertex object, by defining the `Vertex_Type` and (x,y) coordinates"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 28,
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "[(5.0, 6.0), <Vertex_Type.SITE2: 3>]\n"
+     ]
+    }
+   ],
+   "source": [
+    "set_verts = cfg.graph.set_vertex_type(v_type= Vertex_Type.SITE2, x=5, y=6)\n",
+    "print(set_verts.info())"
+   ]
+  },
+  {
+   "attachments": {},
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "### **set_vertex_coords()**"
+   ]
+  },
+  {
+   "attachments": {},
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "##### Similar to `set_vertex_type()`, `set_vertex_coords()` will set a defined Vertex_Type to specificed (x,y) coordinates"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 5,
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "Coordinates of Input Vertex:[(1, 2), <Vertex_Type.BASIC: 0>]\n",
+      "Coordinates of New Vertex:[(9, 7), <Vertex_Type.SITE3: 4>]\n"
+     ]
+    }
+   ],
+   "source": [
+    "input_vertex = lgtool.Vertex(x=1,y=2,v_type=Vertex_Type.BASIC)\n",
+    "print(f'Coordinates of Input Vertex:{input_vertex.info()}')\n",
+    "new_vertex = cfg.graph.set_vertex_coords(v=input_vertex, x=9,y=7)\n",
+    "print(f'Coordinates of New Vertex:{new_vertex.info()}')"
+   ]
+  },
+  {
+   "attachments": {},
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "### **vertices_array()**"
+   ]
+  },
+  {
+   "attachments": {},
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "##### We can use the `vertices_array()` method to extract a Numpy array of vertices in the graph"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 50,
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "[[3. 0.]\n",
+      " [3. 2.]\n",
+      " [3. 6.]\n",
+      " [3. 4.]\n",
+      " [3. 7.]\n",
+      " [2. 3.]\n",
+      " [2. 0.]\n",
+      " [2. 1.]\n",
+      " [2. 8.]\n",
+      " [2. 5.]\n",
+      " [4. 1.]\n",
+      " [4. 6.]\n",
+      " [1. 2.]\n",
+      " [1. 5.]\n",
+      " [1. 3.]\n",
+      " [1. 7.]\n",
+      " [1. 0.]\n",
+      " [0. 8.]\n",
+      " [0. 7.]\n",
+      " [0. 6.]\n",
+      " [7. 1.]\n",
+      " [7. 4.]\n",
+      " [7. 0.]\n",
+      " [7. 3.]\n",
+      " [6. 2.]\n",
+      " [6. 0.]\n",
+      " [5. 2.]\n",
+      " [5. 6.]\n",
+      " [5. 7.]\n",
+      " [5. 0.]\n",
+      " [0. 9.]\n",
+      " [2. 1.]\n",
+      " [2. 1.]]\n"
+     ]
+    }
+   ],
+   "source": [
+    "vert_array = cfg.graph.vertices_array()\n",
+    "print(vert_array)"
+   ]
+  },
+  {
+   "attachments": {},
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "### **vertices_info()**"
+   ]
+  },
+  {
+   "attachments": {},
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "##### By calling `.vertices_info()` the user can either define a list of vertices to recieve info about. Here we will use the [get_vertices_type()](#get_vertices_type) method to extract a list of SITE3 Vertex_Types and use the list to get vertices information."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 53,
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "{(0.0, 9.0): (<Vertex_Type.SITE3: 4>, 1),\n",
+      " (1.0, 2.0): (<Vertex_Type.SITE3: 4>, 1),\n",
+      " (2.0, 1.0): (<Vertex_Type.SITE3: 4>, 2),\n",
+      " (2.0, 5.0): (<Vertex_Type.SITE3: 4>, 1),\n",
+      " (4.0, 6.0): (<Vertex_Type.SITE3: 4>, 1),\n",
+      " (5.0, 6.0): (<Vertex_Type.SITE3: 4>, 1),\n",
+      " (7.0, 3.0): (<Vertex_Type.SITE3: 4>, 1)}\n"
+     ]
+    }
+   ],
+   "source": [
+    "defined_verts_list = cfg.graph.vertices_info(vert_list=cfg.graph.get_vertices_type(v_type=Vertex_Type.SITE3))\n",
+    "pp.pprint(defined_verts_list)"
+   ]
+  },
+  {
+   "attachments": {},
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "##### We can also provide no vertices list and recieve all vertices in the graph"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 52,
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "{(0.0, 6.0): (<Vertex_Type.BASIC: 0>, 1),\n",
+      " (0.0, 7.0): (<Vertex_Type.ORIGIN: 1>, 1),\n",
+      " (0.0, 8.0): (<Vertex_Type.BASIC: 0>, 1),\n",
+      " (0.0, 9.0): (<Vertex_Type.SITE3: 4>, 1),\n",
+      " (1.0, 0.0): (<Vertex_Type.BASIC: 0>, 1),\n",
+      " (1.0, 2.0): (<Vertex_Type.SITE3: 4>, 1),\n",
+      " (1.0, 3.0): (<Vertex_Type.SITE1: 2>, 1),\n",
+      " (1.0, 5.0): (<Vertex_Type.BASIC: 0>, 1),\n",
+      " (1.0, 7.0): (<Vertex_Type.BASIC: 0>, 1),\n",
+      " (2.0, 0.0): (<Vertex_Type.BASIC: 0>, 1),\n",
+      " (2.0, 1.0): (<Vertex_Type.SITE3: 4>, 3),\n",
+      " (2.0, 3.0): (<Vertex_Type.BASIC: 0>, 1),\n",
+      " (2.0, 5.0): (<Vertex_Type.SITE3: 4>, 1),\n",
+      " (2.0, 8.0): (<Vertex_Type.BASIC: 0>, 1),\n",
+      " (3.0, 0.0): (<Vertex_Type.SITE2: 3>, 1),\n",
+      " (3.0, 2.0): (<Vertex_Type.SITE2: 3>, 1),\n",
+      " (3.0, 4.0): (<Vertex_Type.SITE1: 2>, 1),\n",
+      " (3.0, 6.0): (<Vertex_Type.BASIC: 0>, 1),\n",
+      " (3.0, 7.0): (<Vertex_Type.BASIC: 0>, 1),\n",
+      " (4.0, 1.0): (<Vertex_Type.BASIC: 0>, 1),\n",
+      " (4.0, 6.0): (<Vertex_Type.SITE3: 4>, 1),\n",
+      " (5.0, 0.0): (<Vertex_Type.BASIC: 0>, 1),\n",
+      " (5.0, 2.0): (<Vertex_Type.BASIC: 0>, 1),\n",
+      " (5.0, 6.0): (<Vertex_Type.SITE3: 4>, 1),\n",
+      " (5.0, 7.0): (<Vertex_Type.BASIC: 0>, 1),\n",
+      " (6.0, 0.0): (<Vertex_Type.BASIC: 0>, 1),\n",
+      " (6.0, 2.0): (<Vertex_Type.BASIC: 0>, 1),\n",
+      " (7.0, 0.0): (<Vertex_Type.SITE1: 2>, 1),\n",
+      " (7.0, 1.0): (<Vertex_Type.BASIC: 0>, 1),\n",
+      " (7.0, 3.0): (<Vertex_Type.SITE3: 4>, 1),\n",
+      " (7.0, 4.0): (<Vertex_Type.BASIC: 0>, 1)}\n"
+     ]
+    }
+   ],
+   "source": [
+    "all_verts_list = cfg.graph.vertices_info()\n",
+    "pp.pprint(all_verts_list)"
+   ]
+  },
+  {
+   "attachments": {},
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "-----------------------"
+   ]
+  },
+  {
+   "attachments": {},
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "## **Vertex_Type Object**"
+   ]
+  },
+  {
+   "attachments": {},
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "##### Vertex_Type is used to store and define each location type on the graph. These variables will contain spatial location information, as well as reward amount and time to extract. SITEs 1,2 and 3 can contain varying reward amounts.\n",
+    "\n",
+    "##### `Vertex_Type.BASIC` - BASIC is a location in space, neither a SITE nor the ORIGIN (regular point on the graph)\n",
+    "##### `Vertex_Type.ORIGIN` - starting point for workers\n",
+    "##### `Vertex_Type.OTHER`\n",
+    "##### `Vertex_Type.OTHER2`\n",
+    "##### `Vertex_Type.SITE1` - point on graph with reward\n",
+    "##### `Vertex_Type.SITE2` - point on graph with reward\n",
+    "##### `Vertex_Type.SITE2` - point on graph with reward"
+   ]
+  },
+  {
+   "attachments": {},
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "-----------------------"
+   ]
+  },
+  {
+   "attachments": {},
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "## **Vertex Object**"
+   ]
+  },
+  {
+   "attachments": {},
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "##### The `Vertex` object allows users to create vertices for that graph by defining characteristics such as coordinates (x,y), Vertex_Type, rewards available at given site, site expiration time, and time to aquire. Below we create a vertex object and assign attributes. "
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 33,
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/plain": [
+       "[(4, 5), <Vertex_Type.SITE1: 2>]"
+      ]
+     },
+     "execution_count": 33,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "verts = lgtool.Vertex(x=4,y=5, v_type=Vertex_Type.SITE1, reward=200)\n",
+    "verts.info()"
+   ]
+  },
+  {
+   "attachments": {},
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "### **Vertex.info()**"
+   ]
+  },
+  {
+   "attachments": {},
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "##### Using `.info()` we can view the `Vertex` object we just created, along with it's defining characteristics"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 36,
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/plain": [
+       "[(4, 5), <Vertex_Type.SITE1: 2>]"
+      ]
+     },
+     "execution_count": 36,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "verts.info()"
+   ]
+  },
+  {
+   "attachments": {},
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "### **accessible_types()**"
+   ]
+  },
+  {
+   "attachments": {},
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "##### We can also use `.accessible_types()` to determine which `Vertex_Types` are accessible"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 37,
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/plain": [
+       "[<Vertex_Type.SITE1: 2>, <Vertex_Type.SITE2: 3>, <Vertex_Type.SITE3: 4>]"
+      ]
+     },
+     "execution_count": 37,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "verts.accessible_types()"
+   ]
+  },
+  {
+   "attachments": {},
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "-----------------------"
+   ]
+  },
+  {
+   "attachments": {},
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "## **Worker_Type Object**"
+   ]
+  },
+  {
+   "attachments": {},
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "##### `Worker_Type` holds the variable information the three types of workers: WORKER1, WORKER2, and WORKER3. Each worker is assigned an order, and this can be viewed by calling `.worker_types` on the configuration ocject created in the initial setup.\n",
+    "\n",
+    "##### In the [Configuration-Object](#configuration-object) section above you can see how to get the [cost rate](#cost_rate) assigned to each worker for the configuration."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 86,
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/plain": [
+       "[<Worker_Type.WORKER1: 0>, <Worker_Type.WORKER2: 1>, <Worker_Type.WORKER3: 2>]"
+      ]
+     },
+     "execution_count": 86,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "cfg.worker_types"
+   ]
+  },
+  {
+   "attachments": {},
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "-----------------------"
+   ]
+  },
+  {
+   "attachments": {},
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "## **Worker Object**"
+   ]
+  },
+  {
+   "attachments": {},
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "##### The Worker object contains the information about worker type and associated cost rate."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "# output still in progress\n",
+    "wrker_obj = lgtool.Worker(w_type=Worker_Type.WORKER2, rates=5)"
+   ]
+  },
+  {
+   "attachments": {},
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "-----------------------"
+   ]
+  }
+ ],
+ "metadata": {
+  "kernelspec": {
+   "display_name": "base",
+   "language": "python",
+   "name": "python3"
+  },
+  "language_info": {
+   "codemirror_mode": {
+    "name": "ipython",
+    "version": 3
+   },
+   "file_extension": ".py",
+   "mimetype": "text/x-python",
+   "name": "python",
+   "nbconvert_exporter": "python",
+   "pygments_lexer": "ipython3",
+   "version": "3.10.9"
+  },
+  "orig_nbformat": 4
+ },
+ "nbformat": 4,
+ "nbformat_minor": 2
+}
