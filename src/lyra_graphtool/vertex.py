@@ -22,7 +22,6 @@ class Vertex_Type(IntEnum):
 
 # create and return a vertex object
 class Vertex(Generic[Vertex]):
-
     def __init__(self, x, y,
                  v_type=Vertex_Type.BASIC,
                  reward=0,  # reward given

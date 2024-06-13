@@ -1,6 +1,5 @@
 import json
 import pickle
-import warnings
 from copy import deepcopy
 from enum import IntEnum
 from random import choices, sample, shuffle
@@ -10,7 +9,6 @@ import matplotlib.pyplot as plt
 import numpy as np
 import math
 
-import lyra_graphtool.utils as utils
 from lyra_graphtool.edge import Edge
 from lyra_graphtool.utils import vertices_array
 from lyra_graphtool.worker import Worker_Type
@@ -27,39 +25,38 @@ class Graph_Type(IntEnum):
 # graph object
 class Graph(Generic[Graph]):
 
-    def __init__(self, num_vertices, max_x, max_y, site_structures,
+    def __init__(self, num_vertices, max_x, max_y,
                  gr_type=Graph_Type.RANDOM, int_pairs=True):
-        
         '''
-        Graph object set up graph and vertices for process
+                Graph object set up graph and vertices for process
 
-            Arguments:
+                    Arguments:
 
-                num_vertices:
+                        num_vertices:
 
-                max_x:
+                        max_x:
 
-                max_y:
+                        max_y:
 
-                site_structures:
+                        site_structures:
 
-                gr_type: Graph_Type.RANDOM, loaded from Graph_Type(class)
+                        gr_type: Graph_Type.RANDOM, loaded from Graph_Type(class)
 
-                int_pairs: bool, default=True
+                        int_pairs: bool, default=True
 
-            Return:
+                    Return:
 
-                None
+                        None
         '''
-
         self.vertices = []
         self.edges = []
         self.graph_type = gr_type
-        self.generate_integer_pairs = int_pairs  # locations (x,y) integer pairs?
-        self.site_structures = site_structures
+        # locations (x,y) integer pairs?
+        self.generate_integer_pairs = int_pairs
 
         if num_vertices > max_x * max_y:
-            raise ValueError(f'Number of vertices ({num_vertices}) must be < max_x * max_y ({max_x}*{max_y})')
+            raise ValueError(
+                f'Number of vertices ({num_vertices}) must be < max_x * max_y ({max_x}*{max_y})')
 
         if gr_type == Graph_Type.RANDOM:
 
@@ -86,7 +83,8 @@ class Graph(Generic[Graph]):
             # if one could not generate integer pairs, use sample approach
             #
             if not unique_flag:
-                sample_space = [[i, j] for i in range(max_x) for j in range(max_y)]
+                sample_space = [[i, j]
+                                for i in range(max_x) for j in range(max_y)]
                 shuffle(sample_space)
                 x_rand = [sample_space[i][0] for i in range(num_vertices)]
                 y_rand = [sample_space[i][1] for i in range(num_vertices)]
@@ -187,7 +185,8 @@ class Graph(Generic[Graph]):
         # make sure type is legitimate
         if v_type not in Vertex_Type:
             types = list(Vertex_Type.__members__)
-            raise ValueError(f'vertex type {v_type} is not in vertex_type.{types}')
+            raise ValueError(
+                f'vertex type {v_type} is not in vertex_type.{types}')
 
         # get vertices of given type
         verts = []
@@ -270,49 +269,6 @@ class Graph(Generic[Graph]):
                 return self.vertices[i]
 
         return None
-    
-    # set vertex on graph
-    def add_vertex(self, v: Vertex):
-        
-        # check if vertex not in graph already
-        for graph_v in self.vertices:
-            if graph_v.x == v.x and graph_v.y == v.y:
-                raise ValueError("Vertex already in the graph")
-        
-        # set other parameters for vertex
-        v.time_to_acquire = self.site_structures.site_acquire_times[v.vertex_type]
-        v.reward = self.site_structures.site_rewards[v.vertex_type]
-        v.mult_time = self.site_structures.site_mult_time[v.vertex_type]
-        v.mult_time_active = self.site_structures.site_mult_time_active[v.vertex_type]
-        v.mult_worker = self.site_structures.site_mult_worker[v.vertex_type]
-        v.expiration_time = self.site_structures.site_expiration_times[v.vertex_type]
-        self.vertices.append(v)
-        self.make_graph_connected()
-        self.set_edges()
-    
-    # remove vertex from graph
-    def remove_vertex(self, x: float, y: float):
-        for i, v in enumerate(self.vertices):
-            if v.x == x and v.y == y:
-                self.vertices.pop(i)
-        self.set_edges()
-                
-    def _set_site_structures(self):
-        for v in self.vertices:
-            vt = v.vertex_type
-            if vt in v.accessible_types():
-                if self.site_structures.site_acquire_times[vt] != utils.NotSpecI:
-                    v.time_to_acquire = self.site_structures.site_acquire_times[vt]
-                if self.site_structures.site_rewards[vt] != utils.NotSpecF:
-                    v.reward = self.site_structures.site_rewards[vt]
-                if self.site_structures.site_mult_time[vt] != utils.NotSpecF:
-                    v.mult_time = self.site_structures.site_mult_time[vt]
-                if self.site_structures.site_mult_time_active[vt] != utils.NotSpecI:
-                    v.mult_time_active = self.site_structures.site_mult_time_active[vt]
-                if self.site_structures.site_mult_worker[vt] != utils.NotSpecF:
-                    v.mult_worker = self.site_structures.site_mult_worker[vt]
-                if self.site_structures.site_expiration_times[vt] != utils.NotSpecI:
-                    v.expiration_time = self.site_structures.site_expiration_times[vt]
 
     # closest vertices to specified vertex
     def closest_vertices(self, v: Vertex) -> List:
@@ -417,7 +373,8 @@ class Graph(Generic[Graph]):
                              f'+ num site 3 ({n_site3})+ 1'
                              )
 
-        index_verts = sample(range(0, num_v), num_sites + 1)  # sites and origin
+        index_verts = sample(range(0, num_v), num_sites +
+                             1)  # sites and origin
 
         # set sites
         for i in index_verts[:n_site1]:
@@ -429,7 +386,6 @@ class Graph(Generic[Graph]):
 
         # set last to origin
         self.vertices[index_verts[-1]].vertex_type = Vertex_Type.ORIGIN
-        self._set_site_structures()
 
     # return edge of minimum distance between two sets of vertices
     # this is the minimum distance of points (v1,v2) v1 in set1, v2 in set2
@@ -529,7 +485,8 @@ class Graph(Generic[Graph]):
                     # which is a translation by (vax + sx - v0x)
                     x_new = c.x + sx
                     y_new = c.y
-                    self.set_vertex_coords(v=c, x=x_new, y=y_new)  # change graph vert
+                    self.set_vertex_coords(
+                        v=c, x=x_new, y=y_new)  # change graph vert
                     c0_translate_x[i].x, c0_translate_x[i].y = x_new, y_new
 
                 self.set_edges()  # update edges since vertices were changed
@@ -679,11 +636,13 @@ class Graph(Generic[Graph]):
                 if vnext == v2:
                     paths_next = [[v2]]
                 else:
-                    paths_next = self.paths(vnext, v2, max_len, visited_next)  # get path vnext to end v2
+                    # get path vnext to end v2
+                    paths_next = self.paths(vnext, v2, max_len, visited_next)
 
                 for p in paths_next:
                     if len(p) > 0:
-                        paths_return.append([v1] + p)  # path from start v1 to end v2
+                        # path from start v1 to end v2
+                        paths_return.append([v1] + p)
 
             return paths_return
 
@@ -702,7 +661,8 @@ class Graph(Generic[Graph]):
                 if k != 'x' and k != 'y':
                     val = getattr(v, k)
                     # print(f'v={(v.x,v.y)}  {k}={k}, type k={type(k)}, val={val}, typev={type(val)}')
-                    graph_json['vertices'][str(v.x)][str(v.y)][k] = getattr(v, k)
+                    graph_json['vertices'][str(v.x)][str(
+                        v.y)][k] = getattr(v, k)
 
         graph_json['edges'] = []
         for e in self.edges:
@@ -788,15 +748,14 @@ class Graph(Generic[Graph]):
                     v2 = v
 
             if v1 is None:
-                raise RuntimeError(f'{(x1, y1)} in json file edges, but not in json file vertices')
+                raise RuntimeError(
+                    f'{(x1, y1)} in json file edges, but not in json file vertices')
             if v2 is None:
-                raise RuntimeError(f'{(x2, y2)} in json file edges, but not in json file vertices')
+                raise RuntimeError(
+                    f'{(x2, y2)} in json file edges, but not in json file vertices')
 
             e = Edge(v1, v2)
             edges.append(e)
 
         self.vertices = vertices  # no errors, set up verts & edges
         self.edges = edges
-
-
-

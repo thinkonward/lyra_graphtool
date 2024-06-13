@@ -29,7 +29,11 @@ class Worker(Generic[Worker]):
         '''
 
         self.worker_type = w_type
-        self.worker_cost_rate = rates[w_type] or WORKER_COST_RATE[w_type]
+
+        if rates is None:
+            self.worker_cost_rate = WORKER_COST_RATE[w_type]
+        else:
+            self.worker_cost_rate = rates[w_type]
 
     # worker == site ?
     def __eq__(self, obj) -> bool:

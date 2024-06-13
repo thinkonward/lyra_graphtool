@@ -75,6 +75,7 @@ class Configuration(Generic[Configuration]):
                 None
 
         '''
+
         self.parameters = params
         self.budget = params.budget
         self.duration_time = params.duration_time
@@ -88,8 +89,24 @@ class Configuration(Generic[Configuration]):
         self.worker_types = worker_types
 
         max_workers = {}  # indexed by Worker_Type
+
+        sites = []
         for wt in worker_types:
-            max_workers[wt] = int(np.floor(budget / self.worker_cost_rate[wt]))
+            if self.worker_cost_rate[wt] > 0:
+                max_workers[wt] = int(
+                    np.floor(budget / self.worker_cost_rate[wt]))
+            else:
+                if len(sites) == 0:
+                    for vt in self.graph.vertices[0].accessible_types():
+                        sites_vt = self.graph.get_vertices_type(vt)
+                        sites += sites_vt
+
+                w = self.get_worker(wt)
+                max_workers_wt = 0
+                for s in sites:
+                    if s <= w:
+                        max_workers_wt += 1
+                max_workers[wt] = max(max_workers_wt, 1)
 
         self.max_workers = max_workers
 
@@ -168,7 +185,8 @@ class Configuration(Generic[Configuration]):
         if len(sched) == self.duration_time:
             self.config[wt][wn] = deepcopy(sched)
         else:
-            raise ValueError(f'Schedule must have length {self.duration_time}.')
+            raise ValueError(
+                f'Schedule must have length {self.duration_time}.')
 
     # display info on given schedule
     @staticmethod
@@ -187,7 +205,8 @@ class Configuration(Generic[Configuration]):
         info = []
         for t in range(len(sched)):
             i = sched[t].info()  # [ (x,y), vtype, access ]
-            info.append(f'[t={t}, ({i[0][0]},{i[0][1]}), vtype={i[1]}, acc={i[2]} ]')
+            info.append(
+                f'[t={t}, ({i[0][0]},{i[0][1]}), vtype={i[1]}, acc={i[2]} ]')
         return info
 
     # Method to return Worker object, that has rates compliant with configuration
@@ -218,7 +237,8 @@ class Configuration(Generic[Configuration]):
         for wt in self.worker_types:
             used_workers[wt] = 0
             for wn, sched in config[wt].items():
-                not_na = [1 if cs.v is not None else 0 for _, cs in sched.items()]
+                not_na = [1 if cs.v is not None else 0 for _,
+                          cs in sched.items()]
                 if np.sum(not_na) > 0:
                     used_workers[wt] += 1
         return used_workers
@@ -226,7 +246,7 @@ class Configuration(Generic[Configuration]):
     # Method to return sites accessed in schedule
     # Return: dict with key (x,y) , value access_count: int
     # Note: access_count = 1 means the site v appeared v.time_to_acquire adjacent times in a schedule
-    def get_accessed_sites(self, schedule: Dict) -> Tuple[Dict, str]:
+    def get_accessed_sites(self, config: Dict) -> Tuple[Dict, str]:
         '''
         Method to return sites accessed in a schedule
         
@@ -240,13 +260,14 @@ class Configuration(Generic[Configuration]):
 
                 value access_count: int
         '''
+
         accesses = {(vertex.x, vertex.y): 0 for vertex in self.graph.vertices
                     if vertex.vertex_type in self.graph.vertices[0].accessible_types()
                     }
         worker_message = "Log of accesses:\n"
 
         for wt in self.worker_types:
-            for wn, sched in schedule[wt].items():
+            for wn, sched in config[wt].items():
                 t = 0
                 while t < len(sched):
                     curr_sched = sched[t]
@@ -323,6 +344,7 @@ class Configuration(Generic[Configuration]):
                 bool 
                     True if site v is being accessed in configuration, False otherwise
         '''
+
         for wt in self.worker_types:
             for wn in range(len(self.config[wt])):
                 for t in range(len(self.config[wt][wn])):
@@ -401,8 +423,10 @@ class Configuration(Generic[Configuration]):
                 bool
                     True if schedule is spatially feasible, false if otherwise
         '''
+
         if len(sched) != self.duration_time:
-            raise ValueError(f'Schedule must have {self.duration_time} keys to match duration_time.')
+            raise ValueError(
+                f'Schedule must have {self.duration_time} keys to match duration_time.')
 
         if sched[0].v is not None and origin_flag:  # must start at origin if specified
             if sched[0].v.vertex_type != Vertex_Type.ORIGIN:
@@ -434,7 +458,8 @@ class Configuration(Generic[Configuration]):
                     v_prev = sched[t].v
                     continue
 
-                else:  # different location: vertex follows vertex (both not None)
+                # different location: vertex follows vertex (both not None)
+                else:
 
                     # must be an edge in graph
                     e = Edge(v_prev, sched[t].v)
@@ -515,7 +540,7 @@ class Configuration(Generic[Configuration]):
                     t += 1
                     continue
 
-            if v.vertex_type == Vertex_Type.BASIC or v.vertex_type ==  Vertex_Type.ORIGIN:
+            if v.vertex_type == Vertex_Type.BASIC or v.vertex_type == Vertex_Type.ORIGIN:
                 if acc is True:
                     return False
                 else:
@@ -883,7 +908,8 @@ class Configuration(Generic[Configuration]):
                                         raise ValueError(
                                             f'Vertex in json file {file_name} with coords {(x, y)} not found in graph.')
 
-                                    config[wt][wn][t] = Config_Single_Time(v, access)
+                                    config[wt][wn][t] = Config_Single_Time(
+                                        v, access)
 
         self.config = config  # no errors, copy config
 
@@ -896,5 +922,5 @@ class Configuration(Generic[Configuration]):
     #        Node: deepcopy of original configuration
     #
     def __deepcopy__(self, memo):
-        return pickle.loads(pickle.dumps(self, -1))  # -1 uses most recent protocol
-
+        # -1 uses most recent protocol
+        return pickle.loads(pickle.dumps(self, -1))

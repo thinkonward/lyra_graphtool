@@ -3,7 +3,7 @@ import itertools
 import json
 import os
 import pickle
-from argparse import ArgumentParser, ArgumentError
+from argparse import ArgumentParser
 from copy import deepcopy
 from typing import Generic, List, TypeVar
 
@@ -30,30 +30,33 @@ class Parameters(Generic[Parameters]):
 
 # noinspection DuplicatedCode,SpellCheckingInspection
 class ProcessArgs:
+    """
+    Set up args and graph. Get graph from this class object after instantiating.
+    """
 
     def __init__(self, args_list: List = None, verbose=False):
         # noinspection PyUnresolvedReferences
         """
-        Set up args and graph. Get graph from this class object after instantiating.
+                set up args
+                Arguments:
+                    args_list - list of form
 
-            Arguments:
-                args_list - list of form
+                                    ['--budget', '1000', '--duration', '20', ...]
 
-                    Example: ['--budget', '1000', '--duration', '20', ...]
+                                args followed by values.
+                                If args_list = '', default values will be used.
 
-                    Args followed by values in a list.
-                    If args_list = '', default values will be used.
+                        Note: If args_list contains a value for 'filename_graph',
+                                the graph will be loaded (pickle file).
+                                specified args will OVERRIDE graph parameters.
+                              If there is no value for 'filename_graph', a graph will be created
+                              using arg parameters.
 
-                    Note: If args_list contains a value for 'filename_graph',
-                    the graph will be loaded (pickle file). Specified args will OVERRIDE graph parameters.
-                    If there is no value for 'filename_graph', a graph will be created
-                    using arg parameters.
+                        verbose: bool, default = False
 
-                verbose: bool, default = False
-
-            Return:
-                None
-        """
+                Returns:
+                    None
+                """
 
         # set these below
         self.args = None
@@ -61,6 +64,7 @@ class ProcessArgs:
         self.graph = None
         self.site_structures = None
         self.worker_cost_rate = None
+
         self.keys_gen = [
             'trial_name', 'filename_graph',
             # graph geometric properties
@@ -81,10 +85,11 @@ class ProcessArgs:
             'site1_exp_time', 'site2_exp_time', 'site3_exp_time'
         ]
 
-        parser = ArgumentParser(description='Args for Lyra', exit_on_error=False)
+        parser = ArgumentParser(description='Args for Lyra')
 
         # trial name
-        parser.add_argument('--trial_name', type=str, required=False, default="Lyra_trial", help='name of trial')
+        parser.add_argument('--trial_name', type=str, required=False,
+                            default="Lyra_trial", help='name of trial')
 
         # graph
         parser.add_argument('--filename_graph', type=str, required=False, default="",
@@ -128,13 +133,13 @@ class ProcessArgs:
 
         parser.add_argument('--site1_mult_time_active', type=utils.comma_separated_int_2, required=False,
                             default=utils.NotSpecI, help='time multiplier is active between these times for all '
-                                                            'site-type 1 (if only one arg t, active time >= t)')
+                            'site-type 1 (if only one arg t, active time >= t)')
         parser.add_argument('--site2_mult_time_active', type=utils.comma_separated_int_2, required=False,
                             default=utils.NotSpecI, help='time multiplier is active between these times for all '
-                                                            'site-type 2 (if only one arg t, active time >= t)')
+                            'site-type 2 (if only one arg t, active time >= t)')
         parser.add_argument('--site3_mult_time_active', type=utils.comma_separated_int_2, required=False,
                             default=utils.NotSpecI, help='time multiplier is active between these times for all '
-                                                            'site-type 3 (if only one arg t, active time >= t)')
+                            'site-type 3 (if only one arg t, active time >= t)')
 
         parser.add_argument('--site1_mult_workers', type=utils.comma_separated_float_3, required=False,
                             default=utils.NotSpecF,
@@ -168,11 +173,7 @@ class ProcessArgs:
                             help='duration - number of time steps (eg days) in simulation')
 
         if args_list is None:
-            if parser.prog == 'ipykernel_launcher.py':
-                self.args = parser.parse_args('')
-            else:
-                self.args = parser.parse_args()
-            
+            self.args = parser.parse_args()
         else:
             self.args = parser.parse_args(args_list)
 
@@ -219,13 +220,16 @@ class ProcessArgs:
 
             # set up structures for parameters - site_structures will have arg defaults here
             # if args are unspecified, a loaded graph can override below
-            self.site_structures = Site_Structures(self.args, use_arg_defaults=True)
+            self.site_structures = Site_Structures(
+                self.args, use_arg_defaults=True)
 
             # set args from graph vars
             #
             # default dict for site access times in class Parameter - graph vars set in Configuration instantiation
             try:
-                graph = Graph(self.args.num_verts, self.args.max_x, self.args.max_y, self.site_structures)
+                graph_type = Graph_Type.RANDOM
+                graph = Graph(self.args.num_verts, self.args.max_x,
+                              self.args.max_y, graph_type)
                 graph.load_from_json(filename_graph)
             except Exception as msg_e:
                 msg = f'Could not load graph file "{filename_graph}" from current directory {os.getcwd()}: {msg_e}.'
@@ -240,9 +244,11 @@ class ProcessArgs:
                 vt_list = graph.get_vertices_type(vt)
                 if len(vt_list) > 0:
                     if verbose:
-                        print(f'in graph, vertex type {vt} acq time = {vt_list[0].time_to_acquire}', flush=True)
+                        print(
+                            f'in graph, vertex type {vt} acq time = {vt_list[0].time_to_acquire}', flush=True)
                         if self.site_structures.site_acquire_times[vt] != utils.NotSpecI:
-                            print(f'   ...overriding graph value with command-line arg value of acquire times')
+                            print(
+                                f'   ...overriding graph value with command-line arg value of acquire times')
                 else:
                     if verbose:
                         print(f'no vertices found in graph of type {vt}')
@@ -251,9 +257,11 @@ class ProcessArgs:
                 vt_list = graph.get_vertices_type(vt)
                 if len(vt_list) > 0:
                     if verbose:
-                        print(f'in graph, vertex type {vt} reward = {vt_list[0].reward}', flush=True)
+                        print(
+                            f'in graph, vertex type {vt} reward = {vt_list[0].reward}', flush=True)
                         if self.site_structures.site_rewards[vt] != utils.NotSpecF:
-                            print(f'   ...overriding graph value with command-line arg value of rewards')
+                            print(
+                                f'   ...overriding graph value with command-line arg value of rewards')
                 else:
                     if verbose:
                         print(f'no vertices found in graph of type {vt}')
@@ -262,9 +270,11 @@ class ProcessArgs:
                 vt_list = graph.get_vertices_type(vt)
                 if len(vt_list) > 0:
                     if verbose:
-                        print(f'in graph, vertex type {vt} multiplier time = {vt_list[0].mult_time}', flush=True)
+                        print(
+                            f'in graph, vertex type {vt} multiplier time = {vt_list[0].mult_time}', flush=True)
                         if self.site_structures.site_mult_time[vt] != utils.NotSpecF:
-                            print(f'   ...overriding graph value with command-line arg value of time multiplier')
+                            print(
+                                f'   ...overriding graph value with command-line arg value of time multiplier')
                 else:
                     if verbose:
                         print(f'no vertices found in graph of type {vt}')
@@ -274,9 +284,11 @@ class ProcessArgs:
                 vt_list = graph.get_vertices_type(vt)
                 if len(vt_list) > 0:
                     if verbose:
-                        print(f'in graph, vertex type {vt} multiplier time active = {vt_list[0].mult_time}', flush=True)
+                        print(
+                            f'in graph, vertex type {vt} multiplier time active = {vt_list[0].mult_time}', flush=True)
                         if self.site_structures.site_mult_time_active[vt] != utils.NotSpecI:
-                            print(f'   ...overriding graph value with command-line arg value of time multiplier active')
+                            print(
+                                f'   ...overriding graph value with command-line arg value of time multiplier active')
                 else:
                     if verbose:
                         print(f'no vertices found in graph of type {vt}')
@@ -285,9 +297,11 @@ class ProcessArgs:
                 vt_list = graph.get_vertices_type(vt)
                 if len(vt_list) > 0:
                     if verbose:
-                        print(f'in graph, vertex type {vt} multiplier worker = {vt_list[0].mult_worker}', flush=True)
+                        print(
+                            f'in graph, vertex type {vt} multiplier worker = {vt_list[0].mult_worker}', flush=True)
                         if self.site_structures.site_mult_worker[vt] != utils.NotSpecF:
-                            print(f'   ...overriding graph value with command-line arg value of worker multiplier')
+                            print(
+                                f'   ...overriding graph value with command-line arg value of worker multiplier')
                 else:
                     if verbose:
                         print(f'no vertices found in graph of type {vt}')
@@ -296,9 +310,11 @@ class ProcessArgs:
                 vt_list = graph.get_vertices_type(vt)
                 if len(vt_list) > 0:
                     if verbose:
-                        print(f'in graph, vertex type {vt} exp time = {vt_list[0].expiration_time}', flush=True)
+                        print(
+                            f'in graph, vertex type {vt} exp time = {vt_list[0].expiration_time}', flush=True)
                         if self.site_structures.site_expiration_times[vt] != utils.NotSpecI:
-                            print(f'   ...overriding graph value with command-line arg value of expiration times')
+                            print(
+                                f'   ...overriding graph value with command-line arg value of expiration times')
                 else:
                     if verbose:
                         print(f'no vertices found in graph of type {vt}')
@@ -307,7 +323,8 @@ class ProcessArgs:
 
             # set up structures for parameters -
             # if args are unspecified, use Site_Structures defaults
-            self.site_structures = Site_Structures(self.args, use_arg_defaults=False)
+            self.site_structures = Site_Structures(
+                self.args, use_arg_defaults=False)
 
             if self.args.num_verts < self.args.num_site1 + self.args.num_site2 + self.args.num_site3 + 1:
                 msg = f'Not enough vertices on graph: ' + \
@@ -322,11 +339,13 @@ class ProcessArgs:
                 else:
                     graph_type = Graph_Type.GRID
 
-                graph = Graph(self.args.num_verts, self.args.max_x, self.args.max_y, self.site_structures, graph_type)
+                graph = Graph(self.args.num_verts, self.args.max_x,
+                              self.args.max_y, graph_type)
 
                 graph.make_graph_connected()
 
-                graph.set_random_sites_origin(self.args.num_site1, self.args.num_site2, self.args.num_site3)
+                graph.set_random_sites_origin(
+                    self.args.num_site1, self.args.num_site2, self.args.num_site3)
 
         # above,
         #   graph loaded -> SiteStructure variables were set to values in graph IF arg was unspecified
@@ -338,21 +357,21 @@ class ProcessArgs:
         #
         # check for argument overrides in parser.add_argument above
         # if the argument has a default value, it was not specified - so don't override
-        # for v in graph.vertices:
-        #     vt = v.vertex_type
-        #     if vt in v.accessible_types():
-        #         if self.site_structures.site_acquire_times[vt] != utils.NotSpecI:
-        #             v.time_to_acquire = self.site_structures.site_acquire_times[vt]
-        #         if self.site_structures.site_rewards[vt] != utils.NotSpecF:
-        #             v.reward = self.site_structures.site_rewards[vt]
-        #         if self.site_structures.site_mult_time[vt] != utils.NotSpecF:
-        #             v.mult_time = self.site_structures.site_mult_time[vt]
-        #         if self.site_structures.site_mult_time_active[vt] != utils.NotSpecI:
-        #             v.mult_time_active = self.site_structures.site_mult_time_active[vt]
-        #         if self.site_structures.site_mult_worker[vt] != utils.NotSpecF:
-        #             v.mult_worker = self.site_structures.site_mult_worker[vt]
-        #         if self.site_structures.site_expiration_times[vt] != utils.NotSpecI:
-        #             v.expiration_time = self.site_structures.site_expiration_times[vt]
+        for v in graph.vertices:
+            vt = v.vertex_type
+            if vt in v.accessible_types():
+                if self.site_structures.site_acquire_times[vt] != utils.NotSpecI:
+                    v.time_to_acquire = self.site_structures.site_acquire_times[vt]
+                if self.site_structures.site_rewards[vt] != utils.NotSpecF:
+                    v.reward = self.site_structures.site_rewards[vt]
+                if self.site_structures.site_mult_time[vt] != utils.NotSpecF:
+                    v.mult_time = self.site_structures.site_mult_time[vt]
+                if self.site_structures.site_mult_time_active[vt] != utils.NotSpecI:
+                    v.mult_time_active = self.site_structures.site_mult_time_active[vt]
+                if self.site_structures.site_mult_worker[vt] != utils.NotSpecF:
+                    v.mult_worker = self.site_structures.site_mult_worker[vt]
+                if self.site_structures.site_expiration_times[vt] != utils.NotSpecI:
+                    v.expiration_time = self.site_structures.site_expiration_times[vt]
 
         # copy possible overridden values to args
         args_temp = deepcopy(self.args)
@@ -370,13 +389,11 @@ class ProcessArgs:
 
     def values_to_args(self) -> List:
         """
-        Get the arg values needed for input into Process_Args()
-            Arguments:
-                    args - from argparse.ArgumentParser copy class variables to these args
-                    
-            Return:
-                    arg_list - command-line-style argument list that can be
-                            used as input to Process_Args()
+        Arguments:
+                args - from argparse.ArgumentParser copy class variables to these args
+        Return:
+                arg_list - command-line-style argument list that can be
+                        used as input to Process_Args()
         """
 
         arg_list = []
@@ -402,7 +419,7 @@ class ProcessArgs:
 
     @classmethod
     def load(cls, arguments_file: str = None, graph_file: str = None):
-        """
+       """
         Method to load arguments
             Arguments:
                 filename: str, path to file with arguments
@@ -412,18 +429,30 @@ class ProcessArgs:
             Return:
                 list, list of arguments
         """
+
         def json_to_list(x):
             lst_tup = [('--' + k, str(v)) for k, v in args_dict.items()]
             return list(itertools.chain(*lst_tup))
 
-        with open(arguments_file) as f:
-            args_dict = json.load(f)
+        args_dict = {}
+        args_list = None
 
-        if graph_file is not None and os.path.isfile(graph_file):
-            args_dict['filename_graph'] = graph_file
+        if arguments_file is not None:
+            if os.path.isfile(arguments_file):
+                with open(arguments_file) as f:
+                    args_dict = json.load(f)
+            else:
+                msg = f'Arguments file {arguments_file} was not found.'
+                raise Exception(msg)
+
+        if graph_file is not None:
+            if os.path.isfile(graph_file):
+                args_dict['filename_graph'] = graph_file
+            else:
+                msg = f'Graph file {graph_file} was not found.'
+                raise Exception(msg)
 
         args_list = json_to_list(args_dict)
-
         return cls(args_list)
 
 
@@ -451,28 +480,32 @@ class Site_Structures:
         self.site_acquire_times = {
             Vertex_Type.SITE1: utils.checki(args.site1_acquire_time, default=1, use_arg_default=ad),
             Vertex_Type.SITE2: utils.checki(args.site2_acquire_time, default=2, use_arg_default=ad),
-            Vertex_Type.SITE3: utils.checki(args.site3_acquire_time, default=3, use_arg_default=ad)
+            Vertex_Type.SITE3: utils.checki(
+                args.site3_acquire_time, default=3, use_arg_default=ad)
         }
 
         self.site_rewards = {
             Vertex_Type.SITE1: utils.checkf(args.site1_reward, default=1000, use_arg_default=ad),
             Vertex_Type.SITE2: utils.checkf(args.site2_reward, default=2000, use_arg_default=ad),
-            Vertex_Type.SITE3: utils.checkf(args.site3_reward, default=3000, use_arg_default=ad)
+            Vertex_Type.SITE3: utils.checkf(
+                args.site3_reward, default=3000, use_arg_default=ad)
         }
 
         self.site_mult_time = {
             Vertex_Type.SITE1: utils.checkf(args.site1_mult_time, default=1, use_arg_default=ad),
             Vertex_Type.SITE2: utils.checkf(args.site2_mult_time, default=1, use_arg_default=ad),
-            Vertex_Type.SITE3: utils.checkf(args.site3_mult_time, default=1, use_arg_default=ad)
+            Vertex_Type.SITE3: utils.checkf(
+                args.site3_mult_time, default=1, use_arg_default=ad)
         }
 
         # default is entire duration
         self.site_mult_time_active = {
             Vertex_Type.SITE1: utils.checkp2(args.site1_mult_time_active, default=(0, args.duration),
-                                            use_arg_default=ad),
+                                             use_arg_default=ad),
             Vertex_Type.SITE2: utils.checkp2(args.site2_mult_time_active, default=(0, args.duration),
-                                            use_arg_default=ad),
-            Vertex_Type.SITE3: utils.checkp2(args.site3_mult_time_active, default=(0, args.duration), use_arg_default=ad)
+                                             use_arg_default=ad),
+            Vertex_Type.SITE3: utils.checkp2(
+                args.site3_mult_time_active, default=(0, args.duration), use_arg_default=ad)
         }
 
         # values are dict with key,val = worker_type for which multiplier applies, multiplier
@@ -480,14 +513,16 @@ class Site_Structures:
         self.site_mult_worker = {
             Vertex_Type.SITE1: utils.checkd3([wt1, wt2, wt3], args.site1_mult_workers, [1, 1, 1], use_arg_default=ad),
             Vertex_Type.SITE2: utils.checkd3([wt1, wt2, wt3], args.site2_mult_workers, [1, 1, 1], use_arg_default=ad),
-            Vertex_Type.SITE3: utils.checkd3([wt1, wt2, wt3], args.site3_mult_workers, [1, 1, 1], use_arg_default=ad)
+            Vertex_Type.SITE3: utils.checkd3([wt1, wt2, wt3], args.site3_mult_workers, [
+                                             1, 1, 1], use_arg_default=ad)
         }
 
         # check for value = -1 below - set to last time in this case
         self.site_expiration_times = {
             Vertex_Type.SITE1: utils.checki(args.site1_exp_time, default=args.duration, use_arg_default=ad),
             Vertex_Type.SITE2: utils.checki(args.site2_exp_time, default=args.duration, use_arg_default=ad),
-            Vertex_Type.SITE3: utils.checki(args.site3_exp_time, default=args.duration, use_arg_default=ad)
+            Vertex_Type.SITE3: utils.checki(
+                args.site3_exp_time, default=args.duration, use_arg_default=ad)
         }
 
     # noinspection DuplicatedCode
@@ -529,7 +564,8 @@ class Site_Structures:
             args.site2_exp_time = self.site_expiration_times[Vertex_Type.SITE2]
             args.site3_exp_time = self.site_expiration_times[Vertex_Type.SITE3]
         except:
-            raise RuntimeError('Input args missing fields in Site_Structures.values_to_args() call.')
+            raise RuntimeError(
+                'Input args missing fields in Site_Structures.values_to_args() call.')
 
         keys_site = [  # site economics properties
             'site1_acquire_time', 'site2_acquire_time', 'site3_acquire_time',
@@ -549,7 +585,7 @@ class Site_Structures:
                 v = list(att)
                 sv = str(v)[1:-1]  # get rid of brackets on tuple or list
             else:
-                sv = att
+                sv = str(att)
 
             setattr(args, k, sv)  # convert site structure form to arg form
             arg_list += ['--' + k, sv]
